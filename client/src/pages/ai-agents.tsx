@@ -14,6 +14,25 @@ import { z } from "zod";
 import { insertAiAgentSchema, type AiAgent } from "@shared/schema";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import {
+  useSortable,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import { 
   Bot, 
   Plus, 
@@ -27,17 +46,87 @@ import {
   Trash2,
   Edit,
   Play,
-  Pause
+  Pause,
+  GripVertical,
+  ArrowRight
 } from "lucide-react";
 
 const formSchema = insertAiAgentSchema;
 type FormData = z.infer<typeof formSchema>;
+
+// Sortable flow item component
+function SortableFlowItem({ agent }: { agent: AiAgent }) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+  } = useSortable({ id: agent.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  };
+
+  const AgentIcon = getAgentIcon(agent.type);
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      {...attributes}
+      className="flex items-center p-3 bg-surface border border-gray-600 rounded-lg"
+    >
+      <div
+        {...listeners}
+        className="cursor-grab active:cursor-grabbing p-1 mr-3 text-gray-400 hover:text-gray-200"
+      >
+        <GripVertical className="h-4 w-4" />
+      </div>
+      
+      <div className="flex items-center flex-1">
+        <div className="bg-primary/10 p-2 rounded-lg mr-3">
+          <AgentIcon className="h-4 w-4 text-primary" />
+        </div>
+        <div className="flex-1">
+          <h4 className="text-gray-100 font-medium">{agent.name}</h4>
+          <p className="text-sm text-gray-400 capitalize">{agent.type} Agent</p>
+        </div>
+        <div className="text-sm text-gray-500">
+          Order: {agent.flowOrder || 0}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function getAgentIcon(type: string) {
+  switch (type) {
+    case 'openai':
+      return Bot;
+    case 'anthropic':
+      return Bot;
+    case 'local':
+      return Brain;
+    case 'burp':
+      return Shield;
+    default:
+      return Bot;
+  }
+}
 
 export default function AiAgents() {
   const [showForm, setShowForm] = useState(false);
   const [editingAgent, setEditingAgent] = useState<AiAgent | null>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
 
   const { data: agents, isLoading } = useQuery({
     queryKey: ["/api/ai-agents"],
@@ -50,6 +139,8 @@ export default function AiAgents() {
       type: "openai",
       endpoint: "",
       apiKey: "",
+      modelPrompt: "",
+      flowOrder: 0,
       status: "offline",
       config: {}
     }
@@ -156,6 +247,8 @@ export default function AiAgents() {
       type: agent.type,
       endpoint: agent.endpoint || "",
       apiKey: agent.apiKey || "",
+      modelPrompt: agent.modelPrompt || "",
+      flowOrder: agent.flowOrder || 0,
       status: agent.status,
       config: agent.config
     });
@@ -168,20 +261,36 @@ export default function AiAgents() {
     }
   };
 
-  const getAgentIcon = (type: string) => {
-    switch (type) {
-      case 'openai':
-        return Bot;
-      case 'anthropic':
-        return Bot;
-      case 'local':
-        return Brain;
-      case 'burp':
-        return Shield;
-      default:
-        return Bot;
+  const updateFlowOrder = useMutation({
+    mutationFn: async ({ agentId, newOrder }: { agentId: number; newOrder: number }) => {
+      const response = await apiRequest("PUT", `/api/ai-agents/${agentId}`, { flowOrder: newOrder });
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/ai-agents"] });
+    },
+  });
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (over && active.id !== over.id && agents) {
+      const sortedAgents = [...agents].sort((a, b) => (a.flowOrder || 0) - (b.flowOrder || 0));
+      const oldIndex = sortedAgents.findIndex((agent) => agent.id === active.id);
+      const newIndex = sortedAgents.findIndex((agent) => agent.id === over.id);
+
+      const newAgents = arrayMove(sortedAgents, oldIndex, newIndex);
+      
+      // Update flow order for all agents
+      newAgents.forEach((agent, index) => {
+        if (agent.flowOrder !== index) {
+          updateFlowOrder.mutate({ agentId: agent.id, newOrder: index });
+        }
+      });
     }
   };
+
+
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -322,6 +431,44 @@ export default function AiAgents() {
                             type="password"
                             placeholder="Enter API key (if required)"
                             className="bg-card border-gray-600 text-gray-100"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="modelPrompt"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-gray-300">Model Prompt</FormLabel>
+                        <FormControl>
+                          <Textarea
+                            {...field}
+                            placeholder="Enter custom prompt to characterize this agent's behavior..."
+                            className="bg-card border-gray-600 text-gray-100 min-h-[100px]"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="flowOrder"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-gray-300">Flow Order</FormLabel>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            type="number"
+                            placeholder="Agent execution order (0-100)"
+                            className="bg-card border-gray-600 text-gray-100"
+                            onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
                           />
                         </FormControl>
                         <FormMessage />
@@ -518,12 +665,25 @@ export default function AiAgents() {
                         </Button>
                       </div>
 
+                      {/* Model Prompt */}
+                      {agent.modelPrompt && (
+                        <div className="mt-4 p-3 bg-card rounded-lg">
+                          <h4 className="text-sm font-medium text-gray-100 mb-2">Custom Prompt</h4>
+                          <div className="text-xs text-gray-400 italic">
+                            "{agent.modelPrompt}"
+                          </div>
+                        </div>
+                      )}
+
                       {/* Agent-specific capabilities */}
                       <div className="mt-4 p-3 bg-card rounded-lg">
                         <h4 className="text-sm font-medium text-gray-100 mb-2">Capabilities</h4>
                         <div className="text-xs text-gray-400">
                           {agent.type === 'openai' && 
                             'Report generation, vulnerability analysis, CVSS scoring, remediation suggestions'
+                          }
+                          {agent.type === 'anthropic' && 
+                            'Advanced reasoning, vulnerability analysis, comprehensive reporting, ethical assessment'
                           }
                           {agent.type === 'local' && 
                             'Code analysis, vulnerability detection, pattern matching, offline processing'
@@ -538,6 +698,63 @@ export default function AiAgents() {
                 </Card>
               );
             })}
+          </div>
+        )}
+
+        {/* Flow Order Section */}
+        {agents && agents.length > 0 && (
+          <div className="mt-8">
+            <Card className="bg-surface border-gray-700">
+              <CardHeader>
+                <CardTitle className="text-gray-100 flex items-center">
+                  <ArrowRight className="h-5 w-5 mr-2 text-primary" />
+                  Agent Flow Order
+                </CardTitle>
+                <p className="text-gray-400 text-sm">
+                  Drag and drop to organize the order that AI agents will communicate with each other
+                </p>
+              </CardHeader>
+              <CardContent>
+                <DndContext
+                  sensors={sensors}
+                  collisionDetection={closestCenter}
+                  onDragEnd={handleDragEnd}
+                >
+                  <SortableContext
+                    items={[...agents].sort((a, b) => (a.flowOrder || 0) - (b.flowOrder || 0)).map(agent => agent.id)}
+                    strategy={verticalListSortingStrategy}
+                  >
+                    <div className="space-y-3">
+                      {[...agents]
+                        .sort((a, b) => (a.flowOrder || 0) - (b.flowOrder || 0))
+                        .map((agent, index) => (
+                          <div key={agent.id} className="flex items-center space-x-3">
+                            <div className="flex items-center justify-center w-8 h-8 bg-primary/10 rounded-full text-primary text-sm font-medium">
+                              {index + 1}
+                            </div>
+                            <SortableFlowItem agent={agent} />
+                            {index < agents.length - 1 && (
+                              <ArrowRight className="h-4 w-4 text-gray-500" />
+                            )}
+                          </div>
+                        ))}
+                    </div>
+                  </SortableContext>
+                </DndContext>
+                
+                {agents.length > 1 && (
+                  <div className="mt-6 p-4 bg-card/50 rounded-lg border border-gray-600">
+                    <h4 className="text-sm font-medium text-gray-100 mb-2">How Agent Flow Works</h4>
+                    <ul className="text-xs text-gray-400 space-y-1">
+                      <li>• Agents execute in the order shown above (top to bottom)</li>
+                      <li>• Each agent can process and enhance the previous agent's output</li>
+                      <li>• Drag agents up or down to change their execution order</li>
+                      <li>• The final output combines insights from all agents in sequence</li>
+                    </ul>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
           </div>
         )}
       </main>

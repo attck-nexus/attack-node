@@ -60,6 +60,8 @@ export const aiAgents = pgTable("ai_agents", {
   type: text("type").notNull(), // openai, anthropic, local, burp
   endpoint: text("endpoint"),
   apiKey: text("api_key"),
+  modelPrompt: text("model_prompt"),
+  flowOrder: integer("flow_order").default(0),
   status: text("status").notNull().default("offline"), // online, offline, error
   lastPing: timestamp("last_ping"),
   config: json("config").$type<Record<string, any>>().default({}),
