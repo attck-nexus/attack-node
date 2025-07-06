@@ -153,6 +153,40 @@ Preferred communication style: Simple, everyday language.
 - Resource monitoring and cleanup
 - Port management for web interfaces
 
+## Agent Loop System Architecture
+
+### Iterative Refinement Mechanism
+The platform implements sophisticated agent loops for iterative payload and POC refinement:
+
+1. **Loop Configuration**
+   - Enable/disable loop functionality per agent
+   - Partner agent selection for collaborative refinement
+   - Maximum iteration limits (default: 5)
+   - Configurable exit conditions (functional POC, vulnerability confirmed, exploit successful)
+
+2. **Loop Execution Engine**
+   - Alternating execution between paired agents
+   - Context preservation across iterations
+   - Exit condition evaluation after each iteration
+   - Real-time progress monitoring and status updates
+
+3. **Agent Communication**
+   - Output from one agent becomes input for the next
+   - Custom prompts enhance agent specialization
+   - Multi-agent workflow orchestration via flow order
+   - Seamless integration with OpenAI, Anthropic, and local agents
+
+4. **Loop Management Interface**
+   - Visual loop configuration in agent forms
+   - Real-time monitoring of active loops
+   - Manual loop termination controls
+   - Iteration history and result tracking
+
+### Exit Conditions
+- **Functional POC**: Loop completes when a working proof of concept is generated
+- **Vulnerability Confirmed**: Stops when vulnerability is verified and documented
+- **Exploit Successful**: Terminates upon successful exploit development
+
 ## Changelog
 
 Changelog:
@@ -162,3 +196,4 @@ Changelog:
 - July 06, 2025. Implemented file upload system for custom tool installations
 - July 06, 2025. Added Anthropic Claude integration to AI Agents alongside OpenAI
 - July 06, 2025. Removed OWASP ZAP, Wireshark, and Metasploit from integrations per user request
+- July 06, 2025. Implemented agent loop mechanism with iterative payload refinement system

@@ -5,6 +5,7 @@ import { insertProgramSchema, insertTargetSchema, insertVulnerabilitySchema, ins
 import { generateVulnerabilityReport } from "./services/openai";
 import { testConnection as testAnthropicConnection } from "./services/anthropic";
 import { dockerService } from "./services/docker";
+import { agentLoopService } from "./services/agent-loop";
 import multer from "multer";
 import path from "path";
 import { z } from "zod";
@@ -458,6 +459,61 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Failed to stop all containers:", error);
       res.status(500).json({ error: "Failed to stop all containers" });
+    }
+  });
+
+  // Agent Loop routes
+  app.post("/api/agent-loops/start", async (req, res) => {
+    try {
+      const { agentId, vulnerabilityId, initialInput } = req.body;
+      
+      if (!agentId || !vulnerabilityId || !initialInput) {
+        return res.status(400).json({ error: "Missing required fields" });
+      }
+
+      const loopExecution = await agentLoopService.startLoop(
+        parseInt(agentId), 
+        parseInt(vulnerabilityId), 
+        initialInput
+      );
+      
+      res.json(loopExecution);
+    } catch (error) {
+      console.error("Failed to start agent loop:", error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.get("/api/agent-loops", async (req, res) => {
+    try {
+      const activeLoops = agentLoopService.getActiveLoops();
+      res.json(activeLoops);
+    } catch (error) {
+      console.error("Failed to get active loops:", error);
+      res.status(500).json({ error: "Failed to get active loops" });
+    }
+  });
+
+  app.get("/api/agent-loops/:loopId", async (req, res) => {
+    try {
+      const loop = agentLoopService.getLoop(req.params.loopId);
+      if (!loop) {
+        return res.status(404).json({ error: "Loop not found" });
+      }
+      res.json(loop);
+    } catch (error) {
+      console.error("Failed to get loop:", error);
+      res.status(500).json({ error: "Failed to get loop" });
+    }
+  });
+
+  app.post("/api/agent-loops/:loopId/stop", async (req, res) => {
+    try {
+      const success = agentLoopService.stopLoop(req.params.loopId);
+      res.json({ success });
+    } catch (error) {
+      console.error("Failed to stop loop:", error);
+      res.status(500).json({ error: "Failed to stop loop" });
     }
   });
 

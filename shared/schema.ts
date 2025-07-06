@@ -65,6 +65,11 @@ export const aiAgents = pgTable("ai_agents", {
   status: text("status").notNull().default("offline"), // online, offline, error
   lastPing: timestamp("last_ping"),
   config: json("config").$type<Record<string, any>>().default({}),
+  // Loop configuration
+  loopEnabled: boolean("loop_enabled").default(false),
+  loopPartnerId: integer("loop_partner_id"),
+  maxLoopIterations: integer("max_loop_iterations").default(5),
+  loopExitCondition: text("loop_exit_condition"), // 'functional_poc', 'vulnerability_confirmed', 'exploit_successful'
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
@@ -107,6 +112,13 @@ export const reportsRelations = relations(reports, ({ one }) => ({
   vulnerability: one(vulnerabilities, {
     fields: [reports.vulnerabilityId],
     references: [vulnerabilities.id],
+  }),
+}));
+
+export const aiAgentsRelations = relations(aiAgents, ({ one }) => ({
+  loopPartner: one(aiAgents, {
+    fields: [aiAgents.loopPartnerId],
+    references: [aiAgents.id],
   }),
 }));
 
