@@ -3,6 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertProgramSchema, insertTargetSchema, insertVulnerabilitySchema, insertAiAgentSchema, insertReportSchema } from "@shared/schema";
 import { generateVulnerabilityReport } from "./services/openai";
+import { testConnection as testAnthropicConnection } from "./services/anthropic";
 import { dockerService } from "./services/docker";
 import multer from "multer";
 import path from "path";
@@ -254,6 +255,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
           await generateVulnerabilityReport("Test connection", "P4", "Testing OpenAI connection");
           latency = Date.now() - start;
           status = "online";
+        } catch (error) {
+          status = "error";
+        }
+      } else if (agent.type === "anthropic") {
+        try {
+          const result = await testAnthropicConnection(agent.apiKey ?? undefined);
+          status = result.status;
+          latency = result.latency;
         } catch (error) {
           status = "error";
         }

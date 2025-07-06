@@ -57,7 +57,7 @@ export const vulnerabilities = pgTable("vulnerabilities", {
 export const aiAgents = pgTable("ai_agents", {
   id: serial("id").primaryKey(),
   name: text("name").notNull(),
-  type: text("type").notNull(), // openai, local, burp
+  type: text("type").notNull(), // openai, anthropic, local, burp
   endpoint: text("endpoint"),
   apiKey: text("api_key"),
   status: text("status").notNull().default("offline"), // online, offline, error

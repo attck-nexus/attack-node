@@ -93,6 +93,7 @@ RESTful API endpoints organized by resource:
 
 ### AI and Security Tools
 - **openai**: GPT-4 integration for report generation
+- **@anthropic-ai/sdk**: Claude integration for enhanced AI capabilities
 - **multer**: File upload handling
 - **express-session**: Session management
 
@@ -159,3 +160,5 @@ Changelog:
 - July 06, 2025. Added Docker integration with Burp Suite Professional support
 - July 06, 2025. Created comprehensive integrations page with KasmWeb applications
 - July 06, 2025. Implemented file upload system for custom tool installations
+- July 06, 2025. Added Anthropic Claude integration to AI Agents alongside OpenAI
+- July 06, 2025. Removed OWASP ZAP, Wireshark, and Metasploit from integrations per user request

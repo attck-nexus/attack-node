@@ -172,6 +172,8 @@ export default function AiAgents() {
     switch (type) {
       case 'openai':
         return Bot;
+      case 'anthropic':
+        return Bot;
       case 'local':
         return Brain;
       case 'burp':
@@ -279,6 +281,7 @@ export default function AiAgents() {
                             </FormControl>
                             <SelectContent>
                               <SelectItem value="openai">OpenAI GPT</SelectItem>
+                              <SelectItem value="anthropic">Anthropic Claude</SelectItem>
                               <SelectItem value="local">Local AI (Ollama)</SelectItem>
                               <SelectItem value="burp">Burp Suite</SelectItem>
                             </SelectContent>
