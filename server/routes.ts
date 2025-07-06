@@ -1,0 +1,357 @@
+import type { Express } from "express";
+import { createServer, type Server } from "http";
+import { storage } from "./storage";
+import { insertProgramSchema, insertTargetSchema, insertVulnerabilitySchema, insertAiAgentSchema, insertReportSchema } from "@shared/schema";
+import { generateVulnerabilityReport } from "./services/openai";
+import multer from "multer";
+import path from "path";
+import { z } from "zod";
+
+const upload = multer({ 
+  dest: "uploads/",
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit
+});
+
+export async function registerRoutes(app: Express): Promise<Server> {
+  // Programs routes
+  app.get("/api/programs", async (req, res) => {
+    try {
+      const programs = await storage.getPrograms();
+      res.json(programs);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch programs" });
+    }
+  });
+
+  app.get("/api/programs/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const program = await storage.getProgram(id);
+      if (!program) {
+        return res.status(404).json({ message: "Program not found" });
+      }
+      res.json(program);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch program" });
+    }
+  });
+
+  app.post("/api/programs", async (req, res) => {
+    try {
+      const programData = insertProgramSchema.parse(req.body);
+      const program = await storage.createProgram(programData);
+      res.status(201).json(program);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid program data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to create program" });
+    }
+  });
+
+  app.put("/api/programs/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const programData = insertProgramSchema.partial().parse(req.body);
+      const program = await storage.updateProgram(id, programData);
+      res.json(program);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid program data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to update program" });
+    }
+  });
+
+  app.delete("/api/programs/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      await storage.deleteProgram(id);
+      res.status(204).send();
+    } catch (error) {
+      res.status(500).json({ message: "Failed to delete program" });
+    }
+  });
+
+  // Targets routes
+  app.get("/api/targets", async (req, res) => {
+    try {
+      const programId = req.query.programId ? parseInt(req.query.programId as string) : undefined;
+      const targets = await storage.getTargets(programId);
+      res.json(targets);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch targets" });
+    }
+  });
+
+  app.post("/api/targets", async (req, res) => {
+    try {
+      const targetData = insertTargetSchema.parse(req.body);
+      const target = await storage.createTarget(targetData);
+      res.status(201).json(target);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid target data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to create target" });
+    }
+  });
+
+  app.put("/api/targets/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const targetData = insertTargetSchema.partial().parse(req.body);
+      const target = await storage.updateTarget(id, targetData);
+      res.json(target);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid target data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to update target" });
+    }
+  });
+
+  app.delete("/api/targets/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      await storage.deleteTarget(id);
+      res.status(204).send();
+    } catch (error) {
+      res.status(500).json({ message: "Failed to delete target" });
+    }
+  });
+
+  // Vulnerabilities routes
+  app.get("/api/vulnerabilities", async (req, res) => {
+    try {
+      const programId = req.query.programId ? parseInt(req.query.programId as string) : undefined;
+      const vulnerabilities = await storage.getVulnerabilities(programId);
+      res.json(vulnerabilities);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch vulnerabilities" });
+    }
+  });
+
+  app.get("/api/vulnerabilities/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const vulnerability = await storage.getVulnerability(id);
+      if (!vulnerability) {
+        return res.status(404).json({ message: "Vulnerability not found" });
+      }
+      res.json(vulnerability);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch vulnerability" });
+    }
+  });
+
+  app.post("/api/vulnerabilities", upload.array("attachments"), async (req, res) => {
+    try {
+      const vulnerabilityData = insertVulnerabilitySchema.parse(req.body);
+      
+      // Handle file uploads
+      const attachments = (req.files as Express.Multer.File[])?.map(file => file.filename) || [];
+      vulnerabilityData.attachments = attachments;
+      
+      const vulnerability = await storage.createVulnerability(vulnerabilityData);
+      res.status(201).json(vulnerability);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid vulnerability data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to create vulnerability" });
+    }
+  });
+
+  app.put("/api/vulnerabilities/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const vulnerabilityData = insertVulnerabilitySchema.partial().parse(req.body);
+      const vulnerability = await storage.updateVulnerability(id, vulnerabilityData);
+      res.json(vulnerability);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid vulnerability data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to update vulnerability" });
+    }
+  });
+
+  app.delete("/api/vulnerabilities/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      await storage.deleteVulnerability(id);
+      res.status(204).send();
+    } catch (error) {
+      res.status(500).json({ message: "Failed to delete vulnerability" });
+    }
+  });
+
+  // AI Agent routes
+  app.get("/api/ai-agents", async (req, res) => {
+    try {
+      const agents = await storage.getAiAgents();
+      res.json(agents);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch AI agents" });
+    }
+  });
+
+  app.post("/api/ai-agents", async (req, res) => {
+    try {
+      const agentData = insertAiAgentSchema.parse(req.body);
+      const agent = await storage.createAiAgent(agentData);
+      res.status(201).json(agent);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid AI agent data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to create AI agent" });
+    }
+  });
+
+  app.put("/api/ai-agents/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const agentData = insertAiAgentSchema.partial().parse(req.body);
+      const agent = await storage.updateAiAgent(id, agentData);
+      res.json(agent);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid AI agent data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to update AI agent" });
+    }
+  });
+
+  app.delete("/api/ai-agents/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      await storage.deleteAiAgent(id);
+      res.status(204).send();
+    } catch (error) {
+      res.status(500).json({ message: "Failed to delete AI agent" });
+    }
+  });
+
+  // Test AI agent connection
+  app.post("/api/ai-agents/:id/test", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const agent = await storage.getAiAgent(id);
+      if (!agent) {
+        return res.status(404).json({ message: "AI agent not found" });
+      }
+
+      // Test the connection based on agent type
+      let status = "offline";
+      let latency = 0;
+      
+      if (agent.type === "openai") {
+        try {
+          const start = Date.now();
+          await generateVulnerabilityReport("Test connection", "P4", "Testing OpenAI connection");
+          latency = Date.now() - start;
+          status = "online";
+        } catch (error) {
+          status = "error";
+        }
+      } else if (agent.type === "local") {
+        // Test local AI connection
+        try {
+          const start = Date.now();
+          const response = await fetch(agent.endpoint + "/health");
+          latency = Date.now() - start;
+          status = response.ok ? "online" : "error";
+        } catch (error) {
+          status = "error";
+        }
+      } else if (agent.type === "burp") {
+        // Test Burp Suite connection
+        try {
+          const start = Date.now();
+          const response = await fetch(agent.endpoint + "/burp/scanner/status");
+          latency = Date.now() - start;
+          status = response.ok ? "online" : "error";
+        } catch (error) {
+          status = "error";
+        }
+      }
+
+      // Update agent status
+      await storage.updateAiAgent(id, { status, lastPing: new Date() });
+      
+      res.json({ status, latency });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to test AI agent connection" });
+    }
+  });
+
+  // Reports routes
+  app.get("/api/reports", async (req, res) => {
+    try {
+      const vulnerabilityId = req.query.vulnerabilityId ? parseInt(req.query.vulnerabilityId as string) : undefined;
+      const reports = await storage.getReports(vulnerabilityId);
+      res.json(reports);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch reports" });
+    }
+  });
+
+  app.post("/api/reports", async (req, res) => {
+    try {
+      const reportData = insertReportSchema.parse(req.body);
+      const report = await storage.createReport(reportData);
+      res.status(201).json(report);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid report data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to create report" });
+    }
+  });
+
+  // Generate AI report
+  app.post("/api/reports/generate", async (req, res) => {
+    try {
+      const { vulnerabilityId, title, severity, description } = req.body;
+      
+      if (!vulnerabilityId || !title || !severity || !description) {
+        return res.status(400).json({ message: "Missing required fields" });
+      }
+
+      const reportContent = await generateVulnerabilityReport(title, severity, description);
+      
+      const report = await storage.createReport({
+        vulnerabilityId,
+        content: reportContent,
+        format: "markdown",
+        aiGenerated: true,
+      });
+
+      res.json(report);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to generate AI report" });
+    }
+  });
+
+  // Dashboard analytics
+  app.get("/api/dashboard/stats", async (req, res) => {
+    try {
+      const stats = await storage.getDashboardStats();
+      res.json(stats);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch dashboard stats" });
+    }
+  });
+
+  // Serve uploaded files
+  app.get("/api/uploads/:filename", (req, res) => {
+    const filename = req.params.filename;
+    const filePath = path.join(process.cwd(), "uploads", filename);
+    res.sendFile(filePath);
+  });
+
+  const httpServer = createServer(app);
+  return httpServer;
+}

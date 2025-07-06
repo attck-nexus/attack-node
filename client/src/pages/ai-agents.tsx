@@ -1,0 +1,543 @@
+import { useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { insertAiAgentSchema, type AiAgent } from "@shared/schema";
+import { apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
+import { 
+  Bot, 
+  Plus, 
+  Settings, 
+  Zap, 
+  Shield, 
+  Brain, 
+  Wifi, 
+  WifiOff, 
+  AlertTriangle,
+  Trash2,
+  Edit,
+  Play,
+  Pause
+} from "lucide-react";
+
+const formSchema = insertAiAgentSchema;
+type FormData = z.infer<typeof formSchema>;
+
+export default function AiAgents() {
+  const [showForm, setShowForm] = useState(false);
+  const [editingAgent, setEditingAgent] = useState<AiAgent | null>(null);
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+
+  const { data: agents, isLoading } = useQuery({
+    queryKey: ["/api/ai-agents"],
+  });
+
+  const form = useForm<FormData>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      name: "",
+      type: "openai",
+      endpoint: "",
+      apiKey: "",
+      status: "offline",
+      config: {}
+    }
+  });
+
+  const createAgent = useMutation({
+    mutationFn: async (data: FormData) => {
+      const response = await apiRequest("POST", "/api/ai-agents", data);
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/ai-agents"] });
+      toast({
+        title: "Success",
+        description: "AI agent created successfully",
+      });
+      form.reset();
+      setShowForm(false);
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to create AI agent",
+        variant: "destructive",
+      });
+    }
+  });
+
+  const updateAgent = useMutation({
+    mutationFn: async ({ id, data }: { id: number; data: Partial<FormData> }) => {
+      const response = await apiRequest("PUT", `/api/ai-agents/${id}`, data);
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/ai-agents"] });
+      toast({
+        title: "Success",
+        description: "AI agent updated successfully",
+      });
+      setEditingAgent(null);
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to update AI agent",
+        variant: "destructive",
+      });
+    }
+  });
+
+  const deleteAgent = useMutation({
+    mutationFn: async (id: number) => {
+      await apiRequest("DELETE", `/api/ai-agents/${id}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/ai-agents"] });
+      toast({
+        title: "Success",
+        description: "AI agent deleted successfully",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to delete AI agent",
+        variant: "destructive",
+      });
+    }
+  });
+
+  const testConnection = useMutation({
+    mutationFn: async (id: number) => {
+      const response = await apiRequest("POST", `/api/ai-agents/${id}/test`);
+      return response.json();
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/ai-agents"] });
+      toast({
+        title: "Connection Test",
+        description: `Status: ${data.status}, Latency: ${data.latency}ms`,
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to test connection",
+        variant: "destructive",
+      });
+    }
+  });
+
+  const onSubmit = (data: FormData) => {
+    if (editingAgent) {
+      updateAgent.mutate({ id: editingAgent.id, data });
+    } else {
+      createAgent.mutate(data);
+    }
+  };
+
+  const handleEdit = (agent: AiAgent) => {
+    setEditingAgent(agent);
+    form.reset({
+      name: agent.name,
+      type: agent.type,
+      endpoint: agent.endpoint || "",
+      apiKey: agent.apiKey || "",
+      status: agent.status,
+      config: agent.config
+    });
+    setShowForm(true);
+  };
+
+  const handleDelete = (id: number) => {
+    if (confirm("Are you sure you want to delete this AI agent?")) {
+      deleteAgent.mutate(id);
+    }
+  };
+
+  const getAgentIcon = (type: string) => {
+    switch (type) {
+      case 'openai':
+        return Bot;
+      case 'local':
+        return Brain;
+      case 'burp':
+        return Shield;
+      default:
+        return Bot;
+    }
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'online':
+        return 'bg-success/10 text-success';
+      case 'offline':
+        return 'bg-error/10 text-error';
+      case 'error':
+        return 'bg-warning/10 text-warning';
+      default:
+        return 'bg-gray-500/10 text-gray-500';
+    }
+  };
+
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case 'online':
+        return Wifi;
+      case 'offline':
+        return WifiOff;
+      case 'error':
+        return AlertTriangle;
+      default:
+        return WifiOff;
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="text-gray-400">Loading AI agents...</div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-dark">
+      {/* Header */}
+      <header className="bg-surface border-b border-gray-700 px-6 py-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-2xl font-bold text-gray-100">AI Agents</h2>
+            <p className="text-gray-400 mt-1">Manage your AI integrations and automations</p>
+          </div>
+          <Dialog open={showForm} onOpenChange={(open) => {
+            setShowForm(open);
+            if (!open) {
+              setEditingAgent(null);
+              form.reset();
+            }
+          }}>
+            <DialogTrigger asChild>
+              <Button className="bg-primary hover:bg-primary/90 text-white">
+                <Plus className="h-4 w-4 mr-2" />
+                Add Agent
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-2xl bg-surface border-gray-700">
+              <DialogHeader>
+                <DialogTitle className="text-gray-100">
+                  {editingAgent ? 'Edit AI Agent' : 'Add New AI Agent'}
+                </DialogTitle>
+              </DialogHeader>
+              
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="name"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-gray-300">Agent Name</FormLabel>
+                          <FormControl>
+                            <Input
+                              {...field}
+                              placeholder="Enter agent name"
+                              className="bg-card border-gray-600 text-gray-100"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="type"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-gray-300">Agent Type</FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                              <SelectTrigger className="bg-card border-gray-600 text-gray-100">
+                                <SelectValue placeholder="Select agent type" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="openai">OpenAI GPT</SelectItem>
+                              <SelectItem value="local">Local AI (Ollama)</SelectItem>
+                              <SelectItem value="burp">Burp Suite</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  <FormField
+                    control={form.control}
+                    name="endpoint"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-gray-300">Endpoint URL</FormLabel>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            placeholder="https://api.openai.com/v1 or http://localhost:11434"
+                            className="bg-card border-gray-600 text-gray-100"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="apiKey"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-gray-300">API Key</FormLabel>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            type="password"
+                            placeholder="Enter API key (if required)"
+                            className="bg-card border-gray-600 text-gray-100"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <div className="flex gap-3">
+                    <Button
+                      type="submit"
+                      disabled={createAgent.isPending || updateAgent.isPending}
+                      className="bg-primary hover:bg-primary/90"
+                    >
+                      {(createAgent.isPending || updateAgent.isPending) ? 
+                        "Saving..." : 
+                        (editingAgent ? "Update Agent" : "Create Agent")
+                      }
+                    </Button>
+                    
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => setShowForm(false)}
+                      className="border-gray-600 text-gray-300 hover:bg-card"
+                    >
+                      Cancel
+                    </Button>
+                  </div>
+                </form>
+              </Form>
+            </DialogContent>
+          </Dialog>
+        </div>
+      </header>
+
+      {/* Main Content */}
+      <main className="p-6">
+        {/* Agent Status Overview */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <Card className="bg-surface border-gray-700">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-gray-400 text-sm">Total Agents</p>
+                  <p className="text-2xl font-bold text-gray-100 mt-2">
+                    {agents?.length || 0}
+                  </p>
+                </div>
+                <div className="bg-primary/10 p-3 rounded-lg">
+                  <Bot className="text-primary h-6 w-6" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-surface border-gray-700">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-gray-400 text-sm">Online Agents</p>
+                  <p className="text-2xl font-bold text-gray-100 mt-2">
+                    {agents?.filter((a: AiAgent) => a.status === 'online').length || 0}
+                  </p>
+                </div>
+                <div className="bg-success/10 p-3 rounded-lg">
+                  <Wifi className="text-success h-6 w-6" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-surface border-gray-700">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-gray-400 text-sm">Error Agents</p>
+                  <p className="text-2xl font-bold text-gray-100 mt-2">
+                    {agents?.filter((a: AiAgent) => a.status === 'error').length || 0}
+                  </p>
+                </div>
+                <div className="bg-error/10 p-3 rounded-lg">
+                  <AlertTriangle className="text-error h-6 w-6" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Agents List */}
+        {!agents || agents.length === 0 ? (
+          <Card className="bg-surface border-gray-700">
+            <CardContent className="p-12">
+              <div className="text-center">
+                <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Bot className="h-8 w-8 text-primary" />
+                </div>
+                <h3 className="text-xl font-semibold text-gray-100 mb-2">No AI Agents Configured</h3>
+                <p className="text-gray-400 mb-6">
+                  Set up your first AI agent to enable automated vulnerability analysis and report generation.
+                </p>
+                <Button 
+                  onClick={() => setShowForm(true)}
+                  className="bg-primary hover:bg-primary/90 text-white"
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  Configure Your First Agent
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        ) : (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {agents.map((agent: AiAgent) => {
+              const AgentIcon = getAgentIcon(agent.type);
+              const StatusIcon = getStatusIcon(agent.status);
+              
+              return (
+                <Card key={agent.id} className="bg-surface border-gray-700">
+                  <CardHeader>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center">
+                        <div className="bg-primary/10 p-2 rounded-lg mr-3">
+                          <AgentIcon className="h-5 w-5 text-primary" />
+                        </div>
+                        <div>
+                          <CardTitle className="text-gray-100 text-lg">{agent.name}</CardTitle>
+                          <p className="text-sm text-gray-400 capitalize">{agent.type} Agent</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Badge className={getStatusColor(agent.status)}>
+                          <StatusIcon className="h-3 w-3 mr-1" />
+                          {agent.status}
+                        </Badge>
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-2 gap-4 text-sm">
+                        <div>
+                          <span className="text-gray-400">Type:</span>
+                          <p className="text-gray-100 capitalize">{agent.type}</p>
+                        </div>
+                        <div>
+                          <span className="text-gray-400">Endpoint:</span>
+                          <p className="text-gray-100 truncate">
+                            {agent.endpoint || 'Default'}
+                          </p>
+                        </div>
+                        <div>
+                          <span className="text-gray-400">Last Ping:</span>
+                          <p className="text-gray-100">
+                            {agent.lastPing ? 
+                              new Date(agent.lastPing).toLocaleString() : 
+                              'Never'
+                            }
+                          </p>
+                        </div>
+                        <div>
+                          <span className="text-gray-400">Created:</span>
+                          <p className="text-gray-100">
+                            {new Date(agent.createdAt).toLocaleDateString()}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="flex space-x-2">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => testConnection.mutate(agent.id)}
+                          disabled={testConnection.isPending}
+                          className="flex-1 border-gray-600 text-gray-300"
+                        >
+                          <Zap className="h-3 w-3 mr-1" />
+                          {testConnection.isPending ? 'Testing...' : 'Test'}
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => handleEdit(agent)}
+                          className="border-gray-600 text-gray-300"
+                        >
+                          <Edit className="h-3 w-3" />
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => handleDelete(agent.id)}
+                          className="border-gray-600 text-gray-300 hover:border-error hover:text-error"
+                        >
+                          <Trash2 className="h-3 w-3" />
+                        </Button>
+                      </div>
+
+                      {/* Agent-specific capabilities */}
+                      <div className="mt-4 p-3 bg-card rounded-lg">
+                        <h4 className="text-sm font-medium text-gray-100 mb-2">Capabilities</h4>
+                        <div className="text-xs text-gray-400">
+                          {agent.type === 'openai' && 
+                            'Report generation, vulnerability analysis, CVSS scoring, remediation suggestions'
+                          }
+                          {agent.type === 'local' && 
+                            'Code analysis, vulnerability detection, pattern matching, offline processing'
+                          }
+                          {agent.type === 'burp' && 
+                            'Automated scanning, proxy integration, vulnerability discovery, traffic analysis'
+                          }
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+        )}
+      </main>
+    </div>
+  );
+}
