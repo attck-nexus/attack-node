@@ -20,8 +20,6 @@ import {
   PowerOff,
   Activity,
   RefreshCw,
-  Terminal,
-  Zap,
   Globe,
   Search
 } from "lucide-react";
@@ -76,36 +74,7 @@ export default function Integrations() {
       status: "running",
       category: "development"
     },
-    {
-      id: "owasp-zap",
-      name: "OWASP ZAP",
-      description: "Web application security scanner",
-      icon: Zap,
-      dockerImage: "kasmweb/owasp-zap:1.17.0",
-      port: 6904,
-      status: "stopped",
-      category: "security"
-    },
-    {
-      id: "wireshark",
-      name: "Wireshark",
-      description: "Network protocol analyzer",
-      icon: Activity,
-      dockerImage: "kasmweb/wireshark:1.17.0",
-      port: 6905,
-      status: "stopped",
-      category: "analysis"
-    },
-    {
-      id: "metasploit",
-      name: "Metasploit Framework",
-      description: "Penetration testing framework",
-      icon: Terminal,
-      dockerImage: "kasmweb/metasploit:1.17.0",
-      port: 6906,
-      status: "stopped",
-      category: "security"
-    }
+
   ];
 
   const getStatusColor = (status: string) => {

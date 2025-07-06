@@ -138,9 +138,6 @@ Preferred communication style: Simple, everyday language.
 2. **KasmWeb Applications**: Pre-built security tools with web interfaces
    - Maltego: OSINT and forensics analysis
    - Visual Studio Code: Development environment
-   - OWASP ZAP: Web application security scanner
-   - Wireshark: Network protocol analyzer
-   - Metasploit Framework: Penetration testing
 
 3. **Kali Linux Environment**: Full penetration testing distribution
    - Persistent storage for tools and data
