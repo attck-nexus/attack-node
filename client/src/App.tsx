@@ -11,6 +11,7 @@ import Analytics from "@/pages/analytics";
 import AiAgents from "@/pages/ai-agents";
 import KaliEnvironment from "@/pages/kali-environment";
 import BurpSuite from "@/pages/burp-suite";
+import Integrations from "@/pages/integrations";
 import Settings from "@/pages/settings";
 import Sidebar from "@/components/sidebar";
 
@@ -27,6 +28,7 @@ function Router() {
           <Route path="/ai-agents" component={AiAgents} />
           <Route path="/kali" component={KaliEnvironment} />
           <Route path="/burp" component={BurpSuite} />
+          <Route path="/integrations" component={Integrations} />
           <Route path="/settings" component={Settings} />
           <Route component={NotFound} />
         </Switch>

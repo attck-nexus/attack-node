@@ -8,7 +8,8 @@ import {
   Bot, 
   Settings, 
   Monitor,
-  Gauge
+  Gauge,
+  Grid3X3
 } from "lucide-react";
 
 const navigation = [
@@ -20,6 +21,7 @@ const navigation = [
 
 const integrations = [
   { name: "AI Agents", href: "/ai-agents", icon: Bot },
+  { name: "All Integrations", href: "/integrations", icon: Grid3X3 },
   { name: "Burp Suite", href: "/burp", icon: Shield },
   { name: "Kali Environment", href: "/kali", icon: Monitor },
 ];

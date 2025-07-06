@@ -40,6 +40,9 @@ The application uses a relational database with the following core entities:
 3. **AI-Powered Reporting**: Automated vulnerability report generation using OpenAI
 4. **Multi-Agent System**: Support for various AI agents including OpenAI, local agents, and Burp Suite integration
 5. **Analytics Dashboard**: Performance metrics and earnings tracking
+6. **Docker Integration**: Containerized security tools with web-based interfaces
+7. **Burp Suite Professional**: Custom Docker container with user-provided license support
+8. **Kali Linux Environment**: Persistent penetration testing environment
 
 ### UI Components
 - **Sidebar Navigation**: Fixed sidebar with program categories and integrations
@@ -123,7 +126,39 @@ RESTful API endpoints organized by resource:
 
 Preferred communication style: Simple, everyday language.
 
+## Docker Integration Architecture
+
+### Supported Integrations
+1. **Burp Suite Professional**: Custom Docker containers built from user-provided JAR files
+   - Upload burpsuite_pro.jar installer
+   - Optional license file integration
+   - Web-based access via KasmWeb VNC interface
+   - Persistent project storage
+
+2. **KasmWeb Applications**: Pre-built security tools with web interfaces
+   - Maltego: OSINT and forensics analysis
+   - Visual Studio Code: Development environment
+   - OWASP ZAP: Web application security scanner
+   - Wireshark: Network protocol analyzer
+   - Metasploit Framework: Penetration testing
+
+3. **Kali Linux Environment**: Full penetration testing distribution
+   - Persistent storage for tools and data
+   - Pre-installed security applications
+   - VNC web interface for GUI access
+   - Docker container with shared volumes
+
+### Docker Service Features
+- Automatic image pulling and container management
+- File upload handling for custom installations
+- Container lifecycle management (start/stop/status)
+- Resource monitoring and cleanup
+- Port management for web interfaces
+
 ## Changelog
 
 Changelog:
 - July 06, 2025. Initial setup
+- July 06, 2025. Added Docker integration with Burp Suite Professional support
+- July 06, 2025. Created comprehensive integrations page with KasmWeb applications
+- July 06, 2025. Implemented file upload system for custom tool installations

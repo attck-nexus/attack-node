@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -28,6 +29,62 @@ export default function BurpSuite() {
   const [isScanning, setIsScanning] = useState(false);
   const [targetUrl, setTargetUrl] = useState("");
   const [showProjectDialog, setShowProjectDialog] = useState(false);
+  const [jarFile, setJarFile] = useState<File | null>(null);
+  const [licenseFile, setLicenseFile] = useState<File | null>(null);
+  const queryClient = useQueryClient();
+
+  // Query Docker containers
+  const { data: containers = [] } = useQuery({
+    queryKey: ['/api/docker/containers'],
+    refetchInterval: 5000 // Refresh every 5 seconds
+  });
+
+  // Start Burp Suite mutation
+  const startBurpSuite = useMutation({
+    mutationFn: async () => {
+      const formData = new FormData();
+      if (jarFile) formData.append('jar', jarFile);
+      if (licenseFile) formData.append('license', licenseFile);
+      
+      const response = await fetch("/api/docker/start-burpsuite", {
+        method: "POST",
+        body: formData
+      });
+      
+      if (!response.ok) {
+        throw new Error("Failed to start Burp Suite");
+      }
+      
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/docker/containers'] });
+    }
+  });
+
+  // Start other apps mutation
+  const startApp = useMutation({
+    mutationFn: async (app: { appName: string; image: string; port: number }) => {
+      return await apiRequest("/api/docker/start-app", "POST", app);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/docker/containers'] });
+    }
+  });
+
+  // Stop container mutation
+  const stopContainer = useMutation({
+    mutationFn: async (nameOrId: string) => {
+      return await apiRequest(`/api/docker/stop/${nameOrId}`, "POST");
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/docker/containers'] });
+    }
+  });
+
+  const containers_typed = containers as any[];
+  const burpContainer = containers_typed.find((c: any) => c.name === 'bugbounty-burpsuite');
+  const isBurpRunning = burpContainer?.status === 'running';
 
   // Mock data for demonstration - would integrate with actual Burp Suite API
   const scanResults = [
@@ -359,66 +416,132 @@ export default function BurpSuite() {
           </Card>
         </div>
 
-        {/* Burp Suite Configuration */}
-        <Card className="bg-surface border-gray-700">
+        {/* Burp Suite Docker Integration */}
+        <Card className="bg-surface border-gray-700 mb-8">
           <CardHeader>
-            <CardTitle className="text-lg font-semibold text-gray-100">Burp Suite Configuration</CardTitle>
+            <CardTitle className="text-lg font-semibold text-gray-100">Burp Suite Professional Integration</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <div className="space-y-4">
-                <div>
-                  <label className="text-sm text-gray-300 mb-2 block">Burp Suite Endpoint</label>
-                  <Input
-                    defaultValue="http://localhost:1337"
-                    className="bg-card border-gray-600 text-gray-100"
-                  />
+                <div className="bg-card p-4 rounded-lg">
+                  <h4 className="text-gray-100 font-medium mb-2">Docker Container Status</h4>
+                  <div className="flex items-center justify-between">
+                    <span className="text-gray-400">Burp Suite Container</span>
+                    <Badge className="bg-error/10 text-error">Stopped</Badge>
+                  </div>
+                  <div className="flex items-center justify-between mt-2">
+                    <span className="text-gray-400">Port</span>
+                    <span className="text-gray-300">6901</span>
+                  </div>
+                  <div className="flex items-center justify-between mt-2">
+                    <span className="text-gray-400">License File</span>
+                    <span className="text-gray-300">Not uploaded</span>
+                  </div>
                 </div>
-                <div>
-                  <label className="text-sm text-gray-300 mb-2 block">API Key</label>
-                  <Input
-                    type="password"
-                    placeholder="Enter Burp Suite API key"
-                    className="bg-card border-gray-600 text-gray-100"
-                  />
-                </div>
-                <div>
-                  <label className="text-sm text-gray-300 mb-2 block">Project Path</label>
-                  <Input
-                    defaultValue="/home/kali/burp-projects"
-                    className="bg-card border-gray-600 text-gray-100"
-                  />
+
+                <div className="space-y-3">
+                  <div>
+                    <label className="text-sm text-gray-300 mb-2 block">Burp Suite JAR File</label>
+                    <Input
+                      type="file"
+                      accept=".jar"
+                      onChange={(e) => setJarFile(e.target.files?.[0] || null)}
+                      className="bg-card border-gray-600 text-gray-100"
+                    />
+                    {jarFile && (
+                      <p className="text-xs text-success mt-1">Selected: {jarFile.name}</p>
+                    )}
+                  </div>
+                  <div>
+                    <label className="text-sm text-gray-300 mb-2 block">License File (Optional)</label>
+                    <Input
+                      type="file"
+                      accept=".txt,.license"
+                      onChange={(e) => setLicenseFile(e.target.files?.[0] || null)}
+                      className="bg-card border-gray-600 text-gray-100"
+                    />
+                    {licenseFile && (
+                      <p className="text-xs text-success mt-1">Selected: {licenseFile.name}</p>
+                    )}
+                  </div>
                 </div>
               </div>
 
               <div className="space-y-4">
                 <div className="bg-card p-4 rounded-lg">
-                  <h4 className="text-gray-100 font-medium mb-2">Connection Status</h4>
-                  <div className="flex items-center justify-between">
-                    <span className="text-gray-400">Burp Suite Professional</span>
-                    <Badge className="bg-success/10 text-success">Connected</Badge>
-                  </div>
-                  <div className="flex items-center justify-between mt-2">
-                    <span className="text-gray-400">Version</span>
-                    <span className="text-gray-300">2023.12.1</span>
-                  </div>
-                  <div className="flex items-center justify-between mt-2">
-                    <span className="text-gray-400">License</span>
-                    <span className="text-gray-300">Professional</span>
+                  <h4 className="text-gray-100 font-medium mb-2">Quick Actions</h4>
+                  <div className="space-y-3">
+                    {!isBurpRunning ? (
+                      <Button 
+                        className="w-full bg-primary hover:bg-primary/90"
+                        onClick={() => startBurpSuite.mutate()}
+                        disabled={startBurpSuite.isPending || (!jarFile)}
+                      >
+                        <Play className="h-4 w-4 mr-2" />
+                        {startBurpSuite.isPending ? "Starting..." : "Start Burp Suite Container"}
+                      </Button>
+                    ) : (
+                      <>
+                        <Button 
+                          className="w-full bg-primary hover:bg-primary/90"
+                          onClick={() => window.open(`http://localhost:${burpContainer?.port}`, '_blank')}
+                        >
+                          <ExternalLink className="h-4 w-4 mr-2" />
+                          Open Web Interface
+                        </Button>
+                        <Button 
+                          variant="destructive" 
+                          className="w-full"
+                          onClick={() => stopContainer.mutate(burpContainer?.name)}
+                          disabled={stopContainer.isPending}
+                        >
+                          <Square className="h-4 w-4 mr-2" />
+                          {stopContainer.isPending ? "Stopping..." : "Stop Container"}
+                        </Button>
+                      </>
+                    )}
+                    <Button variant="outline" className="w-full border-gray-600 text-gray-300">
+                      <Settings className="h-4 w-4 mr-2" />
+                      Configure Settings
+                    </Button>
                   </div>
                 </div>
 
-                <div className="flex gap-3">
-                  <Button className="bg-primary hover:bg-primary/90 flex-1">
-                    <Settings className="h-4 w-4 mr-2" />
-                    Test Connection
-                  </Button>
-                  <Button variant="outline" className="border-gray-600 text-gray-300 flex-1">
-                    <ExternalLink className="h-4 w-4 mr-2" />
-                    Open Burp
-                  </Button>
+                <div className="bg-warning/10 border border-warning/20 rounded-lg p-3">
+                  <p className="text-warning text-sm">
+                    Upload your burpsuite_pro.jar installer to run Burp Suite in a containerized environment
+                  </p>
                 </div>
               </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Burp Suite Web Interface */}
+        <Card className="bg-surface border-gray-700">
+          <CardHeader>
+            <CardTitle className="text-lg font-semibold text-gray-100">Burp Suite Web Interface</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="bg-card rounded-lg p-4">
+              <div className="text-center py-12">
+                <Shield className="h-16 w-16 text-gray-500 mx-auto mb-4" />
+                <h3 className="text-xl font-semibold text-gray-100 mb-2">Burp Suite Not Running</h3>
+                <p className="text-gray-400 mb-6">
+                  Start the Burp Suite container to access the web interface
+                </p>
+                <Button className="bg-primary hover:bg-primary/90">
+                  <Play className="h-4 w-4 mr-2" />
+                  Launch Burp Suite
+                </Button>
+              </div>
+              {/* When running, this would contain an iframe to the Burp Suite web interface */}
+              {/* <iframe 
+                src="http://localhost:6901/vnc.html?autoconnect=true" 
+                className="w-full h-96 border-0 rounded"
+                title="Burp Suite Professional"
+              /> */}
             </div>
           </CardContent>
         </Card>

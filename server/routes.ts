@@ -3,6 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertProgramSchema, insertTargetSchema, insertVulnerabilitySchema, insertAiAgentSchema, insertReportSchema } from "@shared/schema";
 import { generateVulnerabilityReport } from "./services/openai";
+import { dockerService } from "./services/docker";
 import multer from "multer";
 import path from "path";
 import { z } from "zod";
@@ -350,6 +351,105 @@ export async function registerRoutes(app: Express): Promise<Server> {
     const filename = req.params.filename;
     const filePath = path.join(process.cwd(), "uploads", filename);
     res.sendFile(filePath);
+  });
+
+  // Docker integration routes
+  app.get("/api/docker/containers", async (req, res) => {
+    try {
+      const containers = await dockerService.listContainers();
+      res.json(containers);
+    } catch (error) {
+      console.error("Failed to list containers:", error);
+      res.status(500).json({ error: "Failed to list containers" });
+    }
+  });
+
+  app.post("/api/docker/start-burpsuite", upload.fields([
+    { name: 'jar', maxCount: 1 },
+    { name: 'license', maxCount: 1 }
+  ]), async (req, res) => {
+    try {
+      const files = req.files as { [fieldname: string]: Express.Multer.File[] };
+      
+      let jarPath: string | undefined;
+      let licensePath: string | undefined;
+
+      if (files?.jar?.[0]) {
+        jarPath = await dockerService.saveUploadedFile(files.jar[0].buffer, files.jar[0].originalname);
+      }
+
+      if (files?.license?.[0]) {
+        licensePath = await dockerService.saveUploadedFile(files.license[0].buffer, files.license[0].originalname);
+      }
+
+      const container = await dockerService.startBurpSuite(jarPath, licensePath);
+      res.json(container);
+    } catch (error) {
+      console.error("Failed to start Burp Suite:", error);
+      res.status(500).json({ error: "Failed to start Burp Suite container" });
+    }
+  });
+
+  app.post("/api/docker/start-app", async (req, res) => {
+    try {
+      const { appName, image, port } = req.body;
+      
+      if (!appName || !image || !port) {
+        return res.status(400).json({ error: "Missing required parameters" });
+      }
+
+      const container = await dockerService.startKasmWebApp(appName, image, port);
+      res.json(container);
+    } catch (error) {
+      console.error("Failed to start container:", error);
+      res.status(500).json({ error: "Failed to start container" });
+    }
+  });
+
+  app.post("/api/docker/stop/:nameOrId", async (req, res) => {
+    try {
+      const { nameOrId } = req.params;
+      const success = await dockerService.stopContainer(nameOrId);
+      
+      if (success) {
+        res.json({ message: "Container stopped successfully" });
+      } else {
+        res.status(500).json({ error: "Failed to stop container" });
+      }
+    } catch (error) {
+      console.error("Failed to stop container:", error);
+      res.status(500).json({ error: "Failed to stop container" });
+    }
+  });
+
+  app.get("/api/docker/info", async (req, res) => {
+    try {
+      const info = await dockerService.getDockerInfo();
+      res.json(info);
+    } catch (error) {
+      console.error("Failed to get Docker info:", error);
+      res.status(500).json({ error: "Failed to get Docker information" });
+    }
+  });
+
+  app.post("/api/docker/cleanup", async (req, res) => {
+    try {
+      const success = await dockerService.cleanupUnusedImages();
+      res.json({ success });
+    } catch (error) {
+      console.error("Failed to cleanup images:", error);
+      res.status(500).json({ error: "Failed to cleanup unused images" });
+    }
+  });
+
+  app.post("/api/docker/stop-all", async (req, res) => {
+    try {
+      const success = await dockerService.stopAllContainers();
+      res.json({ success });
+    } catch (error) {
+      console.error("Failed to stop all containers:", error);
+      res.status(500).json({ error: "Failed to stop all containers" });
+    }
   });
 
   const httpServer = createServer(app);
