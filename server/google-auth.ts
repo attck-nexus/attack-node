@@ -9,9 +9,12 @@ import { storage } from "./storage";
 
 const getGoogleOidcConfig = memoize(
   async () => {
+    if (!process.env.GOOGLE_CLIENT_ID) {
+      throw new Error("GOOGLE_CLIENT_ID is not configured");
+    }
     return await client.discovery(
       new URL("https://accounts.google.com"),
-      process.env.GOOGLE_CLIENT_ID!
+      process.env.GOOGLE_CLIENT_ID
     );
   },
   { maxAge: 3600 * 1000 }
@@ -68,6 +71,12 @@ export async function setupGoogleAuth(app: Express) {
   app.use(passport.initialize());
   app.use(passport.session());
 
+  // Only setup Google OAuth if client ID is configured
+  if (!process.env.GOOGLE_CLIENT_ID) {
+    console.log("Google OAuth not configured - skipping authentication setup");
+    return;
+  }
+
   const config = await getGoogleOidcConfig();
 
   const verify: VerifyFunction = async (
@@ -120,6 +129,11 @@ export async function setupGoogleAuth(app: Express) {
 }
 
 export const isAuthenticated: RequestHandler = async (req, res, next) => {
+  // If Google OAuth is not configured, skip authentication for development
+  if (!process.env.GOOGLE_CLIENT_ID) {
+    return next();
+  }
+
   const user = req.user as any;
 
   if (!req.isAuthenticated() || !user?.expires_at) {

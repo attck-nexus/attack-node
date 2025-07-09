@@ -24,6 +24,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Authentication routes
   app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
     try {
+      // If Google OAuth is not configured, return a mock user for development
+      if (!process.env.GOOGLE_CLIENT_ID) {
+        return res.json({
+          id: 'dev-user',
+          username: 'developer',
+          email: 'dev@example.com',
+          firstName: 'Developer',
+          lastName: 'User',
+          profileImageUrl: null,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        });
+      }
+      
       const userId = req.user.claims.sub;
       const user = await storage.getUser(userId);
       res.json(user);
