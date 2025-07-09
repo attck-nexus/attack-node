@@ -1,14 +1,29 @@
-import { pgTable, text, serial, integer, boolean, timestamp, json, decimal } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, boolean, timestamp, json, decimal, varchar, jsonb, index } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
+// Session storage table for Google authentication
+export const sessions = pgTable(
+  "sessions",
+  {
+    sid: varchar("sid").primaryKey(),
+    sess: jsonb("sess").notNull(),
+    expire: timestamp("expire").notNull(),
+  },
+  (table) => [index("IDX_session_expire").on(table.expire)],
+);
+
+// User storage table updated for Google authentication
 export const users = pgTable("users", {
-  id: serial("id").primaryKey(),
-  username: text("username").notNull().unique(),
-  password: text("password").notNull(),
-  email: text("email").notNull().unique(),
+  id: text("id").primaryKey(),
+  username: text("username").unique(),
+  email: text("email").unique(),
+  firstName: text("first_name"),
+  lastName: text("last_name"),
+  profileImageUrl: text("profile_image_url"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
 export const programs = pgTable("programs", {
@@ -123,7 +138,8 @@ export const aiAgentsRelations = relations(aiAgents, ({ one }) => ({
 }));
 
 // Insert schemas
-export const insertUserSchema = createInsertSchema(users).omit({ id: true });
+export const insertUserSchema = createInsertSchema(users).omit({ createdAt: true, updatedAt: true });
+export const upsertUserSchema = createInsertSchema(users).omit({ createdAt: true, updatedAt: true });
 export const insertProgramSchema = createInsertSchema(programs).omit({ id: true, createdAt: true, updatedAt: true });
 export const insertTargetSchema = createInsertSchema(targets).omit({ id: true, createdAt: true });
 export const insertVulnerabilitySchema = createInsertSchema(vulnerabilities).omit({ id: true, submittedAt: true, updatedAt: true });
@@ -132,6 +148,7 @@ export const insertReportSchema = createInsertSchema(reports).omit({ id: true, c
 
 // Types
 export type InsertUser = z.infer<typeof insertUserSchema>;
+export type UpsertUser = z.infer<typeof upsertUserSchema>;
 export type User = typeof users.$inferSelect;
 export type InsertProgram = z.infer<typeof insertProgramSchema>;
 export type Program = typeof programs.$inferSelect;

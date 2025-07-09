@@ -3,6 +3,7 @@ import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { useAuth } from "@/hooks/useAuth";
 import NotFound from "@/pages/not-found";
 import Dashboard from "@/pages/dashboard";
 import Programs from "@/pages/programs";
@@ -12,10 +13,26 @@ import AiAgents from "@/pages/ai-agents";
 import KaliEnvironment from "@/pages/kali-environment";
 import BurpSuite from "@/pages/burp-suite";
 import Integrations from "@/pages/integrations";
+import FileManager from "@/pages/file-manager";
 import Settings from "@/pages/settings";
+import Login from "@/pages/login";
 import Sidebar from "@/components/sidebar";
 
 function Router() {
+  const { isAuthenticated, isLoading } = useAuth();
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-dark flex items-center justify-center">
+        <div className="text-gray-100">Loading...</div>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return <Login />;
+  }
+
   return (
     <div className="flex min-h-screen bg-dark">
       <Sidebar />
@@ -29,6 +46,7 @@ function Router() {
           <Route path="/kali" component={KaliEnvironment} />
           <Route path="/burp" component={BurpSuite} />
           <Route path="/integrations" component={Integrations} />
+          <Route path="/file-manager" component={FileManager} />
           <Route path="/settings" component={Settings} />
           <Route component={NotFound} />
         </Switch>

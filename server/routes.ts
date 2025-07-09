@@ -6,6 +6,8 @@ import { generateVulnerabilityReport } from "./services/openai";
 import { testConnection as testAnthropicConnection } from "./services/anthropic";
 import { dockerService } from "./services/docker";
 import { agentLoopService } from "./services/agent-loop";
+import { setupGoogleAuth, isAuthenticated } from "./google-auth";
+import { fileManagerService } from "./services/file-manager";
 import multer from "multer";
 import path from "path";
 import { z } from "zod";
@@ -16,6 +18,21 @@ const upload = multer({
 });
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Setup Google authentication
+  await setupGoogleAuth(app);
+
+  // Authentication routes
+  app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const user = await storage.getUser(userId);
+      res.json(user);
+    } catch (error) {
+      console.error("Error fetching user:", error);
+      res.status(500).json({ message: "Failed to fetch user" });
+    }
+  });
+
   // Programs routes
   app.get("/api/programs", async (req, res) => {
     try {
@@ -514,6 +531,138 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Failed to stop loop:", error);
       res.status(500).json({ error: "Failed to stop loop" });
+    }
+  });
+
+  // File Management routes
+  app.get("/api/files", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const user = await storage.getUser(userId);
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      const dirPath = req.query.path as string || "/";
+      const listing = await fileManagerService.listDirectory(user, dirPath);
+      res.json(listing);
+    } catch (error) {
+      console.error("Failed to list directory:", error);
+      res.status(500).json({ error: (error as Error).message });
+    }
+  });
+
+  app.post("/api/files/directory", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const user = await storage.getUser(userId);
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      const { path: dirPath } = req.body;
+      if (!dirPath) {
+        return res.status(400).json({ error: "Directory path is required" });
+      }
+
+      await fileManagerService.createDirectory(user, dirPath);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Failed to create directory:", error);
+      res.status(500).json({ error: (error as Error).message });
+    }
+  });
+
+  app.delete("/api/files", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const user = await storage.getUser(userId);
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      const filePath = req.query.path as string;
+      if (!filePath) {
+        return res.status(400).json({ error: "File path is required" });
+      }
+
+      await fileManagerService.deleteFile(user, filePath);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Failed to delete file:", error);
+      res.status(500).json({ error: (error as Error).message });
+    }
+  });
+
+  app.get("/api/files/download", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const user = await storage.getUser(userId);
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      const filePath = req.query.path as string;
+      if (!filePath) {
+        return res.status(400).json({ error: "File path is required" });
+      }
+
+      const fileContent = await fileManagerService.readFile(user, filePath);
+      const fileName = filePath.split('/').pop() || 'download';
+      
+      res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`);
+      res.setHeader('Content-Type', 'application/octet-stream');
+      res.send(fileContent);
+    } catch (error) {
+      console.error("Failed to download file:", error);
+      res.status(500).json({ error: (error as Error).message });
+    }
+  });
+
+  app.post("/api/files/upload", isAuthenticated, upload.single('file'), async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const user = await storage.getUser(userId);
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      if (!req.file) {
+        return res.status(400).json({ error: "No file uploaded" });
+      }
+
+      const targetPath = req.body.path || "/";
+      const fileName = req.file.originalname;
+      const fullPath = targetPath.endsWith('/') ? targetPath + fileName : targetPath + '/' + fileName;
+
+      // Read the uploaded file and write to user directory
+      const fs = await import("fs/promises");
+      const fileContent = await fs.readFile(req.file.path);
+      await fileManagerService.writeFile(user, fullPath, fileContent);
+      
+      // Clean up temporary file
+      await fs.unlink(req.file.path);
+
+      res.json({ success: true, path: fullPath });
+    } catch (error) {
+      console.error("Failed to upload file:", error);
+      res.status(500).json({ error: (error as Error).message });
+    }
+  });
+
+  app.get("/api/files/user-home", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const user = await storage.getUser(userId);
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      const homePath = fileManagerService.getUserHomePath(user);
+      res.json({ homePath });
+    } catch (error) {
+      console.error("Failed to get user home path:", error);
+      res.status(500).json({ error: (error as Error).message });
     }
   });
 

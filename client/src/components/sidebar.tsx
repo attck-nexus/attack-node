@@ -1,5 +1,7 @@
 import { Link, useLocation } from "wouter";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/hooks/useAuth";
+import { Button } from "@/components/ui/button";
 import { 
   Shield, 
   BarChart3, 
@@ -9,7 +11,9 @@ import {
   Settings, 
   Monitor,
   Gauge,
-  Grid3X3
+  Grid3X3,
+  FolderOpen,
+  LogOut
 } from "lucide-react";
 
 const navigation = [
