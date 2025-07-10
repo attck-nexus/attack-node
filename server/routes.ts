@@ -897,6 +897,61 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Global Config routes
+  app.get("/api/config/:configType", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const configType = req.params.configType;
+      
+      const config = await storage.getGlobalConfig(userId, configType);
+      if (!config) {
+        return res.json({}); // Return empty object if no config exists
+      }
+      
+      res.json(config.configData);
+    } catch (error) {
+      console.error("Failed to fetch config:", error);
+      res.status(500).json({ error: "Failed to fetch configuration" });
+    }
+  });
+
+  app.post("/api/config/:configType", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const configType = req.params.configType;
+      const configData = req.body;
+      
+      const savedConfig = await storage.saveGlobalConfig({
+        userId,
+        configType,
+        configData
+      });
+      
+      res.json(savedConfig.configData);
+    } catch (error) {
+      console.error("Failed to save config:", error);
+      res.status(500).json({ error: "Failed to save configuration" });
+    }
+  });
+
+  app.get("/api/config", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const configs = await storage.getAllUserConfigs(userId);
+      
+      // Transform to a more convenient format
+      const configMap = configs.reduce((acc, config) => {
+        acc[config.configType] = config.configData;
+        return acc;
+      }, {} as Record<string, any>);
+      
+      res.json(configMap);
+    } catch (error) {
+      console.error("Failed to fetch all configs:", error);
+      res.status(500).json({ error: "Failed to fetch configurations" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

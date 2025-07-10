@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,6 +7,9 @@ import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
+import { useToast } from "@/hooks/use-toast";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
 import { 
   Settings as SettingsIcon, 
   User, 
@@ -24,6 +27,7 @@ import {
 } from "lucide-react";
 
 export default function Settings() {
+  const { toast } = useToast();
   const [notifications, setNotifications] = useState({
     emailReports: true,
     newVulnerabilities: true,
@@ -45,19 +49,127 @@ export default function Settings() {
     theme: "dark"
   });
 
+  // Load configurations on mount
+  const { data: profileConfig } = useQuery({
+    queryKey: ['/api/config/profile'],
+    queryFn: async () => {
+      const response = await fetch('/api/config/profile');
+      if (response.ok) {
+        return response.json();
+      }
+      return {};
+    }
+  });
+
+  const { data: apiConfig } = useQuery({
+    queryKey: ['/api/config/api'],
+    queryFn: async () => {
+      const response = await fetch('/api/config/api');
+      if (response.ok) {
+        return response.json();
+      }
+      return {};
+    }
+  });
+
+  const { data: notificationConfig } = useQuery({
+    queryKey: ['/api/config/notifications'],
+    queryFn: async () => {
+      const response = await fetch('/api/config/notifications');
+      if (response.ok) {
+        return response.json();
+      }
+      return {};
+    }
+  });
+
+  // Update state when configs are loaded
+  useEffect(() => {
+    if (profileConfig && Object.keys(profileConfig).length > 0) {
+      setUserProfile(prev => ({ ...prev, ...profileConfig }));
+    }
+  }, [profileConfig]);
+
+  useEffect(() => {
+    if (apiConfig && Object.keys(apiConfig).length > 0) {
+      setApiSettings(prev => ({ ...prev, ...apiConfig }));
+    }
+  }, [apiConfig]);
+
+  useEffect(() => {
+    if (notificationConfig && Object.keys(notificationConfig).length > 0) {
+      setNotifications(prev => ({ ...prev, ...notificationConfig }));
+    }
+  }, [notificationConfig]);
+
+  // Save mutations
+  const saveProfile = useMutation({
+    mutationFn: async () => {
+      return await apiRequest("/api/config/profile", "POST", userProfile);
+    },
+    onSuccess: () => {
+      toast({
+        title: "Profile Saved",
+        description: "Your profile settings have been updated successfully.",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to save profile settings.",
+        variant: "destructive",
+      });
+    }
+  });
+
+  const saveNotifications = useMutation({
+    mutationFn: async () => {
+      return await apiRequest("/api/config/notifications", "POST", notifications);
+    },
+    onSuccess: () => {
+      toast({
+        title: "Notifications Saved",
+        description: "Your notification preferences have been updated.",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to save notification preferences.",
+        variant: "destructive",
+      });
+    }
+  });
+
+  const saveApiSettings = useMutation({
+    mutationFn: async () => {
+      return await apiRequest("/api/config/api", "POST", apiSettings);
+    },
+    onSuccess: () => {
+      toast({
+        title: "API Settings Saved",
+        description: "Your API configuration has been updated.",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to save API settings.",
+        variant: "destructive",
+      });
+    }
+  });
+
   const handleSaveProfile = () => {
-    // Save user profile settings
-    console.log("Saving profile:", userProfile);
+    saveProfile.mutate();
   };
 
   const handleSaveNotifications = () => {
-    // Save notification preferences
-    console.log("Saving notifications:", notifications);
+    saveNotifications.mutate();
   };
 
   const handleSaveApiSettings = () => {
-    // Save API configuration
-    console.log("Saving API settings:", apiSettings);
+    saveApiSettings.mutate();
   };
 
   const handleExportData = () => {

@@ -122,6 +122,16 @@ export const clientCertificates = pgTable("client_certificates", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
+// Global configuration table
+export const globalConfig = pgTable("global_config", {
+  id: serial("id").primaryKey(),
+  userId: text("user_id").references(() => users.id).notNull(),
+  configType: text("config_type").notNull(), // 'profile', 'api', 'notifications', etc.
+  configData: json("config_data").$type<Record<string, any>>().notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
 // Relations
 export const programsRelations = relations(programs, ({ many }) => ({
   targets: many(targets),
@@ -171,6 +181,7 @@ export const insertVulnerabilitySchema = createInsertSchema(vulnerabilities).omi
 export const insertAiAgentSchema = createInsertSchema(aiAgents).omit({ id: true, createdAt: true });
 export const insertReportSchema = createInsertSchema(reports).omit({ id: true, createdAt: true });
 export const insertClientCertificateSchema = createInsertSchema(clientCertificates).omit({ id: true, createdAt: true, updatedAt: true });
+export const insertGlobalConfigSchema = createInsertSchema(globalConfig).omit({ id: true, createdAt: true, updatedAt: true });
 
 // Types
 export type InsertUser = z.infer<typeof insertUserSchema>;
@@ -188,3 +199,5 @@ export type InsertReport = z.infer<typeof insertReportSchema>;
 export type Report = typeof reports.$inferSelect;
 export type InsertClientCertificate = z.infer<typeof insertClientCertificateSchema>;
 export type ClientCertificate = typeof clientCertificates.$inferSelect;
+export type InsertGlobalConfig = z.infer<typeof insertGlobalConfigSchema>;
+export type GlobalConfig = typeof globalConfig.$inferSelect;

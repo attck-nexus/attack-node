@@ -6,6 +6,7 @@ import {
   aiAgents,
   reports,
   clientCertificates,
+  globalConfig,
   type User,
   type InsertUser,
   type UpsertUser,
@@ -21,6 +22,8 @@ import {
   type InsertReport,
   type ClientCertificate,
   type InsertClientCertificate,
+  type GlobalConfig,
+  type InsertGlobalConfig,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, and, count } from "drizzle-orm";
@@ -82,6 +85,11 @@ export interface IStorage {
     avgResponseTime: number;
     vulnerabilityTrends: { severity: string; count: number }[];
   }>;
+
+  // Global Config operations
+  getGlobalConfig(userId: string, configType: string): Promise<GlobalConfig | undefined>;
+  saveGlobalConfig(config: InsertGlobalConfig): Promise<GlobalConfig>;
+  getAllUserConfigs(userId: string): Promise<GlobalConfig[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -389,6 +397,48 @@ export class DatabaseStorage implements IStorage {
       avgResponseTime: 2.3, // This would be calculated from actual response times
       vulnerabilityTrends,
     };
+  }
+
+  // Global Config operations
+  async getGlobalConfig(userId: string, configType: string): Promise<GlobalConfig | undefined> {
+    const [config] = await db
+      .select()
+      .from(globalConfig)
+      .where(and(eq(globalConfig.userId, userId), eq(globalConfig.configType, configType)));
+    return config || undefined;
+  }
+
+  async saveGlobalConfig(config: InsertGlobalConfig): Promise<GlobalConfig> {
+    // Check if config already exists
+    const existing = await this.getGlobalConfig(config.userId, config.configType);
+    
+    if (existing) {
+      // Update existing config
+      const [updatedConfig] = await db
+        .update(globalConfig)
+        .set({ 
+          configData: config.configData,
+          updatedAt: new Date() 
+        })
+        .where(and(eq(globalConfig.userId, config.userId), eq(globalConfig.configType, config.configType)))
+        .returning();
+      return updatedConfig;
+    } else {
+      // Create new config
+      const [newConfig] = await db
+        .insert(globalConfig)
+        .values(config)
+        .returning();
+      return newConfig;
+    }
+  }
+
+  async getAllUserConfigs(userId: string): Promise<GlobalConfig[]> {
+    return await db
+      .select()
+      .from(globalConfig)
+      .where(eq(globalConfig.userId, userId))
+      .orderBy(desc(globalConfig.updatedAt));
   }
 }
 
