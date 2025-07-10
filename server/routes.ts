@@ -18,10 +18,17 @@ const upload = multer({
   limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit
 });
 
-// Separate multer configuration for Burp Suite uploads (500MB limit)
+// Separate multer configuration for Burp Suite uploads (1GB limit)
 const burpSuiteUpload = multer({ 
   storage: multer.memoryStorage(),
-  limits: { fileSize: 500 * 1024 * 1024 }, // 500MB limit for Burp Suite JAR files
+  limits: { 
+    fileSize: 1024 * 1024 * 1024, // 1GB limit for Burp Suite JAR files
+    fieldSize: 1024 * 1024 * 1024, // 1GB field size limit
+    fields: 10, // Number of non-file fields
+    files: 2, // Number of file fields
+    parts: 12, // Total number of parts
+    headerPairs: 2000 // Number of header pairs
+  }
 });
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -435,7 +442,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Failed to start Burp Suite:", error);
       if (error.code === 'LIMIT_FILE_SIZE') {
-        return res.status(400).json({ error: "File too large. Maximum size is 500MB." });
+        return res.status(400).json({ error: "File too large. Maximum size is 1GB." });
       }
       res.status(500).json({ error: "Failed to start Burp Suite container" });
     }
