@@ -52,9 +52,13 @@ export default function ProgramCard({ program, onSelect }: ProgramCardProps) {
             </div>
             <div>
               <h3 className="font-medium text-gray-100">{program.name}</h3>
-              <p className="text-sm text-gray-400 flex items-center">
-                <Globe className="h-3 w-3 mr-1" />
-                [{program.name} {program.platform}]({program.url})
+              <p className="text-sm text-gray-400">
+                <span className="flex items-center">
+                  <Globe className="h-3 w-3 mr-1" />
+                  <span className="font-mono text-xs">
+                    [{program.name} {program.platform}]({program.url})
+                  </span>
+                </span>
               </p>
             </div>
           </div>
