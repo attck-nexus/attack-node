@@ -158,7 +158,7 @@ export default function KaliEnvironment() {
                     <label className="text-sm text-gray-300 mb-2 block">Container Port</label>
                     <Input
                       value={containerPort}
-                      onChange={(e) => setContainerPort(e.target.value)}
+                      disabled
                       className="bg-card border-gray-600 text-gray-100"
                     />
                   </div>
