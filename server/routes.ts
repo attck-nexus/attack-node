@@ -18,6 +18,12 @@ const upload = multer({
   limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit
 });
 
+// Separate multer configuration for Burp Suite uploads (500MB limit)
+const burpSuiteUpload = multer({ 
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 500 * 1024 * 1024 }, // 500MB limit for Burp Suite JAR files
+});
+
 export async function registerRoutes(app: Express): Promise<Server> {
   // Setup Google authentication
   await setupGoogleAuth(app);
@@ -406,7 +412,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/docker/start-burpsuite", upload.fields([
+  app.post("/api/docker/start-burpsuite", burpSuiteUpload.fields([
     { name: 'jar', maxCount: 1 },
     { name: 'license', maxCount: 1 }
   ]), async (req, res) => {
