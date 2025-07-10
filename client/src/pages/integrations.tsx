@@ -178,6 +178,22 @@ export default function Integrations() {
 
       {/* Main Content */}
       <main className="p-6">
+        {/* Docker Unavailable Warning */}
+        <div className="mb-6">
+          <div className="bg-warning/10 border border-warning/20 rounded-lg p-4">
+            <div className="flex items-center">
+              <Shield className="h-5 w-5 text-warning mr-3" />
+              <div>
+                <h3 className="text-warning font-semibold">Docker Not Available</h3>
+                <p className="text-gray-400 text-sm mt-1">
+                  Docker containers are not available in this Replit environment. In a production environment with Docker installed, 
+                  these integrations would provide full access to containerized security tools and development environments.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <Tabs defaultValue="security" className="space-y-6">
           <TabsList className="bg-surface border border-gray-700">
             <TabsTrigger value="security" className="data-[state=active]:bg-primary data-[state=active]:text-white">

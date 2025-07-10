@@ -174,6 +174,22 @@ export default function KaliEnvironment() {
 
       {/* Main Content */}
       <main className="p-6">
+        {/* Docker Unavailable Warning */}
+        <div className="mb-6">
+          <div className="bg-warning/10 border border-warning/20 rounded-lg p-4">
+            <div className="flex items-center">
+              <Shield className="h-5 w-5 text-warning mr-3" />
+              <div>
+                <h3 className="text-warning font-semibold">Docker Not Available</h3>
+                <p className="text-gray-400 text-sm mt-1">
+                  Docker containers are not available in this Replit environment. In a production environment with Docker installed, 
+                  this would provide full Kali Linux desktop access via web browser.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* Control Panel */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
           {/* Environment Status */}
@@ -223,10 +239,10 @@ export default function KaliEnvironment() {
                   <Button 
                     onClick={handleStart}
                     className="w-full bg-success hover:bg-success/90 text-white"
-                    disabled={startKali.isPending}
+                    disabled={true}
                   >
                     <Power className="h-4 w-4 mr-2" />
-                    {startKali.isPending ? "Starting..." : "Start Environment"}
+                    Start Environment (Docker Required)
                   </Button>
                 ) : (
                   <>

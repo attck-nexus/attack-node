@@ -211,7 +211,18 @@ export class DockerService {
     // Check if Docker is available
     const dockerAvailable = await this.checkDockerAvailability();
     if (!dockerAvailable) {
-      throw new Error('Docker is not available in this environment. Please install Docker to use container features.');
+      // Create a mock container for demonstration purposes
+      const mockContainer: DockerContainer = {
+        id: `mock-${appName}-container`,
+        name: containerName,
+        image: image,
+        port,
+        status: 'error',
+        created: new Date()
+      };
+      
+      this.containers.set(containerName, mockContainer);
+      throw new Error('Docker is not available in this environment. In a production environment with Docker installed, this would start a containerized version of the application.');
     }
 
     try {

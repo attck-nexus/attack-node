@@ -447,6 +447,22 @@ export default function BurpSuite() {
           </Card>
         </div>
 
+        {/* Docker Unavailable Warning */}
+        <div className="mb-6">
+          <div className="bg-warning/10 border border-warning/20 rounded-lg p-4">
+            <div className="flex items-center">
+              <Shield className="h-5 w-5 text-warning mr-3" />
+              <div>
+                <h3 className="text-warning font-semibold">Docker Not Available</h3>
+                <p className="text-gray-400 text-sm mt-1">
+                  Docker containers are not available in this Replit environment. In a production environment with Docker installed, 
+                  this would provide Burp Suite Professional access via web browser with file upload support.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* Burp Suite Docker Integration */}
         <Card className="bg-surface border-gray-700 mb-8">
           <CardHeader>
@@ -537,19 +553,10 @@ export default function BurpSuite() {
                     {!isBurpRunning ? (
                       <Button 
                         className="w-full bg-primary hover:bg-primary/90"
-                        onClick={() => {
-                          if (isHeadlessMode) {
-                            startHeadlessBurpSuite.mutate();
-                          } else {
-                            startBurpSuite.mutate();
-                          }
-                        }}
-                        disabled={startBurpSuite.isPending || startHeadlessBurpSuite.isPending || (!jarFile)}
+                        disabled={true}
                       >
                         <Play className="h-4 w-4 mr-2" />
-                        {(startBurpSuite.isPending || startHeadlessBurpSuite.isPending) 
-                          ? "Starting..." 
-                          : `Start Burp Suite ${isHeadlessMode ? '(Headless)' : 'Container'}`}
+                        Start Burp Suite (Docker Required)
                       </Button>
                     ) : (
                       <>
