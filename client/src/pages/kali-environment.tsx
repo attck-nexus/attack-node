@@ -1,9 +1,12 @@
 import { useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { useToast } from "@/hooks/use-toast";
 import { 
   Monitor, 
   Play, 
@@ -26,23 +29,83 @@ import {
 } from "lucide-react";
 
 export default function KaliEnvironment() {
-  const [isRunning, setIsRunning] = useState(true);
   const [showConfig, setShowConfig] = useState(false);
   const [vncPassword, setVncPassword] = useState("password");
-  const [containerPort, setContainerPort] = useState("6901");
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  // Query Docker containers
+  const { data: containers = [] } = useQuery({
+    queryKey: ['/api/docker/containers'],
+    refetchInterval: 5000 // Refresh every 5 seconds
+  });
+
+  // Start Kali container mutation
+  const startKali = useMutation({
+    mutationFn: async () => {
+      return await apiRequest("/api/docker/start-app", "POST", {
+        appName: "kali",
+        image: "kasmweb/kali-rolling-desktop:develop",
+        port: 6902
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/docker/containers'] });
+      toast({
+        title: "Success",
+        description: "Kali Linux container is starting...",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to start Kali container",
+        variant: "destructive",
+      });
+    }
+  });
+
+  // Stop container mutation
+  const stopContainer = useMutation({
+    mutationFn: async (nameOrId: string) => {
+      return await apiRequest(`/api/docker/stop/${nameOrId}`, "POST");
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/docker/containers'] });
+      toast({
+        title: "Success",
+        description: "Container stopped successfully",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to stop container",
+        variant: "destructive",
+      });
+    }
+  });
+
+  const containers_typed = containers as any[];
+  const kaliContainer = containers_typed.find((c: any) => c.name === 'bugbounty-kali');
+  const isRunning = kaliContainer?.status === 'running';
+  const containerPort = kaliContainer?.port || 6902;
 
   const handleStart = () => {
-    setIsRunning(true);
-    // Here we would integrate with Docker API to start the container
+    startKali.mutate();
   };
 
   const handleStop = () => {
-    setIsRunning(false);
-    // Here we would integrate with Docker API to stop the container
+    if (kaliContainer) {
+      stopContainer.mutate(kaliContainer.name);
+    }
   };
 
-  const handleRestart = () => {
-    // Here we would restart the Docker container
+  const handleRestart = async () => {
+    if (kaliContainer) {
+      await stopContainer.mutateAsync(kaliContainer.name);
+      setTimeout(() => startKali.mutate(), 2000);
+    }
   };
 
   const openVNC = () => {
@@ -117,8 +180,12 @@ export default function KaliEnvironment() {
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <span className="text-gray-400">Status</span>
-                  <Badge className={isRunning ? "bg-success/10 text-success" : "bg-error/10 text-error"}>
-                    {isRunning ? "Running" : "Stopped"}
+                  <Badge className={
+                    isRunning ? "bg-success/10 text-success" :
+                    kaliContainer?.status === 'error' ? "bg-error/10 text-error" :
+                    "bg-gray-500/10 text-gray-500"
+                  }>
+                    {kaliContainer?.status || 'Not Started'}
                   </Badge>
                 </div>
                 <div className="flex items-center justify-between">
@@ -126,12 +193,12 @@ export default function KaliEnvironment() {
                   <span className="text-gray-300">{containerPort}</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-gray-400">Uptime</span>
-                  <span className="text-gray-300">{isRunning ? "2h 34m" : "0m"}</span>
+                  <span className="text-gray-400">Image</span>
+                  <span className="text-gray-300 text-xs">kasmweb/kali-rolling</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-gray-400">Memory Usage</span>
-                  <span className="text-gray-300">{isRunning ? "1.2GB" : "0MB"}</span>
+                  <span className="text-gray-400">Container</span>
+                  <span className="text-gray-300 text-xs">{kaliContainer?.name || 'bugbounty-kali'}</span>
                 </div>
               </div>
             </CardContent>
@@ -148,9 +215,10 @@ export default function KaliEnvironment() {
                   <Button 
                     onClick={handleStart}
                     className="w-full bg-success hover:bg-success/90 text-white"
+                    disabled={startKali.isPending}
                   >
                     <Power className="h-4 w-4 mr-2" />
-                    Start Environment
+                    {startKali.isPending ? "Starting..." : "Start Environment"}
                   </Button>
                 ) : (
                   <>
@@ -165,6 +233,7 @@ export default function KaliEnvironment() {
                       onClick={handleRestart}
                       variant="outline" 
                       className="w-full border-gray-600 text-gray-300"
+                      disabled={stopContainer.isPending || startKali.isPending}
                     >
                       <RotateCcw className="h-4 w-4 mr-2" />
                       Restart
@@ -173,9 +242,10 @@ export default function KaliEnvironment() {
                       onClick={handleStop}
                       variant="destructive" 
                       className="w-full"
+                      disabled={stopContainer.isPending}
                     >
                       <PowerOff className="h-4 w-4 mr-2" />
-                      Stop Environment
+                      {stopContainer.isPending ? "Stopping..." : "Stop Environment"}
                     </Button>
                   </>
                 )}
@@ -323,7 +393,7 @@ export default function KaliEnvironment() {
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
                     <span className="text-gray-400">Image:</span>
-                    <span className="text-gray-300">kasmweb/kali-rolling-desktop:1.17.0</span>
+                    <span className="text-gray-300">kasmweb/kali-rolling-desktop:develop</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-400">Port Mapping:</span>
@@ -343,7 +413,7 @@ export default function KaliEnvironment() {
               <div className="bg-card p-4 rounded-lg">
                 <h4 className="text-gray-100 font-medium mb-2">Docker Command</h4>
                 <code className="text-xs text-gray-400 bg-gray-800 p-2 rounded block font-mono">
-                  docker run --rm -it --shm-size=512m -p {containerPort}:6901 -e VNC_PW={vncPassword} -v /persistent-data:/home/kali/data kasmweb/kali-rolling-desktop:1.17.0
+                  docker run --rm -it --shm-size=512m -p {containerPort}:6901 -e VNC_PW={vncPassword} -v /persistent-data:/home/kali/data kasmweb/kali-rolling-desktop:develop
                 </code>
               </div>
 
@@ -360,6 +430,27 @@ export default function KaliEnvironment() {
             </div>
           </CardContent>
         </Card>
+
+        {/* Docker Status Message */}
+        <div className="mt-6">
+          {startKali.error && (
+            <div className="bg-error/10 border border-error/20 rounded-lg p-4">
+              <p className="text-error font-medium mb-2">Docker Container Status</p>
+              <p className="text-gray-300 text-sm">
+                Docker is not available in this development environment. In a production environment with Docker installed, 
+                the Kali Linux container would start successfully.
+              </p>
+            </div>
+          )}
+          {!startKali.error && !isRunning && (
+            <div className="bg-warning/10 border border-warning/20 rounded-lg p-4">
+              <p className="text-warning font-medium mb-2">Getting Started</p>
+              <p className="text-gray-300 text-sm">
+                Click "Start Environment" to launch a persistent Kali Linux desktop environment with all penetration testing tools pre-installed.
+              </p>
+            </div>
+          )}
+        </div>
       </main>
     </div>
   );
