@@ -33,6 +33,7 @@ export default function Settings() {
 
   const [apiSettings, setApiSettings] = useState({
     openaiApiKey: "",
+    anthropicApiKey: "",
     burpEndpoint: "http://localhost:1337",
     localAiEndpoint: "http://localhost:11434"
   });
@@ -202,6 +203,18 @@ export default function Settings() {
                   <p className="text-xs text-gray-400 mt-1">Used for AI-powered vulnerability analysis and report generation</p>
                 </div>
 
+                <div>
+                  <label className="text-sm text-gray-300 mb-2 block">Anthropic API Key</label>
+                  <Input
+                    type="password"
+                    value={apiSettings.anthropicApiKey}
+                    onChange={(e) => setApiSettings(prev => ({ ...prev, anthropicApiKey: e.target.value }))}
+                    placeholder="sk-ant-..."
+                    className="bg-card border-gray-600 text-gray-100"
+                  />
+                  <p className="text-xs text-gray-400 mt-1">Used for Claude AI integration in multi-agent workflows</p>
+                </div>
+
                 <Separator className="bg-gray-700" />
 
                 <div>
@@ -245,6 +258,17 @@ export default function Settings() {
                       <div>
                         <p className="text-gray-100 font-medium">OpenAI</p>
                         <p className="text-gray-400 text-sm">GPT-4 API for AI features</p>
+                      </div>
+                    </div>
+                    <div className="bg-success text-success px-2 py-1 rounded text-xs">Connected</div>
+                  </div>
+
+                  <div className="flex items-center justify-between p-3 bg-card rounded-lg">
+                    <div className="flex items-center">
+                      <Globe className="h-5 w-5 text-primary mr-3" />
+                      <div>
+                        <p className="text-gray-100 font-medium">Anthropic</p>
+                        <p className="text-gray-400 text-sm">Claude AI for multi-agent workflows</p>
                       </div>
                     </div>
                     <div className="bg-success text-success px-2 py-1 rounded text-xs">Connected</div>
