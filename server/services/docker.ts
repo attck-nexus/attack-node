@@ -31,11 +31,16 @@ export class DockerService {
     }
 
     try {
+      // Check if Docker CLI is available
       await execAsync('docker --version');
+      
+      // Check if Docker daemon is running
+      await execAsync('docker info');
+      
       this.dockerAvailable = true;
       return true;
     } catch (error) {
-      console.warn('Docker is not available in this environment');
+      console.warn('Docker is not available or daemon is not running in this environment');
       this.dockerAvailable = false;
       return false;
     }
@@ -68,7 +73,19 @@ export class DockerService {
     // Check if Docker is available
     const dockerAvailable = await this.checkDockerAvailability();
     if (!dockerAvailable) {
-      throw new Error('Docker is not available in this environment. Please install Docker to use container features.');
+      // Create a mock container for demonstration purposes
+      const mockContainer: DockerContainer = {
+        id: 'mock-burpsuite-container',
+        name: containerName,
+        image: 'kasmweb/burpsuite-custom',
+        port,
+        status: 'error',
+        created: new Date(),
+        fileUploads: jarPath ? [jarPath, licensePath].filter((f): f is string => Boolean(f)) : []
+      };
+      
+      this.containers.set(containerName, mockContainer);
+      throw new Error('Docker daemon is not running. In a production environment, this would start a Burp Suite container with web interface access.');
     }
 
     try {

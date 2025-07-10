@@ -428,15 +428,25 @@ export default function BurpSuite() {
                   <h4 className="text-gray-100 font-medium mb-2">Docker Container Status</h4>
                   <div className="flex items-center justify-between">
                     <span className="text-gray-400">Burp Suite Container</span>
-                    <Badge className="bg-error/10 text-error">Stopped</Badge>
+                    <Badge className={
+                      burpContainer?.status === 'running' ? 'bg-success/10 text-success' :
+                      burpContainer?.status === 'error' ? 'bg-error/10 text-error' :
+                      'bg-gray-500/10 text-gray-500'
+                    }>
+                      {burpContainer?.status || 'Not Started'}
+                    </Badge>
                   </div>
                   <div className="flex items-center justify-between mt-2">
                     <span className="text-gray-400">Port</span>
                     <span className="text-gray-300">6901</span>
                   </div>
                   <div className="flex items-center justify-between mt-2">
+                    <span className="text-gray-400">JAR File</span>
+                    <span className="text-gray-300">{jarFile ? jarFile.name : 'Not uploaded'}</span>
+                  </div>
+                  <div className="flex items-center justify-between mt-2">
                     <span className="text-gray-400">License File</span>
-                    <span className="text-gray-300">Not uploaded</span>
+                    <span className="text-gray-300">{licenseFile ? licenseFile.name : 'Not uploaded'}</span>
                   </div>
                 </div>
 
@@ -512,6 +522,11 @@ export default function BurpSuite() {
                   <p className="text-warning text-sm">
                     Upload your burpsuite_pro.jar installer to run Burp Suite in a containerized environment
                   </p>
+                  {startBurpSuite.error && (
+                    <p className="text-error text-sm mt-2">
+                      {startBurpSuite.error.message}
+                    </p>
+                  )}
                 </div>
               </div>
             </div>

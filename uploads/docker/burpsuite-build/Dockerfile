@@ -10,7 +10,7 @@ RUN apt-get update && apt-get install -y openjdk-11-jre-headless && rm -rf /var/
 RUN mkdir -p /opt/burpsuite
 
 # Copy Burp Suite jar
-COPY 1752120751518-burpsuite_pro_v2025.5.6.jar /opt/burpsuite/burpsuite.jar
+COPY 1752121007354-burpsuite_pro_v2025.5.6.jar /opt/burpsuite/burpsuite.jar
 
 
 
