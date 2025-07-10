@@ -112,10 +112,10 @@ export default function BurpSuite() {
 
   const containers_typed = containers as any[];
   const burpContainer = containers_typed.find((c: any) => 
-    c.name === 'bugbounty-burpsuite' || c.name === 'bugbounty-burpsuite-headless'
+    c.name === 'attacknode-burpsuite' || c.name === 'attacknode-burpsuite-headless'
   );
   const isBurpRunning = burpContainer?.status === 'running';
-  const isHeadlessBurp = burpContainer?.name === 'bugbounty-burpsuite-headless';
+  const isHeadlessBurp = burpContainer?.name === 'attacknode-burpsuite-headless';
 
   // Mock data for demonstration - would integrate with actual Burp Suite API
   const scanResults = [

@@ -43,7 +43,7 @@ export default function Sidebar() {
   return (
     <div className="fixed left-0 top-0 h-full w-64 bg-surface border-r border-gray-700 z-50">
       <div className="p-6 border-b border-gray-700">
-        <h1 className="text-xl font-bold text-primary">BugBounty Command</h1>
+        <h1 className="text-xl font-bold text-red-500">Attack Node</h1>
         <p className="text-xs text-gray-400 mt-1">Multi-Agent Security Platform</p>
       </div>
       

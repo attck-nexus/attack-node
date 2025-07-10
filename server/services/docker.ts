@@ -67,7 +67,7 @@ export class DockerService {
   }
 
   async startBurpSuite(jarPath?: string, licensePath?: string): Promise<DockerContainer> {
-    const containerName = 'bugbounty-burpsuite';
+    const containerName = 'attacknode-burpsuite';
     const port = 6901;
 
     // Check if Docker is available
@@ -132,7 +132,7 @@ export class DockerService {
   }
 
   async startHeadlessBurpSuite(jarPath: string, licensePath?: string): Promise<DockerContainer> {
-    const containerName = 'bugbounty-burpsuite-headless';
+    const containerName = 'attacknode-burpsuite-headless';
     const port = 8080; // Port for Burp Suite proxy
 
     // Check if Docker is available
@@ -206,7 +206,7 @@ export class DockerService {
   }
 
   async startKasmWebApp(appName: string, image: string, port: number): Promise<DockerContainer> {
-    const containerName = `bugbounty-${appName}`;
+    const containerName = `attacknode-${appName}`;
 
     // Check if Docker is available
     const dockerAvailable = await this.checkDockerAvailability();

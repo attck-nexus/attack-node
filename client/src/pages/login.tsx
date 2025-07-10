@@ -14,10 +14,10 @@ export default function Login() {
         <div className="space-y-6">
           <div className="space-y-2">
             <h1 className="text-4xl font-bold text-gray-100">
-              BugBounty Command
+              Attack Node
             </h1>
             <p className="text-xl text-gray-400">
-              Multi-agent security platform for bug bounty hunters
+              Multi-agent security platform for penetration testing
             </p>
           </div>
 
@@ -77,7 +77,7 @@ export default function Login() {
             <CardHeader className="text-center">
               <CardTitle className="text-gray-100">Welcome Back</CardTitle>
               <CardDescription className="text-gray-400">
-                Sign in to access your bug bounty command center
+                Sign in to access your security testing command center
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">

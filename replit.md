@@ -1,8 +1,8 @@
-# BugBounty Command Platform
+# Attack Node Platform
 
 ## Overview
 
-BugBounty Command is a multi-agent security platform designed for bug bounty hunters and security researchers. It provides a comprehensive suite of tools for managing bug bounty programs, tracking vulnerabilities, and leveraging AI agents for automated security testing and report generation.
+Attack Node is a multi-agent security platform designed for security researchers and penetration testers. It provides a comprehensive suite of tools for managing security testing programs, tracking vulnerabilities, and leveraging AI agents for automated security analysis and report generation.
 
 ## System Architecture
 
@@ -218,6 +218,8 @@ The platform now supports client certificate management for accessing secure res
 
 Changelog:
 - July 06, 2025. Initial setup
+- July 10, 2025. Rebranded from "BugBounty Command" to "Attack Node" with new futuristic red network aesthetic
+- July 10, 2025. Updated color scheme to match dark teal/cyan background with red accents inspired by network node visualization
 - July 06, 2025. Added Docker integration with Burp Suite Professional support
 - July 06, 2025. Created comprehensive integrations page with KasmWeb applications
 - July 06, 2025. Implemented file upload system for custom tool installations

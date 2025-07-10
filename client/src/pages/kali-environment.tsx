@@ -87,7 +87,7 @@ export default function KaliEnvironment() {
   });
 
   const containers_typed = containers as any[];
-  const kaliContainer = containers_typed.find((c: any) => c.name === 'bugbounty-kali');
+  const kaliContainer = containers_typed.find((c: any) => c.name === 'attacknode-kali');
   const isRunning = kaliContainer?.status === 'running';
   const containerPort = kaliContainer?.port || 6902;
 
@@ -222,7 +222,7 @@ export default function KaliEnvironment() {
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-gray-400">Container</span>
-                  <span className="text-gray-300 text-xs">{kaliContainer?.name || 'bugbounty-kali'}</span>
+                  <span className="text-gray-300 text-xs">{kaliContainer?.name || 'attacknode-kali'}</span>
                 </div>
               </div>
             </CardContent>

@@ -193,7 +193,7 @@ export default function ProgramFormEnhanced({ program, onSuccess, onCancel }: Pr
     <Card className="bg-surface border-gray-700">
       <CardHeader>
         <CardTitle className="text-2xl text-gray-100">
-          {isEditing ? "Edit Bug Bounty Program" : "Create New Bug Bounty Program"}
+          {isEditing ? "Edit Security Program" : "Create New Security Program"}
         </CardTitle>
         <CardDescription className="text-gray-400">
           {isEditing ? "Update the program details" : "Fill in the details to add a new program to your portfolio"}

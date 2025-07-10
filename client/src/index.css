@@ -13,46 +13,46 @@
   --card-foreground: hsl(20, 14.3%, 4.1%);
   --border: hsl(20, 5.9%, 90%);
   --input: hsl(20, 5.9%, 90%);
-  --primary: hsl(207, 90%, 54%);
+  --primary: hsl(0, 100%, 60%);
   --primary-foreground: hsl(0, 0%, 98%);
-  --secondary: hsl(14, 100%, 57%);
+  --secondary: hsl(180, 50%, 40%);
   --secondary-foreground: hsl(0, 0%, 98%);
-  --accent: hsl(60, 4.8%, 95.9%);
-  --accent-foreground: hsl(24, 9.8%, 10%);
+  --accent: hsl(0, 100%, 50%);
+  --accent-foreground: hsl(0, 0%, 98%);
   --destructive: hsl(0, 84.2%, 60.2%);
   --destructive-foreground: hsl(60, 9.1%, 97.8%);
-  --ring: hsl(20, 14.3%, 4.1%);
+  --ring: hsl(0, 100%, 60%);
   --radius: 0.5rem;
   
-  /* Bug Bounty Platform specific colors */
-  --dark: hsl(0, 0%, 7%);
-  --surface: hsl(0, 0%, 12%);
-  --card-dark: hsl(0, 0%, 17%);
+  /* Attack Node Platform specific colors */
+  --dark: hsl(180, 35%, 7%);
+  --surface: hsl(180, 30%, 10%);
+  --card-dark: hsl(180, 25%, 13%);
   --success: hsl(122, 39%, 49%);
   --warning: hsl(36, 100%, 50%);
-  --error: hsl(4, 90%, 58%);
+  --error: hsl(0, 100%, 60%);
 }
 
 .dark {
-  --background: hsl(0, 0%, 7%);
+  --background: hsl(180, 35%, 7%);
   --foreground: hsl(0, 0%, 98%);
-  --muted: hsl(0, 0%, 12%);
-  --muted-foreground: hsl(240, 5%, 64.9%);
-  --popover: hsl(0, 0%, 7%);
+  --muted: hsl(180, 30%, 12%);
+  --muted-foreground: hsl(180, 5%, 64.9%);
+  --popover: hsl(180, 35%, 7%);
   --popover-foreground: hsl(0, 0%, 98%);
-  --card: hsl(0, 0%, 17%);
+  --card: hsl(180, 25%, 17%);
   --card-foreground: hsl(0, 0%, 98%);
-  --border: hsl(240, 3.7%, 15.9%);
-  --input: hsl(240, 3.7%, 15.9%);
-  --primary: hsl(207, 90%, 54%);
+  --border: hsl(180, 20%, 25%);
+  --input: hsl(180, 20%, 25%);
+  --primary: hsl(0, 100%, 60%);
   --primary-foreground: hsl(0, 0%, 98%);
-  --secondary: hsl(14, 100%, 57%);
+  --secondary: hsl(180, 50%, 40%);
   --secondary-foreground: hsl(0, 0%, 98%);
-  --accent: hsl(240, 3.7%, 15.9%);
+  --accent: hsl(0, 100%, 50%);
   --accent-foreground: hsl(0, 0%, 98%);
-  --destructive: hsl(4, 90%, 58%);
+  --destructive: hsl(0, 90%, 58%);
   --destructive-foreground: hsl(0, 0%, 98%);
-  --ring: hsl(240, 4.9%, 83.9%);
+  --ring: hsl(0, 100%, 60%);
   --radius: 0.5rem;
 }
 
@@ -100,11 +100,11 @@
   }
   
   .border-gray-700 {
-    border-color: hsl(240, 3.7%, 15.9%);
+    border-color: hsl(180, 20%, 20%);
   }
   
   .border-gray-600 {
-    border-color: hsl(240, 5%, 26%);
+    border-color: hsl(180, 20%, 26%);
   }
   
   .text-gray-100 {
@@ -146,12 +146,12 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background: hsl(240, 5%, 26%);
+  background: hsl(180, 20%, 26%);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: hsl(240, 5%, 34%);
+  background: hsl(0, 100%, 60%);
 }
 
 /* Smooth transitions */
@@ -206,4 +206,61 @@ textarea:focus-visible {
 
 .status-online {
   animation: statusPulse 2s ease-in-out infinite;
+}
+
+/* Attack Node specific animations and effects */
+@keyframes pulse-red {
+  0%, 100% {
+    opacity: 1;
+    box-shadow: 0 0 20px rgba(239, 68, 68, 0.3);
+  }
+  50% {
+    opacity: 0.8;
+    box-shadow: 0 0 40px rgba(239, 68, 68, 0.6);
+  }
+}
+
+@keyframes network-pulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+}
+
+/* Enhance primary buttons with red glow */
+.bg-primary {
+  position: relative;
+  overflow: hidden;
+  animation: pulse-red 3s infinite;
+}
+
+/* Network grid background effect */
+.bg-dark::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    linear-gradient(rgba(239, 68, 68, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(239, 68, 68, 0.03) 1px, transparent 1px);
+  background-size: 50px 50px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Card hover effects with red glow */
+.bg-surface:hover {
+  border-color: rgba(239, 68, 68, 0.3);
+  box-shadow: 0 0 20px rgba(239, 68, 68, 0.1);
+  transition: all 0.3s ease;
 }
