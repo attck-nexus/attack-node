@@ -54,7 +54,7 @@ export default function ProgramCard({ program, onSelect }: ProgramCardProps) {
               <h3 className="font-medium text-gray-100">{program.name}</h3>
               <p className="text-sm text-gray-400 flex items-center">
                 <Globe className="h-3 w-3 mr-1" />
-                {program.url}
+                [{program.name} {program.platform}]({program.url})
               </p>
             </div>
           </div>
