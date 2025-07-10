@@ -14,6 +14,7 @@ import KaliEnvironment from "@/pages/kali-environment";
 import BurpSuite from "@/pages/burp-suite";
 import Integrations from "@/pages/integrations";
 import FileManager from "@/pages/file-manager";
+import Certificates from "@/pages/certificates";
 import Settings from "@/pages/settings";
 import Login from "@/pages/login";
 import Sidebar from "@/components/sidebar";
@@ -47,6 +48,7 @@ function Router() {
           <Route path="/burp" component={BurpSuite} />
           <Route path="/integrations" component={Integrations} />
           <Route path="/file-manager" component={FileManager} />
+          <Route path="/certificates" component={Certificates} />
           <Route path="/settings" component={Settings} />
           <Route component={NotFound} />
         </Switch>

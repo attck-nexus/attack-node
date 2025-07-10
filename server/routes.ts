@@ -1,13 +1,14 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertProgramSchema, insertTargetSchema, insertVulnerabilitySchema, insertAiAgentSchema, insertReportSchema } from "@shared/schema";
+import { insertProgramSchema, insertTargetSchema, insertVulnerabilitySchema, insertAiAgentSchema, insertReportSchema, insertClientCertificateSchema } from "@shared/schema";
 import { generateVulnerabilityReport } from "./services/openai";
 import { testConnection as testAnthropicConnection } from "./services/anthropic";
 import { dockerService } from "./services/docker";
 import { agentLoopService } from "./services/agent-loop";
 import { setupGoogleAuth, isAuthenticated } from "./google-auth";
 import { fileManagerService } from "./services/file-manager";
+import { certificateManager } from "./services/certificate-manager";
 import multer from "multer";
 import path from "path";
 import { z } from "zod";
@@ -677,6 +678,177 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Failed to get user home path:", error);
       res.status(500).json({ error: (error as Error).message });
+    }
+  });
+
+  // Client Certificate routes
+  app.get("/api/certificates", async (req, res) => {
+    try {
+      const certificates = await storage.getClientCertificates();
+      res.json(certificates);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch certificates" });
+    }
+  });
+
+  app.get("/api/certificates/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const certificate = await storage.getClientCertificate(id);
+      if (!certificate) {
+        return res.status(404).json({ message: "Certificate not found" });
+      }
+      res.json(certificate);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch certificate" });
+    }
+  });
+
+  app.post("/api/certificates", upload.fields([
+    { name: 'certificate', maxCount: 1 },
+    { name: 'privateKey', maxCount: 1 },
+    { name: 'ca', maxCount: 1 }
+  ]), async (req: any, res) => {
+    try {
+      const files = req.files;
+      if (!files?.certificate?.[0] || !files?.privateKey?.[0]) {
+        return res.status(400).json({ message: "Certificate and private key files are required" });
+      }
+
+      const certificateFile = files.certificate[0];
+      const privateKeyFile = files.privateKey[0];
+      const caFile = files.ca?.[0];
+
+      // Read file contents
+      const fs = await import("fs/promises");
+      const certificateBuffer = await fs.readFile(certificateFile.path);
+      const privateKeyBuffer = await fs.readFile(privateKeyFile.path);
+      const caBuffer = caFile ? await fs.readFile(caFile.path) : undefined;
+
+      // Validate certificate files
+      const isValid = await certificateManager.validateCertificate(certificateBuffer, privateKeyBuffer);
+      if (!isValid) {
+        return res.status(400).json({ message: "Invalid certificate or private key format" });
+      }
+
+      // Save certificate files
+      const savedFiles = await certificateManager.saveCertificateFiles({
+        certificateFile: certificateBuffer,
+        privateKeyFile: privateKeyBuffer,
+        caFile: caBuffer,
+        originalNames: {
+          certificate: certificateFile.originalname,
+          privateKey: privateKeyFile.originalname,
+          ca: caFile?.originalname,
+        }
+      });
+
+      // Parse certificate information
+      const certInfo = await certificateManager.parseCertificateInfo(certificateBuffer);
+
+      // Encrypt passphrase if provided
+      let encryptedPassphrase = undefined;
+      if (req.body.passphrase) {
+        encryptedPassphrase = await certificateManager.encryptPassphrase(req.body.passphrase);
+      }
+
+      // Create certificate record
+      const certificateData = insertClientCertificateSchema.parse({
+        name: req.body.name,
+        description: req.body.description,
+        domain: req.body.domain,
+        certificateFile: savedFiles.certificateFile,
+        privateKeyFile: savedFiles.privateKeyFile,
+        caFile: savedFiles.caFile,
+        passphrase: encryptedPassphrase,
+        expiresAt: certInfo.validTo,
+        isActive: true,
+      });
+
+      const certificate = await storage.createClientCertificate(certificateData);
+
+      // Clean up temporary files
+      await fs.unlink(certificateFile.path);
+      await fs.unlink(privateKeyFile.path);
+      if (caFile) await fs.unlink(caFile.path);
+
+      res.status(201).json(certificate);
+    } catch (error) {
+      console.error("Certificate upload error:", error);
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid certificate data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to upload certificate" });
+    }
+  });
+
+  app.put("/api/certificates/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const certificateData = insertClientCertificateSchema.partial().parse(req.body);
+      const certificate = await storage.updateClientCertificate(id, certificateData);
+      res.json(certificate);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid certificate data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to update certificate" });
+    }
+  });
+
+  app.delete("/api/certificates/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const certificate = await storage.getClientCertificate(id);
+      if (certificate) {
+        await certificateManager.deleteCertificateFiles(certificate);
+      }
+      await storage.deleteClientCertificate(id);
+      res.status(204).send();
+    } catch (error) {
+      res.status(500).json({ message: "Failed to delete certificate" });
+    }
+  });
+
+  app.get("/api/certificates/:id/download", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const certificate = await storage.getClientCertificate(id);
+      if (!certificate) {
+        return res.status(404).json({ message: "Certificate not found" });
+      }
+
+      const fileType = req.query.type as string;
+      let filePath: string;
+      let fileName: string;
+
+      switch (fileType) {
+        case 'certificate':
+          filePath = certificate.certificateFile;
+          fileName = `${certificate.name}_certificate.pem`;
+          break;
+        case 'privateKey':
+          filePath = certificate.privateKeyFile;
+          fileName = `${certificate.name}_private_key.pem`;
+          break;
+        case 'ca':
+          if (!certificate.caFile) {
+            return res.status(404).json({ message: "CA file not found" });
+          }
+          filePath = certificate.caFile;
+          fileName = `${certificate.name}_ca.pem`;
+          break;
+        default:
+          return res.status(400).json({ message: "Invalid file type" });
+      }
+
+      const fileContent = await certificateManager.getCertificateContent(filePath);
+      res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`);
+      res.setHeader('Content-Type', 'application/x-pem-file');
+      res.send(fileContent);
+    } catch (error) {
+      console.error("Failed to download certificate file:", error);
+      res.status(500).json({ message: "Failed to download certificate file" });
     }
   });
 

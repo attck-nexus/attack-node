@@ -5,6 +5,7 @@ import {
   vulnerabilities,
   aiAgents,
   reports,
+  clientCertificates,
   type User,
   type InsertUser,
   type UpsertUser,
@@ -18,6 +19,8 @@ import {
   type InsertAiAgent,
   type Report,
   type InsertReport,
+  type ClientCertificate,
+  type InsertClientCertificate,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, and, count } from "drizzle-orm";
@@ -63,6 +66,13 @@ export interface IStorage {
   createReport(report: InsertReport): Promise<Report>;
   updateReport(id: number, report: Partial<InsertReport>): Promise<Report>;
   deleteReport(id: number): Promise<void>;
+
+  // Client Certificate operations
+  getClientCertificates(): Promise<ClientCertificate[]>;
+  getClientCertificate(id: number): Promise<ClientCertificate | undefined>;
+  createClientCertificate(certificate: InsertClientCertificate): Promise<ClientCertificate>;
+  updateClientCertificate(id: number, certificate: Partial<InsertClientCertificate>): Promise<ClientCertificate>;
+  deleteClientCertificate(id: number): Promise<void>;
 
   // Analytics operations
   getDashboardStats(): Promise<{
@@ -313,6 +323,37 @@ export class DatabaseStorage implements IStorage {
 
   async deleteReport(id: number): Promise<void> {
     await db.delete(reports).where(eq(reports.id, id));
+  }
+
+  // Client Certificate operations
+  async getClientCertificates(): Promise<ClientCertificate[]> {
+    return await db.select().from(clientCertificates).orderBy(desc(clientCertificates.createdAt));
+  }
+
+  async getClientCertificate(id: number): Promise<ClientCertificate | undefined> {
+    const [certificate] = await db.select().from(clientCertificates).where(eq(clientCertificates.id, id));
+    return certificate || undefined;
+  }
+
+  async createClientCertificate(insertCertificate: InsertClientCertificate): Promise<ClientCertificate> {
+    const [certificate] = await db
+      .insert(clientCertificates)
+      .values(insertCertificate)
+      .returning();
+    return certificate;
+  }
+
+  async updateClientCertificate(id: number, updateCertificate: Partial<InsertClientCertificate>): Promise<ClientCertificate> {
+    const [certificate] = await db
+      .update(clientCertificates)
+      .set({ ...updateCertificate, updatedAt: new Date() })
+      .where(eq(clientCertificates.id, id))
+      .returning();
+    return certificate;
+  }
+
+  async deleteClientCertificate(id: number): Promise<void> {
+    await db.delete(clientCertificates).where(eq(clientCertificates.id, id));
   }
 
   // Analytics operations

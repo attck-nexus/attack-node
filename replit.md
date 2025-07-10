@@ -187,6 +187,28 @@ The platform implements sophisticated agent loops for iterative payload and POC 
 - **Vulnerability Confirmed**: Stops when vulnerability is verified and documented
 - **Exploit Successful**: Terminates upon successful exploit development
 
+## Client Certificate Management System
+
+### Certificate Upload and Storage
+The platform now supports client certificate management for accessing secure resources:
+- **Certificate Upload**: Upload client certificates (.pem/.crt), private keys (.key/.pem), and optional CA certificates
+- **Secure Storage**: Encrypted passphrase storage with secure file management
+- **Certificate Validation**: Automatic validation of certificate and private key format
+- **Domain Mapping**: Associate certificates with specific domains or scopes
+
+### Certificate Management Features
+- **Status Tracking**: Monitor certificate expiration dates and active status
+- **Download Support**: Download individual certificate components (cert, key, CA)
+- **Metadata Management**: Name, description, and domain association
+- **Active/Inactive Toggle**: Enable/disable certificates as needed
+
+### API Endpoints
+- `GET /api/certificates` - List all certificates
+- `POST /api/certificates` - Upload new certificate with files
+- `PUT /api/certificates/:id` - Update certificate metadata
+- `DELETE /api/certificates/:id` - Delete certificate and associated files
+- `GET /api/certificates/:id/download` - Download certificate components
+
 ## Changelog
 
 Changelog:
@@ -197,3 +219,4 @@ Changelog:
 - July 06, 2025. Added Anthropic Claude integration to AI Agents alongside OpenAI
 - July 06, 2025. Removed OWASP ZAP, Wireshark, and Metasploit from integrations per user request
 - July 06, 2025. Implemented agent loop mechanism with iterative payload refinement system
+- July 09, 2025. Added comprehensive client certificate management system with upload/download functionality

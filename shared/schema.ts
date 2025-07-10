@@ -97,6 +97,21 @@ export const reports = pgTable("reports", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+export const clientCertificates = pgTable("client_certificates", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  description: text("description"),
+  certificateFile: text("certificate_file").notNull(), // path to .crt/.pem file
+  privateKeyFile: text("private_key_file").notNull(), // path to .key file
+  caFile: text("ca_file"), // optional CA certificate file
+  passphrase: text("passphrase"), // encrypted passphrase for private key
+  domain: text("domain"), // target domain/scope
+  expiresAt: timestamp("expires_at"),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
 // Relations
 export const programsRelations = relations(programs, ({ many }) => ({
   targets: many(targets),
@@ -145,6 +160,7 @@ export const insertTargetSchema = createInsertSchema(targets).omit({ id: true, c
 export const insertVulnerabilitySchema = createInsertSchema(vulnerabilities).omit({ id: true, submittedAt: true, updatedAt: true });
 export const insertAiAgentSchema = createInsertSchema(aiAgents).omit({ id: true, createdAt: true });
 export const insertReportSchema = createInsertSchema(reports).omit({ id: true, createdAt: true });
+export const insertClientCertificateSchema = createInsertSchema(clientCertificates).omit({ id: true, createdAt: true, updatedAt: true });
 
 // Types
 export type InsertUser = z.infer<typeof insertUserSchema>;
@@ -160,3 +176,5 @@ export type InsertAiAgent = z.infer<typeof insertAiAgentSchema>;
 export type AiAgent = typeof aiAgents.$inferSelect;
 export type InsertReport = z.infer<typeof insertReportSchema>;
 export type Report = typeof reports.$inferSelect;
+export type InsertClientCertificate = z.infer<typeof insertClientCertificateSchema>;
+export type ClientCertificate = typeof clientCertificates.$inferSelect;

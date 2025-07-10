@@ -13,7 +13,8 @@ import {
   Gauge,
   Grid3X3,
   FolderOpen,
-  LogOut
+  LogOut,
+  FileKey
 } from "lucide-react";
 
 const navigation = [
@@ -31,6 +32,8 @@ const integrations = [
 ];
 
 const settings = [
+  { name: "File Manager", href: "/file-manager", icon: FolderOpen },
+  { name: "Client Certificates", href: "/certificates", icon: FileKey },
   { name: "Configuration", href: "/settings", icon: Settings },
 ];
 
