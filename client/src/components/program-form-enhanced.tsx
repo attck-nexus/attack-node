@@ -375,6 +375,9 @@ export default function ProgramFormEnhanced({ program, onSuccess, onCancel }: Pr
                           className="bg-card border-gray-600 text-gray-100 min-h-[120px]"
                         />
                       </FormControl>
+                      <FormDescription className="text-gray-500">
+                        You can use Markdown formatting (e.g., **bold**, *italic*, `code`, lists)
+                      </FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -574,7 +577,8 @@ export default function ProgramFormEnhanced({ program, onSuccess, onCancel }: Pr
                         />
                       </FormControl>
                       <FormDescription className="text-gray-400">
-                        Include testing guidelines, responsible disclosure policy, and any special requirements.
+                        Include testing guidelines, responsible disclosure policy, and any special requirements. 
+                        Supports Markdown formatting (e.g., **bold**, *italic*, `code`, lists).
                       </FormDescription>
                       <FormMessage />
                     </FormItem>

@@ -231,3 +231,4 @@ Changelog:
 - July 10, 2025. Improved Burp Suite integration UI with better status indicators and error messages
 - July 10, 2025. Implemented headless Burp Suite mode with Docker volume mapping using java -jar command
 - July 10, 2025. Enhanced Create Project functionality with multi-step wizard, comprehensive fields (priority, tags, vulnerability types, contact info, dates), and detailed program inspection view
+- July 10, 2025. Added Markdown rendering support for Program Rules & Policies and Description fields using react-markdown with proper dark theme styling

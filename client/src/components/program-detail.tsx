@@ -25,6 +25,8 @@ import {
 } from "lucide-react";
 import { format } from "date-fns";
 import ProgramFormEnhanced from "./program-form-enhanced";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 interface ProgramDetailProps {
   program: Program | null;
@@ -139,7 +141,11 @@ export default function ProgramDetail({ program, open, onClose, onEdit }: Progra
                     <CardTitle className="text-lg text-gray-100">Description</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-gray-300 whitespace-pre-wrap">{program.description}</p>
+                    <div className="prose prose-invert prose-sm max-w-none prose-headings:text-gray-100 prose-p:text-gray-300 prose-strong:text-gray-100 prose-ul:text-gray-300 prose-ol:text-gray-300 prose-li:text-gray-300 prose-code:text-primary prose-code:bg-surface prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-pre:bg-surface prose-pre:border prose-pre:border-gray-700">
+                      <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                        {program.description}
+                      </ReactMarkdown>
+                    </div>
                   </CardContent>
                 </Card>
               )}
@@ -233,7 +239,11 @@ export default function ProgramDetail({ program, open, onClose, onEdit }: Progra
                     <CardTitle className="text-lg text-gray-100">Program Rules & Policies</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-gray-300 whitespace-pre-wrap">{programData.rules}</p>
+                    <div className="prose prose-invert prose-sm max-w-none prose-headings:text-gray-100 prose-p:text-gray-300 prose-strong:text-gray-100 prose-ul:text-gray-300 prose-ol:text-gray-300 prose-li:text-gray-300 prose-code:text-primary prose-code:bg-surface prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-pre:bg-surface prose-pre:border prose-pre:border-gray-700">
+                      <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                        {programData.rules}
+                      </ReactMarkdown>
+                    </div>
                   </CardContent>
                 </Card>
               )}
