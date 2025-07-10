@@ -36,6 +36,10 @@ The application uses a relational database with the following core entities:
 
 ### Core Features
 1. **Program Management**: Track bug bounty programs from HackerOne, Bugcrowd, and other platforms
+   - Enhanced multi-step creation wizard with progress tracking
+   - Comprehensive program details including priority, tags, vulnerability types, and scope
+   - Click-to-inspect program cards with detailed view and edit capabilities
+   - Support for program rules, out-of-scope items, and contact information
 2. **Vulnerability Tracking**: Comprehensive vulnerability lifecycle management with severity classification
 3. **AI-Powered Reporting**: Automated vulnerability report generation using OpenAI
 4. **Multi-Agent System**: Support for various AI agents including OpenAI, local agents, and Burp Suite integration
@@ -226,3 +230,4 @@ Changelog:
 - July 10, 2025. Enhanced Docker service with availability checking and graceful error handling
 - July 10, 2025. Improved Burp Suite integration UI with better status indicators and error messages
 - July 10, 2025. Implemented headless Burp Suite mode with Docker volume mapping using java -jar command
+- July 10, 2025. Enhanced Create Project functionality with multi-step wizard, comprehensive fields (priority, tags, vulnerability types, contact info, dates), and detailed program inspection view

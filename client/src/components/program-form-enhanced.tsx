@@ -13,7 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { insertProgramSchema } from "@shared/schema";
+import { insertProgramSchema, type Program } from "@shared/schema";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -38,6 +38,7 @@ const formSchema = insertProgramSchema.extend({
 type FormData = z.infer<typeof formSchema>;
 
 interface ProgramFormEnhancedProps {
+  program?: Program;
   onSuccess?: () => void;
   onCancel?: () => void;
 }
@@ -72,52 +73,64 @@ const platformOptions = [
   { value: "Other", label: "Other", color: "bg-gray-500" },
 ];
 
-export default function ProgramFormEnhanced({ onSuccess, onCancel }: ProgramFormEnhancedProps) {
+export default function ProgramFormEnhanced({ program, onSuccess, onCancel }: ProgramFormEnhancedProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [currentStep, setCurrentStep] = useState(0);
   const [tagInput, setTagInput] = useState("");
   const [outOfScopeInput, setOutOfScopeInput] = useState("");
+  
+  const isEditing = !!program;
+  const programData = program as any;
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: "",
-      platform: "",
-      url: "",
-      status: "active",
-      minReward: "0",
-      maxReward: "0",
-      description: "",
-      priority: "medium",
-      tags: [],
-      rules: "",
-      outOfScope: [],
-      vulnerabilityTypes: [],
-      contactEmail: "",
-      contactName: "",
-      notes: "",
+      name: program?.name || "",
+      platform: program?.platform || "",
+      url: program?.url || "",
+      status: program?.status || "active",
+      minReward: program?.minReward?.toString() || "0",
+      maxReward: program?.maxReward?.toString() || "0",
+      description: program?.description || "",
+      priority: programData?.priority || "medium",
+      tags: programData?.tags || [],
+      rules: programData?.rules || "",
+      outOfScope: programData?.outOfScope || [],
+      vulnerabilityTypes: programData?.vulnerabilityTypes || [],
+      contactEmail: programData?.contactEmail || "",
+      contactName: programData?.contactName || "",
+      notes: programData?.notes || "",
+      startDate: programData?.startDate ? new Date(programData.startDate) : undefined,
+      endDate: programData?.endDate ? new Date(programData.endDate) : undefined,
     }
   });
 
   const createProgram = useMutation({
     mutationFn: async (data: FormData) => {
-      const response = await apiRequest("POST", "/api/programs", data);
-      return response.json();
+      if (isEditing) {
+        const response = await apiRequest("PUT", `/api/programs/${program.id}`, data);
+        return response.json();
+      } else {
+        const response = await apiRequest("POST", "/api/programs", data);
+        return response.json();
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/programs"] });
       toast({
         title: "Success",
-        description: "Program created successfully",
+        description: isEditing ? "Program updated successfully" : "Program created successfully",
       });
-      form.reset();
+      if (!isEditing) {
+        form.reset();
+      }
       onSuccess?.();
     },
     onError: (error) => {
       toast({
         title: "Error",
-        description: "Failed to create program",
+        description: isEditing ? "Failed to update program" : "Failed to create program",
         variant: "destructive",
       });
     }
@@ -179,9 +192,11 @@ export default function ProgramFormEnhanced({ onSuccess, onCancel }: ProgramForm
   return (
     <Card className="bg-surface border-gray-700">
       <CardHeader>
-        <CardTitle className="text-2xl text-gray-100">Create New Bug Bounty Program</CardTitle>
+        <CardTitle className="text-2xl text-gray-100">
+          {isEditing ? "Edit Bug Bounty Program" : "Create New Bug Bounty Program"}
+        </CardTitle>
         <CardDescription className="text-gray-400">
-          Fill in the details to add a new program to your portfolio
+          {isEditing ? "Update the program details" : "Fill in the details to add a new program to your portfolio"}
         </CardDescription>
         
         {/* Progress Bar */}
@@ -809,12 +824,12 @@ export default function ProgramFormEnhanced({ onSuccess, onCancel }: ProgramForm
                     {createProgram.isPending ? (
                       <>
                         <Clock className="h-4 w-4 mr-2 animate-spin" />
-                        Creating...
+                        {isEditing ? "Updating..." : "Creating..."}
                       </>
                     ) : (
                       <>
                         <Check className="h-4 w-4 mr-2" />
-                        Create Program
+                        {isEditing ? "Update Program" : "Create Program"}
                       </>
                     )}
                   </Button>

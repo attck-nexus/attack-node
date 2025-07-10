@@ -6,13 +6,16 @@ import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import ProgramCard from "@/components/program-card";
 import ProgramFormEnhanced from "@/components/program-form-enhanced";
+import ProgramDetail from "@/components/program-detail";
 import { Plus, Search, Filter } from "lucide-react";
+import { type Program } from "@shared/schema";
 
 export default function Programs() {
   const [searchTerm, setSearchTerm] = useState("");
   const [showForm, setShowForm] = useState(false);
+  const [selectedProgram, setSelectedProgram] = useState<Program | null>(null);
 
-  const { data: programs, isLoading } = useQuery({
+  const { data: programs, isLoading, refetch } = useQuery({
     queryKey: ["/api/programs"],
   });
 
@@ -103,11 +106,26 @@ export default function Programs() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredPrograms.map((program: any) => (
-              <ProgramCard key={program.id} program={program} />
+              <ProgramCard 
+                key={program.id} 
+                program={program} 
+                onSelect={(p) => setSelectedProgram(p)}
+              />
             ))}
           </div>
         )}
       </main>
+
+      {/* Program Detail Modal */}
+      <ProgramDetail
+        program={selectedProgram}
+        open={!!selectedProgram}
+        onClose={() => setSelectedProgram(null)}
+        onEdit={() => {
+          refetch();
+          setSelectedProgram(null);
+        }}
+      />
     </div>
   );
 }
