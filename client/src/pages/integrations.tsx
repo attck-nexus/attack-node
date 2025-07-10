@@ -114,7 +114,14 @@ export default function Integrations() {
   };
 
   const openApp = (app: IntegrationApp) => {
-    window.open(`http://localhost:${app.port}`, '_blank');
+    // In Replit environment, use the proxy URL
+    const isReplit = window.location.hostname.includes('.replit.dev') || window.location.hostname.includes('.repl.co');
+    if (isReplit) {
+      const baseUrl = window.location.origin;
+      window.open(`${baseUrl}/proxy/${app.port}/`, '_blank');
+    } else {
+      window.open(`http://localhost:${app.port}`, '_blank');
+    }
   };
 
   const filteredApps = (category: string) => 

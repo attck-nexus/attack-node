@@ -109,7 +109,15 @@ export default function KaliEnvironment() {
   };
 
   const openVNC = () => {
-    window.open(`http://localhost:${containerPort}`, '_blank');
+    // In Replit environment, use the proxy URL
+    const isReplit = window.location.hostname.includes('.replit.dev') || window.location.hostname.includes('.repl.co');
+    if (isReplit) {
+      // Replit proxy format: https://bugbounty-command-[username].replit.dev/proxy/[port]/
+      const baseUrl = window.location.origin;
+      window.open(`${baseUrl}/proxy/${containerPort}/`, '_blank');
+    } else {
+      window.open(`http://localhost:${containerPort}`, '_blank');
+    }
   };
 
   return (

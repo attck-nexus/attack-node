@@ -556,7 +556,16 @@ export default function BurpSuite() {
                         {!isHeadlessBurp && (
                           <Button 
                             className="w-full bg-primary hover:bg-primary/90"
-                            onClick={() => window.open(`http://localhost:${burpContainer?.port}`, '_blank')}
+                            onClick={() => {
+                              // In Replit environment, use the proxy URL
+                              const isReplit = window.location.hostname.includes('.replit.dev') || window.location.hostname.includes('.repl.co');
+                              if (isReplit) {
+                                const baseUrl = window.location.origin;
+                                window.open(`${baseUrl}/proxy/${burpContainer?.port}/`, '_blank');
+                              } else {
+                                window.open(`http://localhost:${burpContainer?.port}`, '_blank');
+                              }
+                            }}
                           >
                             <ExternalLink className="h-4 w-4 mr-2" />
                             Open Web Interface
