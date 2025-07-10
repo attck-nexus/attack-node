@@ -597,8 +597,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // File Management routes
   app.get("/api/files", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = !process.env.GOOGLE_CLIENT_ID ? 'dev-user' : req.user.claims.sub;
       const user = await storage.getUser(userId);
+      if (!user && !process.env.GOOGLE_CLIENT_ID) {
+        // Create a mock user for development
+        const mockUser = await storage.upsertUser({
+          id: 'dev-user',
+          username: 'developer',
+          email: 'dev@example.com',
+          firstName: 'Developer',
+          lastName: 'User',
+          profileImageUrl: null
+        });
+        const listing = await fileManagerService.listDirectory(mockUser, req.query.path as string || "/");
+        return res.json(listing);
+      }
       if (!user) {
         return res.status(404).json({ error: "User not found" });
       }
@@ -614,8 +627,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/files/directory", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = !process.env.GOOGLE_CLIENT_ID ? 'dev-user' : req.user.claims.sub;
       const user = await storage.getUser(userId);
+      if (!user && !process.env.GOOGLE_CLIENT_ID) {
+        // Create a mock user for development
+        const mockUser = await storage.upsertUser({
+          id: 'dev-user',
+          username: 'developer',
+          email: 'dev@example.com',
+          firstName: 'Developer',
+          lastName: 'User',
+          profileImageUrl: null
+        });
+        await fileManagerService.createDirectory(mockUser, req.body.path);
+        return res.json({ success: true });
+      }
       if (!user) {
         return res.status(404).json({ error: "User not found" });
       }
@@ -635,8 +661,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.delete("/api/files", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = !process.env.GOOGLE_CLIENT_ID ? 'dev-user' : req.user?.claims?.sub;
       const user = await storage.getUser(userId);
+      if (!user && !process.env.GOOGLE_CLIENT_ID) {
+        // Create a mock user for development
+        const mockUser = await storage.upsertUser({
+          id: 'dev-user',
+          username: 'developer',
+          email: 'dev@example.com',
+          firstName: 'Developer',
+          lastName: 'User',
+          profileImageUrl: null
+        });
+        await fileManagerService.deleteFile(mockUser, req.query.path as string);
+        return res.json({ success: true });
+      }
       if (!user) {
         return res.status(404).json({ error: "User not found" });
       }
@@ -656,8 +695,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/files/download", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = !process.env.GOOGLE_CLIENT_ID ? 'dev-user' : req.user?.claims?.sub;
       const user = await storage.getUser(userId);
+      if (!user && !process.env.GOOGLE_CLIENT_ID) {
+        // Create a mock user for development
+        const mockUser = await storage.upsertUser({
+          id: 'dev-user',
+          username: 'developer',
+          email: 'dev@example.com',
+          firstName: 'Developer',
+          lastName: 'User',
+          profileImageUrl: null
+        });
+        const fileContent = await fileManagerService.readFile(mockUser, req.query.path as string);
+        const fileName = (req.query.path as string).split('/').pop() || 'download';
+        res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`);
+        res.setHeader('Content-Type', 'application/octet-stream');
+        return res.send(fileContent);
+      }
       if (!user) {
         return res.status(404).json({ error: "User not found" });
       }
@@ -681,8 +736,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/files/upload", isAuthenticated, upload.single('file'), async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = !process.env.GOOGLE_CLIENT_ID ? 'dev-user' : req.user?.claims?.sub;
       const user = await storage.getUser(userId);
+      if (!user && !process.env.GOOGLE_CLIENT_ID) {
+        // Create a mock user for development
+        const mockUser = await storage.upsertUser({
+          id: 'dev-user',
+          username: 'developer',
+          email: 'dev@example.com',
+          firstName: 'Developer',
+          lastName: 'User',
+          profileImageUrl: null
+        });
+        
+        if (!req.file) {
+          return res.status(400).json({ error: "No file uploaded" });
+        }
+
+        const targetPath = req.body.path || "/";
+        const fileName = req.file.originalname;
+        const fullPath = targetPath.endsWith('/') ? targetPath + fileName : targetPath + '/' + fileName;
+
+        const fs = await import("fs/promises");
+        const fileContent = await fs.readFile(req.file.path);
+        await fileManagerService.writeFile(mockUser, fullPath, fileContent);
+        await fs.unlink(req.file.path);
+
+        return res.json({ success: true, path: fullPath });
+      }
       if (!user) {
         return res.status(404).json({ error: "User not found" });
       }
@@ -712,8 +793,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/files/user-home", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = !process.env.GOOGLE_CLIENT_ID ? 'dev-user' : req.user?.claims?.sub;
       const user = await storage.getUser(userId);
+      if (!user && !process.env.GOOGLE_CLIENT_ID) {
+        // Create a mock user for development
+        const mockUser = await storage.upsertUser({
+          id: 'dev-user',
+          username: 'developer',
+          email: 'dev@example.com',
+          firstName: 'Developer',
+          lastName: 'User',
+          profileImageUrl: null
+        });
+        const homePath = fileManagerService.getUserHomePath(mockUser);
+        return res.json({ homePath });
+      }
       if (!user) {
         return res.status(404).json({ error: "User not found" });
       }
@@ -900,7 +994,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Global Config routes
   app.get("/api/config/:configType", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = !process.env.GOOGLE_CLIENT_ID ? 'dev-user' : req.user?.claims?.sub;
       const configType = req.params.configType;
       
       const config = await storage.getGlobalConfig(userId, configType);
@@ -917,7 +1011,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/config/:configType", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = !process.env.GOOGLE_CLIENT_ID ? 'dev-user' : req.user?.claims?.sub;
       const configType = req.params.configType;
       const configData = req.body;
       
@@ -936,7 +1030,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/config", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = !process.env.GOOGLE_CLIENT_ID ? 'dev-user' : req.user?.claims?.sub;
       const configs = await storage.getAllUserConfigs(userId);
       
       // Transform to a more convenient format

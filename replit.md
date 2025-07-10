@@ -235,3 +235,6 @@ Changelog:
 - July 10, 2025. Enhanced Create Project functionality with multi-step wizard, comprehensive fields (priority, tags, vulnerability types, contact info, dates), and detailed program inspection view
 - July 10, 2025. Added Markdown rendering support for Program Rules & Policies and Description fields using react-markdown with proper dark theme styling
 - July 10, 2025. Fixed Docker container VNC access by updating all window.open calls to use Replit proxy URLs (/proxy/[port]/) instead of localhost - affects Kali environment, Burp Suite, and all integrations
+- July 10, 2025. Implemented global configuration persistence with database storage for settings, API keys, and user preferences
+- July 10, 2025. Fixed notification bell icon by adding interactive dropdown menu with sample notifications and mark-as-read functionality
+- July 10, 2025. Fixed File Manager authentication errors in development mode by properly handling mock user authentication when Google OAuth is not configured
