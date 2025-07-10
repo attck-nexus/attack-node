@@ -448,6 +448,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.post("/api/docker/start-headless-burpsuite", burpSuiteUpload.fields([
+    { name: 'jar', maxCount: 1 },
+    { name: 'license', maxCount: 1 }
+  ]), async (req, res) => {
+    try {
+      const files = req.files as { [fieldname: string]: Express.Multer.File[] };
+      
+      if (!files?.jar?.[0]) {
+        return res.status(400).json({ error: "JAR file is required for headless mode" });
+      }
+
+      const jarPath = await dockerService.saveUploadedFile(files.jar[0].buffer, files.jar[0].originalname);
+      
+      let licensePath: string | undefined;
+      if (files?.license?.[0]) {
+        licensePath = await dockerService.saveUploadedFile(files.license[0].buffer, files.license[0].originalname);
+      }
+
+      const container = await dockerService.startHeadlessBurpSuite(jarPath, licensePath);
+      res.json(container);
+    } catch (error) {
+      console.error("Failed to start headless Burp Suite:", error);
+      if (error.code === 'LIMIT_FILE_SIZE') {
+        return res.status(400).json({ error: "File too large. Maximum size is 1GB." });
+      }
+      res.status(500).json({ error: error.message || "Failed to start headless Burp Suite container" });
+    }
+  });
+
   app.post("/api/docker/start-app", async (req, res) => {
     try {
       const { appName, image, port } = req.body;

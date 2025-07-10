@@ -131,6 +131,80 @@ export class DockerService {
     }
   }
 
+  async startHeadlessBurpSuite(jarPath: string, licensePath?: string): Promise<DockerContainer> {
+    const containerName = 'bugbounty-burpsuite-headless';
+    const port = 8080; // Port for Burp Suite proxy
+
+    // Check if Docker is available
+    const dockerAvailable = await this.checkDockerAvailability();
+    if (!dockerAvailable) {
+      // Create a mock container for demonstration purposes
+      const mockContainer: DockerContainer = {
+        id: 'mock-headless-burpsuite',
+        name: containerName,
+        image: 'openjdk:11-slim',
+        port,
+        status: 'error',
+        created: new Date(),
+        fileUploads: [jarPath, licensePath].filter((f): f is string => Boolean(f))
+      };
+      
+      this.containers.set(containerName, mockContainer);
+      throw new Error('Docker daemon is not running. In a production environment, this would start a headless Burp Suite container.');
+    }
+
+    try {
+      // Stop existing container if running
+      await this.stopContainer(containerName);
+
+      // Get absolute path of the JAR file
+      const jarAbsPath = path.resolve(jarPath);
+      const jarFileName = path.basename(jarPath);
+      
+      // Prepare volume mappings
+      const volumes = [`${jarAbsPath}:/app/${jarFileName}:ro`];
+      
+      // Add license file volume if provided
+      let licenseCmd = '';
+      if (licensePath) {
+        const licenseAbsPath = path.resolve(licensePath);
+        const licenseFileName = path.basename(licensePath);
+        volumes.push(`${licenseAbsPath}:/app/${licenseFileName}:ro`);
+        licenseCmd = `--config-file=/app/${licenseFileName}`;
+      }
+
+      // Start the headless Burp Suite container
+      const dockerCmd = [
+        'docker', 'run', '-d',
+        '--name', containerName,
+        '-p', `${port}:8080`,
+        ...volumes.map(v => ['-v', v]).flat(),
+        '-w', '/app',
+        'openjdk:11-slim',
+        'java', '-jar', '-Xmx1024m', `/app/${jarFileName}`, licenseCmd
+      ].filter(Boolean);
+
+      const { stdout } = await execAsync(dockerCmd.join(' '));
+      const containerId = stdout.trim();
+
+      const container: DockerContainer = {
+        id: containerId,
+        name: containerName,
+        image: 'openjdk:11-slim (headless Burp Suite)',
+        port,
+        status: 'running',
+        created: new Date(),
+        fileUploads: [jarPath, licensePath].filter((f): f is string => Boolean(f))
+      };
+
+      this.containers.set(containerName, container);
+      return container;
+    } catch (error) {
+      console.error('Failed to start headless Burp Suite container:', error);
+      throw new Error('Failed to start headless Burp Suite container');
+    }
+  }
+
   async startKasmWebApp(appName: string, image: string, port: number): Promise<DockerContainer> {
     const containerName = `bugbounty-${appName}`;
 

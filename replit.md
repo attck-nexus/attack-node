@@ -130,11 +130,12 @@ Preferred communication style: Simple, everyday language.
 ## Docker Integration Architecture
 
 ### Supported Integrations
-1. **Burp Suite Professional**: Custom Docker containers built from user-provided JAR files
-   - Upload burpsuite_pro.jar installer
-   - Optional license file integration
-   - Web-based access via KasmWeb VNC interface
-   - Persistent project storage
+1. **Burp Suite Professional**: Custom Docker containers with two modes:
+   - **GUI Mode**: Web-based access via KasmWeb VNC interface on port 6901
+   - **Headless Mode**: Runs with Docker volume mapping using `java -jar -Xmx1024m` command
+   - Upload burpsuite_pro.jar installer (required)
+   - Optional license file integration for automated activation
+   - Persistent project storage in both modes
 
 2. **KasmWeb Applications**: Pre-built security tools with web interfaces
    - Maltego: OSINT and forensics analysis
@@ -224,3 +225,4 @@ Changelog:
 - July 10, 2025. Fixed file upload size limit issues - increased limits to 1GB for large JAR file uploads
 - July 10, 2025. Enhanced Docker service with availability checking and graceful error handling
 - July 10, 2025. Improved Burp Suite integration UI with better status indicators and error messages
+- July 10, 2025. Implemented headless Burp Suite mode with Docker volume mapping using java -jar command

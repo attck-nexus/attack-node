@@ -7,6 +7,8 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 import { 
   Shield, 
   Play, 
@@ -22,7 +24,8 @@ import {
   AlertTriangle,
   CheckCircle,
   Clock,
-  BarChart3
+  BarChart3,
+  Terminal
 } from "lucide-react";
 
 export default function BurpSuite() {
@@ -31,6 +34,7 @@ export default function BurpSuite() {
   const [showProjectDialog, setShowProjectDialog] = useState(false);
   const [jarFile, setJarFile] = useState<File | null>(null);
   const [licenseFile, setLicenseFile] = useState<File | null>(null);
+  const [isHeadlessMode, setIsHeadlessMode] = useState(false);
   const queryClient = useQueryClient();
 
   // Query Docker containers
@@ -39,7 +43,7 @@ export default function BurpSuite() {
     refetchInterval: 5000 // Refresh every 5 seconds
   });
 
-  // Start Burp Suite mutation
+  // Start Burp Suite mutation (GUI mode)
   const startBurpSuite = useMutation({
     mutationFn: async () => {
       const formData = new FormData();
@@ -53,6 +57,30 @@ export default function BurpSuite() {
       
       if (!response.ok) {
         throw new Error("Failed to start Burp Suite");
+      }
+      
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/docker/containers'] });
+    }
+  });
+
+  // Start Headless Burp Suite mutation
+  const startHeadlessBurpSuite = useMutation({
+    mutationFn: async () => {
+      const formData = new FormData();
+      if (jarFile) formData.append('jar', jarFile);
+      if (licenseFile) formData.append('license', licenseFile);
+      
+      const response = await fetch("/api/docker/start-headless-burpsuite", {
+        method: "POST",
+        body: formData
+      });
+      
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "Failed to start headless Burp Suite");
       }
       
       return response.json();
@@ -83,8 +111,11 @@ export default function BurpSuite() {
   });
 
   const containers_typed = containers as any[];
-  const burpContainer = containers_typed.find((c: any) => c.name === 'bugbounty-burpsuite');
+  const burpContainer = containers_typed.find((c: any) => 
+    c.name === 'bugbounty-burpsuite' || c.name === 'bugbounty-burpsuite-headless'
+  );
   const isBurpRunning = burpContainer?.status === 'running';
+  const isHeadlessBurp = burpContainer?.name === 'bugbounty-burpsuite-headless';
 
   // Mock data for demonstration - would integrate with actual Burp Suite API
   const scanResults = [
@@ -438,7 +469,11 @@ export default function BurpSuite() {
                   </div>
                   <div className="flex items-center justify-between mt-2">
                     <span className="text-gray-400">Port</span>
-                    <span className="text-gray-300">6901</span>
+                    <span className="text-gray-300">{isHeadlessMode ? '8080' : '6901'}</span>
+                  </div>
+                  <div className="flex items-center justify-between mt-2">
+                    <span className="text-gray-400">Mode</span>
+                    <span className="text-gray-300">{isHeadlessMode ? 'Headless' : 'GUI (VNC)'}</span>
                   </div>
                   <div className="flex items-center justify-between mt-2">
                     <span className="text-gray-400">JAR File</span>
@@ -475,6 +510,23 @@ export default function BurpSuite() {
                       <p className="text-xs text-success mt-1">Selected: {licenseFile.name}</p>
                     )}
                   </div>
+                  <div className="flex items-center space-x-2 mt-4 p-3 bg-card rounded-lg">
+                    <Switch
+                      id="headless-mode"
+                      checked={isHeadlessMode}
+                      onCheckedChange={setIsHeadlessMode}
+                      className="data-[state=checked]:bg-primary"
+                    />
+                    <Label htmlFor="headless-mode" className="text-gray-300 cursor-pointer">
+                      <div className="flex items-center space-x-2">
+                        <Terminal className="h-4 w-4" />
+                        <span>Headless Mode</span>
+                      </div>
+                      <p className="text-xs text-gray-400 mt-1">
+                        Run Burp Suite without GUI (uses volume mapping with java -jar command)
+                      </p>
+                    </Label>
+                  </div>
                 </div>
               </div>
 
@@ -485,21 +537,39 @@ export default function BurpSuite() {
                     {!isBurpRunning ? (
                       <Button 
                         className="w-full bg-primary hover:bg-primary/90"
-                        onClick={() => startBurpSuite.mutate()}
-                        disabled={startBurpSuite.isPending || (!jarFile)}
+                        onClick={() => {
+                          if (isHeadlessMode) {
+                            startHeadlessBurpSuite.mutate();
+                          } else {
+                            startBurpSuite.mutate();
+                          }
+                        }}
+                        disabled={startBurpSuite.isPending || startHeadlessBurpSuite.isPending || (!jarFile)}
                       >
                         <Play className="h-4 w-4 mr-2" />
-                        {startBurpSuite.isPending ? "Starting..." : "Start Burp Suite Container"}
+                        {(startBurpSuite.isPending || startHeadlessBurpSuite.isPending) 
+                          ? "Starting..." 
+                          : `Start Burp Suite ${isHeadlessMode ? '(Headless)' : 'Container'}`}
                       </Button>
                     ) : (
                       <>
-                        <Button 
-                          className="w-full bg-primary hover:bg-primary/90"
-                          onClick={() => window.open(`http://localhost:${burpContainer?.port}`, '_blank')}
-                        >
-                          <ExternalLink className="h-4 w-4 mr-2" />
-                          Open Web Interface
-                        </Button>
+                        {!isHeadlessBurp && (
+                          <Button 
+                            className="w-full bg-primary hover:bg-primary/90"
+                            onClick={() => window.open(`http://localhost:${burpContainer?.port}`, '_blank')}
+                          >
+                            <ExternalLink className="h-4 w-4 mr-2" />
+                            Open Web Interface
+                          </Button>
+                        )}
+                        {isHeadlessBurp && (
+                          <div className="p-3 bg-success/10 border border-success/20 rounded-lg">
+                            <p className="text-success text-sm font-medium">Headless Burp Suite Running</p>
+                            <p className="text-gray-400 text-xs mt-1">
+                              Proxy available on port {burpContainer?.port || '8080'}
+                            </p>
+                          </div>
+                        )}
                         <Button 
                           variant="destructive" 
                           className="w-full"
@@ -520,11 +590,13 @@ export default function BurpSuite() {
 
                 <div className="bg-warning/10 border border-warning/20 rounded-lg p-3">
                   <p className="text-warning text-sm">
-                    Upload your burpsuite_pro.jar installer to run Burp Suite in a containerized environment
+                    {isHeadlessMode 
+                      ? "Headless mode runs Burp Suite without GUI using Docker volume mapping with java -jar command"
+                      : "GUI mode provides web-based VNC access to Burp Suite Professional interface"}
                   </p>
-                  {startBurpSuite.error && (
+                  {(startBurpSuite.error || startHeadlessBurpSuite.error) && (
                     <p className="text-error text-sm mt-2">
-                      {startBurpSuite.error.message}
+                      {startBurpSuite.error?.message || startHeadlessBurpSuite.error?.message}
                     </p>
                   )}
                 </div>
