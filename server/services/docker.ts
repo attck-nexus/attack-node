@@ -18,9 +18,27 @@ export interface DockerContainer {
 export class DockerService {
   private containers = new Map<string, DockerContainer>();
   private uploadDir = path.join(process.cwd(), 'uploads', 'docker');
+  private dockerAvailable: boolean | null = null;
 
   constructor() {
     this.ensureUploadDir();
+    this.checkDockerAvailability();
+  }
+
+  private async checkDockerAvailability(): Promise<boolean> {
+    if (this.dockerAvailable !== null) {
+      return this.dockerAvailable;
+    }
+
+    try {
+      await execAsync('docker --version');
+      this.dockerAvailable = true;
+      return true;
+    } catch (error) {
+      console.warn('Docker is not available in this environment');
+      this.dockerAvailable = false;
+      return false;
+    }
   }
 
   private async ensureUploadDir() {
@@ -46,6 +64,12 @@ export class DockerService {
   async startBurpSuite(jarPath?: string, licensePath?: string): Promise<DockerContainer> {
     const containerName = 'bugbounty-burpsuite';
     const port = 6901;
+
+    // Check if Docker is available
+    const dockerAvailable = await this.checkDockerAvailability();
+    if (!dockerAvailable) {
+      throw new Error('Docker is not available in this environment. Please install Docker to use container features.');
+    }
 
     try {
       // Stop existing container if running
@@ -92,6 +116,12 @@ export class DockerService {
 
   async startKasmWebApp(appName: string, image: string, port: number): Promise<DockerContainer> {
     const containerName = `bugbounty-${appName}`;
+
+    // Check if Docker is available
+    const dockerAvailable = await this.checkDockerAvailability();
+    if (!dockerAvailable) {
+      throw new Error('Docker is not available in this environment. Please install Docker to use container features.');
+    }
 
     try {
       // Stop existing container if running
@@ -166,6 +196,11 @@ export class DockerService {
   }
 
   async listContainers(): Promise<DockerContainer[]> {
+    const dockerAvailable = await this.checkDockerAvailability();
+    if (!dockerAvailable) {
+      return [];
+    }
+    
     try {
       // Update status for all tracked containers
       const entries = Array.from(this.containers.entries());
