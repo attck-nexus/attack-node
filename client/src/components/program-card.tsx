@@ -1,7 +1,8 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { type Program } from "@shared/schema";
-import { Building, Globe, DollarSign } from "lucide-react";
+import { Building, Globe, DollarSign, Calendar, AlertCircle, Tag } from "lucide-react";
+import { format } from "date-fns";
 
 interface ProgramCardProps {
   program: Program;
@@ -12,6 +13,13 @@ const statusColors = {
   active: "bg-success/10 text-success",
   paused: "bg-warning/10 text-warning",
   ended: "bg-error/10 text-error"
+};
+
+const priorityColors = {
+  low: "bg-gray-500/10 text-gray-400",
+  medium: "bg-blue-500/10 text-blue-400",
+  high: "bg-orange-500/10 text-orange-400",
+  critical: "bg-red-500/10 text-red-400"
 };
 
 export default function ProgramCard({ program, onSelect }: ProgramCardProps) {
@@ -58,7 +66,7 @@ export default function ProgramCard({ program, onSelect }: ProgramCardProps) {
           </Badge>
         </div>
         
-        <div className="grid grid-cols-2 gap-4 text-sm">
+        <div className="grid grid-cols-2 gap-4 text-sm mb-3">
           <div className="flex items-center text-gray-400">
             <Building className="h-4 w-4 mr-2" />
             <span>{program.platform}</span>
@@ -68,6 +76,41 @@ export default function ProgramCard({ program, onSelect }: ProgramCardProps) {
             <span>${program.minReward} - ${program.maxReward}</span>
           </div>
         </div>
+
+        {/* Priority and Tags Row */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            {(program as any).priority && (
+              <Badge 
+                variant="secondary" 
+                className={`${priorityColors[(program as any).priority as keyof typeof priorityColors]} px-2 py-0.5 text-xs`}
+              >
+                <AlertCircle className="h-3 w-3 mr-1" />
+                {(program as any).priority}
+              </Badge>
+            )}
+            {(program as any).endDate && new Date((program as any).endDate) < new Date() && (
+              <Badge variant="secondary" className="bg-gray-500/10 text-gray-400 px-2 py-0.5 text-xs">
+                <Calendar className="h-3 w-3 mr-1" />
+                Ended
+              </Badge>
+            )}
+          </div>
+          
+          {(program as any).tags && (program as any).tags.length > 0 && (
+            <div className="flex items-center gap-1">
+              <Tag className="h-3 w-3 text-gray-400" />
+              <span className="text-xs text-gray-400">{(program as any).tags.length}</span>
+            </div>
+          )}
+        </div>
+
+        {/* Description if exists */}
+        {program.description && (
+          <p className="text-xs text-gray-400 mt-3 line-clamp-2">
+            {program.description}
+          </p>
+        )}
       </CardContent>
     </Card>
   );

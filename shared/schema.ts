@@ -35,6 +35,16 @@ export const programs = pgTable("programs", {
   minReward: decimal("min_reward", { precision: 10, scale: 2 }).default("0"),
   maxReward: decimal("max_reward", { precision: 10, scale: 2 }).default("0"),
   description: text("description"),
+  priority: text("priority").default("medium"), // low, medium, high, critical
+  tags: json("tags").$type<string[]>().default([]),
+  rules: text("rules"), // Program rules and policies
+  outOfScope: json("out_of_scope").$type<string[]>().default([]), // Out of scope items
+  vulnerabilityTypes: json("vulnerability_types").$type<string[]>().default([]), // Accepted vulnerability types
+  contactEmail: text("contact_email"),
+  contactName: text("contact_name"),
+  startDate: timestamp("start_date"),
+  endDate: timestamp("end_date"),
+  notes: text("notes"), // Internal notes
   lastChecked: timestamp("last_checked").defaultNow(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),

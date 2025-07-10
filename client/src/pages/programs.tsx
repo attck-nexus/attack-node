@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import ProgramCard from "@/components/program-card";
-import ProgramForm from "@/components/program-form";
+import ProgramFormEnhanced from "@/components/program-form-enhanced";
 import { Plus, Search, Filter } from "lucide-react";
 
 export default function Programs() {
@@ -45,11 +45,8 @@ export default function Programs() {
                 Add Program
               </Button>
             </DialogTrigger>
-            <DialogContent className="max-w-2xl bg-surface border-gray-700">
-              <DialogHeader>
-                <DialogTitle className="text-gray-100">Add New Program</DialogTitle>
-              </DialogHeader>
-              <ProgramForm
+            <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-surface border-gray-700">
+              <ProgramFormEnhanced
                 onSuccess={() => setShowForm(false)}
                 onCancel={() => setShowForm(false)}
               />
