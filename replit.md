@@ -214,6 +214,20 @@ The platform now supports client certificate management for accessing secure res
 - `DELETE /api/certificates/:id` - Delete certificate and associated files
 - `GET /api/certificates/:id/download` - Download certificate components
 
+## Local Deployment
+
+The project includes comprehensive deployment documentation:
+- **DEPLOYMENT_GUIDE.md**: Step-by-step Ubuntu 22.04 deployment instructions
+- **.env.example**: Example environment configuration file
+- **setup.sh**: Automated setup script for quick installation
+
+Quick start on Ubuntu 22.04:
+```bash
+chmod +x setup.sh
+./setup.sh
+npm run dev
+```
+
 ## Changelog
 
 Changelog:
@@ -238,3 +252,4 @@ Changelog:
 - July 10, 2025. Implemented global configuration persistence with database storage for settings, API keys, and user preferences
 - July 10, 2025. Fixed notification bell icon by adding interactive dropdown menu with sample notifications and mark-as-read functionality
 - July 10, 2025. Fixed File Manager authentication errors in development mode by properly handling mock user authentication when Google OAuth is not configured
+- July 10, 2025. Created comprehensive local deployment guide with automated setup script for Ubuntu 22.04, including PostgreSQL setup, environment configuration, and optional Docker installation
