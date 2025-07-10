@@ -1,14 +1,18 @@
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import StatsCard from "@/components/stats-card";
 import VulnerabilityCard from "@/components/vulnerability-card";
 import AiAgentStatus from "@/components/ai-agent-status";
-import { Target, Bug, DollarSign, Clock, Plus, Bell, ExternalLink, Play, Square } from "lucide-react";
+import { Target, Bug, DollarSign, Clock, Plus, Bell, ExternalLink, Play, Square, CheckCircle, AlertCircle, Info } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 
 export default function Dashboard() {
+  const [unreadNotifications, setUnreadNotifications] = useState(3);
+  
   const { data: stats, isLoading: statsLoading } = useQuery({
     queryKey: ["/api/dashboard/stats"],
   });
@@ -28,6 +32,46 @@ export default function Dashboard() {
   const recentVulnerabilities = vulnerabilities?.slice(0, 3) || [];
   const activePrograms = programs?.filter((p: any) => p.status === 'active').slice(0, 3) || [];
   const agentsList = aiAgents?.slice(0, 3) || [];
+
+  // Sample notifications data
+  const notifications = [
+    {
+      id: 1,
+      type: 'success',
+      title: 'Vulnerability Confirmed',
+      message: 'Your XSS vulnerability report on Target Alpha has been triaged as P2',
+      time: '5 minutes ago',
+      read: false,
+      icon: CheckCircle
+    },
+    {
+      id: 2,
+      type: 'warning',
+      title: 'Agent Status Alert',
+      message: 'OpenAI Agent has been offline for 15 minutes',
+      time: '1 hour ago',
+      read: false,
+      icon: AlertCircle
+    },
+    {
+      id: 3,
+      type: 'info',
+      title: 'New Program Available',
+      message: 'Microsoft has launched a new bug bounty program with up to $100k rewards',
+      time: '2 hours ago',
+      read: false,
+      icon: Info
+    }
+  ];
+
+  const handleMarkAllAsRead = () => {
+    setUnreadNotifications(0);
+  };
+
+  const handleNotificationClick = (notificationId: number) => {
+    // Mark individual notification as read
+    console.log('Notification clicked:', notificationId);
+  };
 
   if (statsLoading) {
     return (
@@ -51,14 +95,87 @@ export default function Dashboard() {
               <Plus className="h-4 w-4 mr-2" />
               New Report
             </Button>
-            <div className="relative">
-              <Button variant="outline" size="icon" className="bg-card border-gray-600 text-gray-100">
-                <Bell className="h-4 w-4" />
-              </Button>
-              <span className="absolute -top-2 -right-2 bg-error text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                3
-              </span>
-            </div>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <div className="relative">
+                  <Button variant="outline" size="icon" className="bg-card border-gray-600 text-gray-100 hover:bg-gray-700">
+                    <Bell className="h-4 w-4" />
+                  </Button>
+                  {unreadNotifications > 0 && (
+                    <span className="absolute -top-2 -right-2 bg-error text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                      {unreadNotifications}
+                    </span>
+                  )}
+                </div>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-96 bg-surface border-gray-700" align="end">
+                <DropdownMenuLabel className="flex items-center justify-between p-4 pb-2">
+                  <span className="text-lg font-semibold text-gray-100">Notifications</span>
+                  {unreadNotifications > 0 && (
+                    <Button
+                      variant="link"
+                      size="sm"
+                      className="text-primary hover:text-primary/80 p-0 h-auto"
+                      onClick={handleMarkAllAsRead}
+                    >
+                      Mark all as read
+                    </Button>
+                  )}
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator className="bg-gray-700" />
+                
+                <div className="max-h-96 overflow-y-auto">
+                  {notifications.length === 0 ? (
+                    <div className="p-8 text-center text-gray-400">
+                      No new notifications
+                    </div>
+                  ) : (
+                    notifications.map((notification) => (
+                      <DropdownMenuItem
+                        key={notification.id}
+                        className="p-4 cursor-pointer hover:bg-card focus:bg-card"
+                        onClick={() => handleNotificationClick(notification.id)}
+                      >
+                        <div className="flex items-start space-x-3 w-full">
+                          <notification.icon 
+                            className={`h-5 w-5 mt-0.5 ${
+                              notification.type === 'success' ? 'text-success' :
+                              notification.type === 'warning' ? 'text-warning' :
+                              'text-info'
+                            }`} 
+                          />
+                          <div className="flex-1 space-y-1">
+                            <p className="text-sm font-medium text-gray-100">
+                              {notification.title}
+                            </p>
+                            <p className="text-sm text-gray-400 line-clamp-2">
+                              {notification.message}
+                            </p>
+                            <p className="text-xs text-gray-500">
+                              {notification.time}
+                            </p>
+                          </div>
+                          {!notification.read && (
+                            <div className="w-2 h-2 bg-primary rounded-full mt-1.5" />
+                          )}
+                        </div>
+                      </DropdownMenuItem>
+                    ))
+                  )}
+                </div>
+                
+                {notifications.length > 0 && (
+                  <>
+                    <DropdownMenuSeparator className="bg-gray-700" />
+                    <DropdownMenuItem className="p-3 text-center hover:bg-card focus:bg-card cursor-pointer">
+                      <span className="text-sm text-primary hover:text-primary/80">
+                        View all notifications
+                      </span>
+                    </DropdownMenuItem>
+                  </>
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
             <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center text-white font-medium">
               SR
             </div>
