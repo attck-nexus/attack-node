@@ -220,3 +220,7 @@ Changelog:
 - July 06, 2025. Removed OWASP ZAP, Wireshark, and Metasploit from integrations per user request
 - July 06, 2025. Implemented agent loop mechanism with iterative payload refinement system
 - July 09, 2025. Added comprehensive client certificate management system with upload/download functionality
+- July 10, 2025. Added Anthropic API Key configuration to settings page alongside OpenAI integration
+- July 10, 2025. Fixed file upload size limit issues - increased limits to 1GB for large JAR file uploads
+- July 10, 2025. Enhanced Docker service with availability checking and graceful error handling
+- July 10, 2025. Improved Burp Suite integration UI with better status indicators and error messages
