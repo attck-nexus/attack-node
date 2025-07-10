@@ -52,13 +52,17 @@ export default function ProgramCard({ program, onSelect }: ProgramCardProps) {
             </div>
             <div>
               <h3 className="font-medium text-gray-100">{program.name}</h3>
-              <p className="text-sm text-gray-400">
-                <span className="flex items-center">
-                  <Globe className="h-3 w-3 mr-1" />
-                  <span className="font-mono text-xs">
-                    [{program.name} {program.platform}]({program.url})
-                  </span>
-                </span>
+              <p className="text-sm text-gray-400 flex items-center">
+                <Globe className="h-3 w-3 mr-1" />
+                <a 
+                  href={program.url} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="hover:text-primary transition-colors underline"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  {program.name} {program.platform}
+                </a>
               </p>
             </div>
           </div>
