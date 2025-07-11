@@ -175,19 +175,36 @@ npm run db:push      # Push database schema changes
 - **URL**: `https://localhost:6902` (HTTPS required)
 - **Username**: `kasm_user`
 - **Password**: `password`
+- **User Privileges**: Root access enabled for full system control
 - **SSL Certificate**: Self-signed (accept browser security warning)
+
+**Features:**
+- **Persistent Storage**: All files and configurations automatically saved
+- **Root Access**: Full administrative privileges for advanced operations
+- **Shared Directory**: Access to `/home/kasm-user/shared` for file transfers
+- **Pre-installed Tools**: Complete Kali Linux arsenal (Nmap, Metasploit, Burp Suite, etc.)
 
 **Getting Started:**
 1. Start Kali Linux container from the Integrations tab or Kali Environment page
-2. Navigate to `https://localhost:6902` in your browser
-3. Accept the SSL certificate warning (click "Advanced" → "Proceed to localhost")
-4. Login with username `kasm_user` and password `password`
-5. Access full Kali Linux desktop with pre-installed security tools
+2. Wait for container initialization (1-2 minutes for full setup)
+3. Navigate to `https://localhost:6902` in your browser
+4. Accept the SSL certificate warning (click "Advanced" → "Proceed to localhost")
+5. Login with username `kasm_user` and password `password`
+6. Enjoy full Kali Linux desktop with root privileges and persistent storage
+
+**Data Persistence:**
+- **Home Directory**: All user files persist between container restarts
+- **Tool Configurations**: Settings and preferences automatically saved
+- **Downloads**: Files downloaded remain available across sessions
+- **Custom Scripts**: Personal scripts and tools persist permanently
+- **Storage Location**: `uploads/kasm_profiles/kali-root/` on host system
 
 **Troubleshooting:**
 - **HTTP 401 Error**: Ensure you're using HTTPS (not HTTP) and correct credentials
 - **Connection Refused**: Verify container is running via Docker Dashboard
 - **SSL Warning**: Accept the self-signed certificate to proceed
+- **Slow Loading**: Allow 2-3 minutes for complete container initialization
+- **Permission Issues**: Container runs with root privileges for full access
 
 ### Burp Suite Professional
 

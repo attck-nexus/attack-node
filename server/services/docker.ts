@@ -244,11 +244,43 @@ export class DockerService {
       // Determine the container port based on the image
       let containerPort = '80'; // Default for nginx
       let environmentVars: string[] = [];
+      let volumeMounts: string[] = [];
+      let additionalOptions: string[] = [];
       
       if (image.includes('kasm')) {
         // Kasm images use VNC on port 6901
         containerPort = '6901';
         environmentVars = ['-e', 'VNC_PW=password'];
+
+        // Special configuration for Kali Linux with persistence and root access
+        if (appName === 'kali') {
+          // Create persistent profile directory
+          const persistentDir = path.join(process.cwd(), 'uploads', 'kasm_profiles', 'kali-root');
+          await fs.mkdir(persistentDir, { recursive: true });
+
+          // Set up volume mounts for persistence
+          volumeMounts = [
+            '-v', `${persistentDir}:/home/kasm-user:rw`,
+            '-v', `${this.uploadDir}:/home/kasm-user/shared:rw`
+          ];
+
+          // Configure for root user access
+          additionalOptions = [
+            '--hostname', 'kasm',
+            '--user', 'root',
+            '--privileged',
+            '--shm-size=512m'
+          ];
+
+          // Additional environment variables for Kali
+          environmentVars.push(
+            '-e', 'KASM_USER=root',
+            '-e', 'KASM_UID=0',
+            '-e', 'KASM_GID=0'
+          );
+
+          console.log(`Setting up Kali container with persistent storage at: ${persistentDir}`);
+        }
       }
 
       // Start the container
@@ -256,9 +288,11 @@ export class DockerService {
         'docker', 'run', '-d',
         '--name', containerName,
         '-p', `${port}:${containerPort}`,
+        ...additionalOptions,
+        ...volumeMounts,
         ...environmentVars,
         image
-      ];
+      ].filter(Boolean);
 
       console.log(`Starting container with command: ${dockerCmd.join(' ')}`);
       

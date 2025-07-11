@@ -230,23 +230,48 @@ docker-compose --version
 - **URL**: `https://localhost:6902` (HTTPS required)
 - **Username**: `kasm_user`
 - **Password**: `password`
+- **User Privileges**: Root access enabled for full system control
 - **SSL Certificate**: Self-signed (accept browser security warning)
+
+**Key Features:**
+- **Persistent Storage**: All files and configurations automatically saved between sessions
+- **Root Access**: Full administrative privileges for advanced penetration testing
+- **Shared Directory**: Host file system access via `/home/kasm-user/shared`
+- **Pre-installed Arsenal**: Complete Kali Linux toolset ready for use
 
 **Usage Steps:**
 1. Navigate to the Integrations tab or Kali Environment page in Attack Node
 2. Click "Start Environment" to launch the Kali Linux container
-3. Wait for the container to fully start (typically 1-2 minutes)
+3. Wait for container initialization (1-2 minutes for full setup with persistent storage)
 4. Open your browser and go to `https://localhost:6902`
 5. Accept the SSL certificate warning (click "Advanced" → "Proceed to localhost")
 6. Login with username `kasm_user` and password `password`
-7. Access the full Kali Linux desktop with pre-installed security tools
+7. Access the full Kali Linux desktop with root privileges and persistent storage
+
+**Data Persistence Configuration:**
+- **Storage Location**: `attack-node/uploads/kasm_profiles/kali-root/`
+- **Persistent Data**: User files, tool configurations, downloads, custom scripts
+- **Shared Access**: Files in `/home/kasm-user/shared` accessible from host system
+- **Automatic Backup**: All changes automatically saved to host filesystem
+
+**Advanced Configuration:**
+```bash
+# Container runs with these settings:
+# - Root user access (UID 0, GID 0)
+# - Privileged mode for full system access
+# - Persistent volume mapping for data retention
+# - Shared memory allocation for GUI performance
+# - Hostname set to 'kasm' for consistency
+```
 
 **Troubleshooting Docker Issues:**
 - **HTTP 401 Unauthorized**: Ensure you're using `https://` (not `http://`) and correct credentials
 - **Container won't start**: Check Docker daemon is running with `sudo systemctl status docker`
 - **Port conflicts**: Verify port 6902 is not already in use with `sudo lsof -i :6902`
 - **SSL certificate errors**: Accept the self-signed certificate to proceed
-- **Connection refused**: Wait for container to fully initialize (check logs in Docker Dashboard)
+- **Connection refused**: Wait for container to fully initialize (2-3 minutes with persistence)
+- **Permission errors**: Container runs with root privileges for full access
+- **Storage issues**: Check `uploads/kasm_profiles/kali-root/` directory permissions
 
 #### Burp Suite Professional
 
