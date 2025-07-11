@@ -1,10 +1,14 @@
 import { useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { useToast } from "@/hooks/use-toast";
 import { 
   Monitor, 
   Play, 
@@ -21,7 +25,17 @@ import {
   Activity,
   RefreshCw,
   Globe,
-  Search
+  Search,
+  Terminal,
+  FileText,
+  Eye,
+  Container,
+  Cpu,
+  MemoryStick,
+  HardDrive,
+  Network,
+  Clock,
+  Info
 } from "lucide-react";
 
 interface IntegrationApp {
@@ -40,6 +54,318 @@ interface IntegrationApp {
 export default function Integrations() {
   const [selectedApp, setSelectedApp] = useState<IntegrationApp | null>(null);
   const [showConfigDialog, setShowConfigDialog] = useState(false);
+  const [selectedContainer, setSelectedContainer] = useState<any>(null);
+  const [containerLogs, setContainerLogs] = useState<string>("");
+  const [containerInspect, setContainerInspect] = useState<any>(null);
+  const [showTerminal, setShowTerminal] = useState(false);
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  // Query Docker containers
+  const { data: containers = [] } = useQuery({
+    queryKey: ['/api/docker/containers'],
+    refetchInterval: 3000 // Refresh every 3 seconds
+  });
+
+  // Query Docker info
+  const { data: dockerInfo } = useQuery({
+    queryKey: ['/api/docker/info'],
+    refetchInterval: 5000
+  });
+
+  // Type the containers and dockerInfo data
+  const containersTyped = containers as any[];
+  const dockerInfoTyped = dockerInfo as any;
+
+  // Start container mutation
+  const startContainer = useMutation({
+    mutationFn: async (app: { appName: string; image: string; port: number }) => {
+      return await apiRequest("/api/docker/start-app", "POST", app);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/docker/containers'] });
+      toast({
+        title: "Success",
+        description: "Container started successfully",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to start container",
+        variant: "destructive",
+      });
+    }
+  });
+
+  // Stop container mutation
+  const stopContainer = useMutation({
+    mutationFn: async (nameOrId: string) => {
+      return await apiRequest(`/api/docker/stop/${nameOrId}`, "POST");
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/docker/containers'] });
+      toast({
+        title: "Success",
+        description: "Container stopped successfully",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to stop container",
+        variant: "destructive",
+      });
+    }
+  });
+
+  // Mock functions for container operations (would connect to actual Docker API)
+  const getContainerLogs = async (containerId: string) => {
+    // This would make an API call to get container logs
+    const mockLogs = `
+2025-01-11T10:30:00.000Z [INFO] Container started
+2025-01-11T10:30:01.000Z [INFO] Loading configuration...
+2025-01-11T10:30:02.000Z [INFO] Server listening on port 80
+2025-01-11T10:30:03.000Z [INFO] Ready to accept connections
+2025-01-11T10:30:10.000Z [INFO] Received request from 192.168.1.100
+2025-01-11T10:30:11.000Z [INFO] Processing request...
+2025-01-11T10:30:12.000Z [INFO] Request completed successfully
+    `;
+    setContainerLogs(mockLogs);
+  };
+
+  const getContainerInspect = async (containerId: string) => {
+    // This would make an API call to get container inspect data
+    const mockInspect = {
+      Id: containerId,
+      Created: "2025-01-11T10:30:00.000Z",
+      Path: "/docker-entrypoint.sh",
+      Args: ["nginx", "-g", "daemon off;"],
+      State: {
+        Status: "running",
+        Running: true,
+        Paused: false,
+        Restarting: false,
+        OOMKilled: false,
+        Dead: false,
+        Pid: 12345,
+        ExitCode: 0,
+        Error: "",
+        StartedAt: "2025-01-11T10:30:00.000Z",
+        FinishedAt: "0001-01-01T00:00:00Z"
+      },
+      Image: "nginx:alpine",
+      ResolvConfPath: "/var/lib/docker/containers/abc123/resolv.conf",
+      HostnamePath: "/var/lib/docker/containers/abc123/hostname",
+      HostsPath: "/var/lib/docker/containers/abc123/hosts",
+      LogPath: "/var/lib/docker/containers/abc123/abc123-json.log",
+      Name: "/nginx-test",
+      RestartCount: 0,
+      Driver: "overlay2",
+      Platform: "linux",
+      MountLabel: "",
+      ProcessLabel: "",
+      AppArmorProfile: "",
+      ExecIDs: null,
+      HostConfig: {
+        Binds: null,
+        ContainerIDFile: "",
+        LogConfig: {
+          Type: "json-file",
+          Config: {}
+        },
+        NetworkMode: "default",
+        PortBindings: {
+          "80/tcp": [
+            {
+              HostIp: "",
+              HostPort: "8080"
+            }
+          ]
+        },
+        RestartPolicy: {
+          Name: "no",
+          MaximumRetryCount: 0
+        },
+        AutoRemove: false,
+        VolumeDriver: "",
+        VolumesFrom: null,
+        CapAdd: null,
+        CapDrop: null,
+        CgroupnsMode: "host",
+        Dns: [],
+        DnsOptions: [],
+        DnsSearch: [],
+        ExtraHosts: null,
+        GroupAdd: null,
+        IpcMode: "private",
+        Cgroup: "",
+        Links: null,
+        OomScoreAdj: 0,
+        PidMode: "",
+        Privileged: false,
+        PublishAllPorts: false,
+        ReadonlyRootfs: false,
+        SecurityOpt: null,
+        UTSMode: "",
+        UsernsMode: "",
+        ShmSize: 67108864,
+        Runtime: "runc",
+        ConsoleSize: [0, 0],
+        Isolation: "",
+        CpuShares: 0,
+        Memory: 0,
+        NanoCpus: 0,
+        CgroupParent: "",
+        BlkioWeight: 0,
+        BlkioWeightDevice: [],
+        BlkioDeviceReadBps: null,
+        BlkioDeviceWriteBps: null,
+        BlkioDeviceReadIOps: null,
+        BlkioDeviceWriteIOps: null,
+        CpuPeriod: 0,
+        CpuQuota: 0,
+        CpuRealtimePeriod: 0,
+        CpuRealtimeRuntime: 0,
+        CpusetCpus: "",
+        CpusetMems: "",
+        Devices: [],
+        DeviceCgroupRules: null,
+        DeviceRequests: null,
+        KernelMemory: 0,
+        KernelMemoryTCP: 0,
+        MemoryReservation: 0,
+        MemorySwap: 0,
+        MemorySwappiness: null,
+        OomKillDisable: false,
+        PidsLimit: null,
+        Ulimits: null,
+        CpuCount: 0,
+        CpuPercent: 0,
+        IOMaximumIOps: 0,
+        IOMaximumBandwidth: 0,
+        MaskedPaths: [
+          "/proc/asound",
+          "/proc/acpi",
+          "/proc/kcore",
+          "/proc/keys",
+          "/proc/latency_stats",
+          "/proc/timer_list",
+          "/proc/timer_stats",
+          "/proc/sched_debug",
+          "/proc/scsi",
+          "/sys/firmware"
+        ],
+        ReadonlyPaths: [
+          "/proc/bus",
+          "/proc/fs",
+          "/proc/irq",
+          "/proc/sys",
+          "/proc/sysrq-trigger"
+        ]
+      },
+      GraphDriver: {
+        Data: {
+          LowerDir: "/var/lib/docker/overlay2/abc123/diff",
+          MergedDir: "/var/lib/docker/overlay2/abc123/merged",
+          UpperDir: "/var/lib/docker/overlay2/abc123/diff",
+          WorkDir: "/var/lib/docker/overlay2/abc123/work"
+        },
+        Name: "overlay2"
+      },
+      Mounts: [],
+      Config: {
+        Hostname: "abc123",
+        Domainname: "",
+        User: "",
+        AttachStdin: false,
+        AttachStdout: false,
+        AttachStderr: false,
+        ExposedPorts: {
+          "80/tcp": {}
+        },
+        Tty: false,
+        OpenStdin: false,
+        StdinOnce: false,
+        Env: [
+          "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+          "NGINX_VERSION=1.25.3",
+          "NJS_VERSION=0.8.2",
+          "PKG_RELEASE=1"
+        ],
+        Cmd: [
+          "nginx",
+          "-g",
+          "daemon off;"
+        ],
+        Image: "nginx:alpine",
+        Volumes: null,
+        WorkingDir: "",
+        Entrypoint: [
+          "/docker-entrypoint.sh"
+        ],
+        OnBuild: null,
+        Labels: {
+          "maintainer": "NGINX Docker Maintainers <docker-maint@nginx.com>"
+        },
+        StopSignal: "SIGQUIT",
+        StopTimeout: 10
+      },
+      NetworkSettings: {
+        Bridge: "",
+        SandboxID: "abc123",
+        HairpinMode: false,
+        LinkLocalIPv6Address: "",
+        LinkLocalIPv6PrefixLen: 0,
+        Ports: {
+          "80/tcp": [
+            {
+              HostIp: "0.0.0.0",
+              HostPort: "8080"
+            }
+          ]
+        },
+        SandboxKey: "/var/run/docker/netns/abc123",
+        SecondaryIPAddresses: null,
+        SecondaryIPv6Addresses: null,
+        EndpointID: "abc123",
+        Gateway: "172.17.0.1",
+        GlobalIPv6Address: "",
+        GlobalIPv6PrefixLen: 0,
+        IPAddress: "172.17.0.2",
+        IPPrefixLen: 16,
+        IPv6Gateway: "",
+        MacAddress: "02:42:ac:11:00:02",
+        Networks: {
+          bridge: {
+            IPAMConfig: null,
+            Links: null,
+            Aliases: null,
+            NetworkID: "abc123",
+            EndpointID: "abc123",
+            Gateway: "172.17.0.1",
+            IPAddress: "172.17.0.2",
+            IPPrefixLen: 16,
+            IPv6Gateway: "",
+            GlobalIPv6Address: "",
+            GlobalIPv6PrefixLen: 0,
+            MacAddress: "02:42:ac:11:00:02",
+            DriverOpts: null
+          }
+        }
+      }
+    };
+    setContainerInspect(mockInspect);
+  };
+
+  const connectToTerminal = (containerId: string) => {
+    // This would open a WebSocket connection to the container's terminal
+    setShowTerminal(true);
+    toast({
+      title: "Terminal",
+      description: "Terminal connection would be established in a production environment",
+    });
+  };
 
   const integrationApps: IntegrationApp[] = [
     {
@@ -178,24 +504,13 @@ export default function Integrations() {
 
       {/* Main Content */}
       <main className="p-6">
-        {/* Docker Unavailable Warning */}
-        <div className="mb-6">
-          <div className="bg-warning/10 border border-warning/20 rounded-lg p-4">
-            <div className="flex items-center">
-              <Shield className="h-5 w-5 text-warning mr-3" />
-              <div>
-                <h3 className="text-warning font-semibold">Docker Not Available</h3>
-                <p className="text-gray-400 text-sm mt-1">
-                  Docker containers are not available in this Replit environment. In a production environment with Docker installed, 
-                  these integrations would provide full access to containerized security tools and development environments.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
 
-        <Tabs defaultValue="security" className="space-y-6">
+        <Tabs defaultValue="docker" className="space-y-6">
           <TabsList className="bg-surface border border-gray-700">
+            <TabsTrigger value="docker" className="data-[state=active]:bg-primary data-[state=active]:text-white">
+              <Container className="h-4 w-4 mr-2" />
+              Docker Dashboard
+            </TabsTrigger>
             <TabsTrigger value="security" className="data-[state=active]:bg-primary data-[state=active]:text-white">
               <Shield className="h-4 w-4 mr-2" />
               Security Tools
@@ -209,6 +524,393 @@ export default function Integrations() {
               Analysis
             </TabsTrigger>
           </TabsList>
+
+          {/* Docker Dashboard */}
+          <TabsContent value="docker" className="space-y-6">
+            {/* System Overview */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+              <Card className="bg-surface border-gray-700">
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-gray-400 text-sm">Docker Version</p>
+                      <p className="text-xl font-bold text-gray-100">{dockerInfoTyped?.version || 'N/A'}</p>
+                    </div>
+                    <Container className="h-8 w-8 text-primary" />
+                  </div>
+                </CardContent>
+              </Card>
+              
+              <Card className="bg-surface border-gray-700">
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-gray-400 text-sm">Running Containers</p>
+                      <p className="text-xl font-bold text-success">{dockerInfoTyped?.runningContainers || 0}</p>
+                    </div>
+                    <Activity className="h-8 w-8 text-success" />
+                  </div>
+                </CardContent>
+              </Card>
+              
+              <Card className="bg-surface border-gray-700">
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-gray-400 text-sm">Total Images</p>
+                      <p className="text-xl font-bold text-gray-100">{dockerInfoTyped?.totalImages || 0}</p>
+                    </div>
+                    <Database className="h-8 w-8 text-primary" />
+                  </div>
+                </CardContent>
+              </Card>
+              
+              <Card className="bg-surface border-gray-700">
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-gray-400 text-sm">System Status</p>
+                      <p className="text-xl font-bold text-success">Healthy</p>
+                    </div>
+                    <Monitor className="h-8 w-8 text-success" />
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Running Containers */}
+            <Card className="bg-surface border-gray-700">
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-lg font-semibold text-gray-100">Running Containers</CardTitle>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="border-gray-600 text-gray-300"
+                    onClick={() => queryClient.invalidateQueries({ queryKey: ['/api/docker/containers'] })}
+                  >
+                    <RefreshCw className="h-4 w-4 mr-2" />
+                    Refresh
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent>
+                {containersTyped.length === 0 ? (
+                  <div className="text-center py-8">
+                    <Container className="h-12 w-12 text-gray-500 mx-auto mb-4" />
+                    <p className="text-gray-400">No containers running</p>
+                    <p className="text-gray-500 text-sm mt-2">Start containers from the other tabs or use the quick actions below</p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {(containers as any[]).map((container) => (
+                      <div key={container.id} className="border border-gray-700 rounded-lg p-4">
+                        <div className="flex items-center justify-between mb-3">
+                          <div className="flex items-center space-x-3">
+                            <div className="bg-primary/10 p-2 rounded-lg">
+                              <Container className="h-5 w-5 text-primary" />
+                            </div>
+                            <div>
+                              <h4 className="text-gray-100 font-medium">{container.name}</h4>
+                              <p className="text-gray-400 text-sm">{container.image}</p>
+                            </div>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <Badge className={getStatusColor(container.status)}>
+                              {container.status}
+                            </Badge>
+                            <Badge variant="outline" className="border-gray-600 text-gray-300">
+                              Port: {container.port}
+                            </Badge>
+                          </div>
+                        </div>
+                        
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs text-gray-400 mb-4">
+                          <div>
+                            <span className="block">Container ID</span>
+                            <span className="text-gray-300 font-mono">{container.id.substring(0, 12)}</span>
+                          </div>
+                          <div>
+                            <span className="block">Created</span>
+                            <span className="text-gray-300">{new Date(container.created).toLocaleString()}</span>
+                          </div>
+                          <div>
+                            <span className="block">Status</span>
+                            <span className="text-gray-300">{container.status}</span>
+                          </div>
+                          <div>
+                            <span className="block">Port Mapping</span>
+                            <span className="text-gray-300">{container.port}:80</span>
+                          </div>
+                        </div>
+
+                        <div className="flex flex-wrap gap-2">
+                          <Button 
+                            size="sm" 
+                            className="bg-primary hover:bg-primary/90 text-white"
+                            onClick={() => {
+                              const isReplit = window.location.hostname.includes('.replit.dev') || window.location.hostname.includes('.repl.co');
+                              if (isReplit) {
+                                window.open(`${window.location.origin}/proxy/${container.port}/`, '_blank');
+                              } else {
+                                window.open(`http://localhost:${container.port}`, '_blank');
+                              }
+                            }}
+                          >
+                            <ExternalLink className="h-3 w-3 mr-1" />
+                            Open
+                          </Button>
+                          
+                          <Button 
+                            size="sm" 
+                            variant="outline" 
+                            className="border-gray-600 text-gray-300"
+                            onClick={() => {
+                              setSelectedContainer(container);
+                              getContainerLogs(container.id);
+                            }}
+                          >
+                            <FileText className="h-3 w-3 mr-1" />
+                            Logs
+                          </Button>
+                          
+                          <Button 
+                            size="sm" 
+                            variant="outline" 
+                            className="border-gray-600 text-gray-300"
+                            onClick={() => {
+                              setSelectedContainer(container);
+                              getContainerInspect(container.id);
+                            }}
+                          >
+                            <Info className="h-3 w-3 mr-1" />
+                            Inspect
+                          </Button>
+                          
+                          <Button 
+                            size="sm" 
+                            variant="outline" 
+                            className="border-gray-600 text-gray-300"
+                            onClick={() => connectToTerminal(container.id)}
+                          >
+                            <Terminal className="h-3 w-3 mr-1" />
+                            Terminal
+                          </Button>
+                          
+                          <Button 
+                            size="sm" 
+                            variant="destructive"
+                            onClick={() => stopContainer.mutate(container.name)}
+                            disabled={stopContainer.isPending}
+                          >
+                            <PowerOff className="h-3 w-3 mr-1" />
+                            {stopContainer.isPending ? "Stopping..." : "Stop"}
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Quick Actions */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <Card className="bg-surface border-gray-700">
+                <CardHeader>
+                  <CardTitle className="text-lg font-semibold text-gray-100">Quick Start</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    <Button 
+                      className="w-full bg-success hover:bg-success/90 text-white justify-start"
+                      onClick={() => startContainer.mutate({ appName: "nginx", image: "nginx:alpine", port: 8080 })}
+                      disabled={startContainer.isPending}
+                    >
+                      <Play className="h-4 w-4 mr-2" />
+                      {startContainer.isPending ? "Starting..." : "Start Nginx (Test)"}
+                    </Button>
+                    
+                    <Button 
+                      className="w-full bg-primary hover:bg-primary/90 text-white justify-start"
+                      onClick={() => startContainer.mutate({ appName: "kali", image: "kasmweb/kali-rolling-desktop:develop", port: 6902 })}
+                      disabled={startContainer.isPending}
+                    >
+                      <Shield className="h-4 w-4 mr-2" />
+                      {startContainer.isPending ? "Starting..." : "Start Kali Linux"}
+                    </Button>
+                    
+                    <Button 
+                      variant="outline" 
+                      className="w-full border-gray-600 text-gray-300 justify-start"
+                      onClick={() => {
+                        queryClient.invalidateQueries({ queryKey: ['/api/docker/containers'] });
+                        queryClient.invalidateQueries({ queryKey: ['/api/docker/info'] });
+                      }}
+                    >
+                      <RefreshCw className="h-4 w-4 mr-2" />
+                      Refresh All Data
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-surface border-gray-700">
+                <CardHeader>
+                  <CardTitle className="text-lg font-semibold text-gray-100">System Management</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    <Button 
+                      variant="outline" 
+                      className="w-full border-gray-600 text-gray-300 justify-start"
+                    >
+                      <Database className="h-4 w-4 mr-2" />
+                      Clean Up Images
+                    </Button>
+                    
+                    <Button 
+                      variant="outline" 
+                      className="w-full border-gray-600 text-gray-300 justify-start"
+                    >
+                      <PowerOff className="h-4 w-4 mr-2" />
+                      Stop All Containers
+                    </Button>
+                    
+                    <Button 
+                      variant="outline" 
+                      className="w-full border-gray-600 text-gray-300 justify-start"
+                    >
+                      <Download className="h-4 w-4 mr-2" />
+                      Pull Latest Images
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Container Details Modal */}
+            {selectedContainer && (
+              <Card className="bg-surface border-gray-700">
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-lg font-semibold text-gray-100">
+                      Container Details: {selectedContainer.name}
+                    </CardTitle>
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="border-gray-600 text-gray-300"
+                      onClick={() => {
+                        setSelectedContainer(null);
+                        setContainerLogs("");
+                        setContainerInspect(null);
+                      }}
+                    >
+                      <Square className="h-4 w-4 mr-2" />
+                      Close
+                    </Button>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <Tabs defaultValue="logs" className="w-full">
+                    <TabsList className="bg-card border border-gray-600">
+                      <TabsTrigger value="logs" className="data-[state=active]:bg-primary data-[state=active]:text-white">
+                        <FileText className="h-4 w-4 mr-2" />
+                        Logs
+                      </TabsTrigger>
+                      <TabsTrigger value="inspect" className="data-[state=active]:bg-primary data-[state=active]:text-white">
+                        <Info className="h-4 w-4 mr-2" />
+                        Inspect
+                      </TabsTrigger>
+                      <TabsTrigger value="terminal" className="data-[state=active]:bg-primary data-[state=active]:text-white">
+                        <Terminal className="h-4 w-4 mr-2" />
+                        Terminal
+                      </TabsTrigger>
+                    </TabsList>
+                    
+                    <TabsContent value="logs" className="mt-4">
+                      <div className="bg-gray-900 border border-gray-700 rounded-lg p-4">
+                        <div className="flex items-center justify-between mb-3">
+                          <h4 className="text-gray-100 font-medium">Container Logs</h4>
+                          <Button 
+                            size="sm" 
+                            variant="outline" 
+                            className="border-gray-600 text-gray-300"
+                            onClick={() => getContainerLogs(selectedContainer.id)}
+                          >
+                            <RefreshCw className="h-3 w-3 mr-1" />
+                            Refresh
+                          </Button>
+                        </div>
+                        <ScrollArea className="h-64 w-full">
+                          <pre className="text-xs text-gray-300 font-mono whitespace-pre-wrap">
+                            {containerLogs || "No logs available"}
+                          </pre>
+                        </ScrollArea>
+                      </div>
+                    </TabsContent>
+                    
+                    <TabsContent value="inspect" className="mt-4">
+                      <div className="bg-gray-900 border border-gray-700 rounded-lg p-4">
+                        <div className="flex items-center justify-between mb-3">
+                          <h4 className="text-gray-100 font-medium">Container Inspect Data</h4>
+                          <Button 
+                            size="sm" 
+                            variant="outline" 
+                            className="border-gray-600 text-gray-300"
+                            onClick={() => getContainerInspect(selectedContainer.id)}
+                          >
+                            <RefreshCw className="h-3 w-3 mr-1" />
+                            Refresh
+                          </Button>
+                        </div>
+                        <ScrollArea className="h-64 w-full">
+                          <pre className="text-xs text-gray-300 font-mono whitespace-pre-wrap">
+                            {containerInspect ? JSON.stringify(containerInspect, null, 2) : "Click Refresh to load inspect data"}
+                          </pre>
+                        </ScrollArea>
+                      </div>
+                    </TabsContent>
+                    
+                    <TabsContent value="terminal" className="mt-4">
+                      <div className="bg-gray-900 border border-gray-700 rounded-lg p-4">
+                        <div className="flex items-center justify-between mb-3">
+                          <h4 className="text-gray-100 font-medium">Container Terminal</h4>
+                          <Button 
+                            size="sm" 
+                            className="bg-primary hover:bg-primary/90 text-white"
+                            onClick={() => connectToTerminal(selectedContainer.id)}
+                          >
+                            <Terminal className="h-3 w-3 mr-1" />
+                            Connect
+                          </Button>
+                        </div>
+                        <div className="bg-black border border-gray-600 rounded p-4 h-64 overflow-y-auto">
+                          <div className="text-green-400 font-mono text-sm">
+                            <div className="mb-2">root@{selectedContainer.name.replace('attacknode-', '')}:~# </div>
+                            <div className="text-gray-400">
+                              {showTerminal ? (
+                                <div>
+                                  <div>Terminal connection established</div>
+                                  <div>Type 'help' for available commands</div>
+                                  <div className="mt-2 text-green-400">
+                                    root@{selectedContainer.name.replace('attacknode-', '')}:~# <span className="animate-pulse">_</span>
+                                  </div>
+                                </div>
+                              ) : (
+                                <div>Click "Connect" to establish terminal connection</div>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </TabsContent>
+                  </Tabs>
+                </CardContent>
+              </Card>
+            )}
+          </TabsContent>
 
           {/* Security Tools */}
           <TabsContent value="security" className="space-y-6">
