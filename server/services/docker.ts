@@ -34,10 +34,16 @@ export class DockerService {
       // Check if Docker CLI is available
       await execAsync('docker --version');
       
-      // Check if Docker daemon is running
-      await execAsync('docker info');
+      // Check if Docker daemon is running - try with sudo if needed
+      try {
+        await execAsync('docker info');
+      } catch (error) {
+        // Try with sudo if regular docker command fails
+        await execAsync('sudo docker info');
+      }
       
       this.dockerAvailable = true;
+      console.log('Docker is available and daemon is running');
       return true;
     } catch (error) {
       console.warn('Docker is not available or daemon is not running in this environment');
@@ -56,7 +62,10 @@ export class DockerService {
 
   async pullImage(image: string): Promise<boolean> {
     try {
-      const { stdout, stderr } = await execAsync(`docker pull ${image}`);
+      let { stdout, stderr } = await execAsync(`docker pull ${image}`).catch(async () => {
+        // Try with sudo if regular command fails
+        return await execAsync(`sudo docker pull ${image}`);
+      });
       console.log('Docker pull output:', stdout);
       if (stderr) console.warn('Docker pull warnings:', stderr);
       return true;
@@ -232,18 +241,33 @@ export class DockerService {
       // Pull the image first
       await this.pullImage(image);
 
+      // Determine the container port based on the image
+      let containerPort = '80'; // Default for nginx
+      let environmentVars: string[] = [];
+      
+      if (image.includes('kasm')) {
+        // Kasm images use VNC on port 6901
+        containerPort = '6901';
+        environmentVars = ['-e', 'VNC_PW=password'];
+      }
+
       // Start the container
       const dockerCmd = [
         'docker', 'run', '-d',
         '--name', containerName,
-        '--shm-size=512m',
-        '-p', `${port}:6901`,
-        '-e', 'VNC_PW=password',
-        '-v', `${this.uploadDir}:/home/kasm-user/shared`,
+        '-p', `${port}:${containerPort}`,
+        ...environmentVars,
         image
       ];
 
-      const { stdout } = await execAsync(dockerCmd.join(' '));
+      console.log(`Starting container with command: ${dockerCmd.join(' ')}`);
+      
+      const { stdout } = await execAsync(dockerCmd.join(' ')).catch(async (error: any) => {
+        // Try with sudo if regular command fails
+        console.log(`Regular docker command failed, trying with sudo: ${error.message}`);
+        return await execAsync('sudo ' + dockerCmd.join(' '));
+      });
+      
       const containerId = stdout.trim();
 
       const container: DockerContainer = {
@@ -256,19 +280,24 @@ export class DockerService {
       };
 
       this.containers.set(containerName, container);
+      console.log(`Successfully started container: ${containerId}`);
       return container;
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Failed to start ${appName} container:`, error);
-      throw new Error(`Failed to start ${appName} container`);
+      throw new Error(`Failed to start ${appName} container: ${error.message}`);
     }
   }
 
   async stopContainer(nameOrId: string): Promise<boolean> {
     try {
       // Try to stop the container
-      await execAsync(`docker stop ${nameOrId}`);
+      await execAsync(`docker stop ${nameOrId}`).catch(async () => {
+        return await execAsync(`sudo docker stop ${nameOrId}`);
+      });
       // Remove the container
-      await execAsync(`docker rm ${nameOrId}`);
+      await execAsync(`docker rm ${nameOrId}`).catch(async () => {
+        return await execAsync(`sudo docker rm ${nameOrId}`);
+      });
       
       // Update our local state
       const entries = Array.from(this.containers.entries());
@@ -289,7 +318,9 @@ export class DockerService {
 
   async getContainerStatus(nameOrId: string): Promise<'running' | 'stopped' | 'error'> {
     try {
-      const { stdout } = await execAsync(`docker ps -q -f name=${nameOrId}`);
+      const { stdout } = await execAsync(`docker ps -q -f name=${nameOrId}`).catch(async () => {
+        return await execAsync(`sudo docker ps -q -f name=${nameOrId}`);
+      });
       return stdout.trim() ? 'running' : 'stopped';
     } catch (error) {
       console.error('Failed to get container status:', error);
@@ -398,10 +429,14 @@ WORKDIR /home/kasm-user
 
   async getDockerInfo(): Promise<any> {
     try {
-      const { stdout } = await execAsync('docker version --format "{{.Server.Version}}"');
+      const { stdout } = await execAsync('docker version --format "{{.Server.Version}}"').catch(async () => {
+        return await execAsync('sudo docker version --format "{{.Server.Version}}"');
+      });
       const version = stdout.trim();
       
-      const { stdout: psOutput } = await execAsync('docker ps --format "table {{.Names}}\t{{.Status}}"');
+      const { stdout: psOutput } = await execAsync('docker ps --format "table {{.Names}}\t{{.Status}}"').catch(async () => {
+        return await execAsync('sudo docker ps --format "table {{.Names}}\t{{.Status}}"');
+      });
       const runningContainers = psOutput.split('\n').length - 2; // Subtract header and empty line
       
       return {
