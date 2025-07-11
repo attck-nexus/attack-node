@@ -13,7 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { insertProgramSchema, type Program } from "@shared/schema";
+import { insertOperationSchema, type Operation } from "@shared/schema";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -22,7 +22,7 @@ import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 
 // Enhanced form schema with all new fields
-const formSchema = insertProgramSchema.extend({
+const formSchema = insertOperationSchema.extend({
   priority: z.string().optional(),
   tags: z.array(z.string()).optional(),
   rules: z.string().optional(),

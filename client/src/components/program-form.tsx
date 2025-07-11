@@ -7,12 +7,12 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { insertProgramSchema } from "@shared/schema";
+import { insertOperationSchema } from "@shared/schema";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 
-const formSchema = insertProgramSchema;
+const formSchema = insertOperationSchema;
 type FormData = z.infer<typeof formSchema>;
 
 interface ProgramFormProps {
@@ -39,7 +39,7 @@ export default function ProgramForm({ onSuccess, onCancel }: ProgramFormProps) {
 
   const createProgram = useMutation({
     mutationFn: async (data: FormData) => {
-      const response = await apiRequest("POST", "/api/programs", data);
+      const response = await apiRequest("POST", "/api/operations", data);
       return response.json();
     },
     onSuccess: () => {

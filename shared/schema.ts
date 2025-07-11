@@ -26,57 +26,100 @@ export const users = pgTable("users", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
-export const programs = pgTable("programs", {
+// Red Team Operations
+export const operations = pgTable("operations", {
   id: serial("id").primaryKey(),
   name: text("name").notNull(),
-  platform: text("platform").notNull(), // HackerOne, Bugcrowd, etc.
-  url: text("url").notNull(),
-  status: text("status").notNull().default("active"), // active, paused, ended
-  minReward: decimal("min_reward", { precision: 10, scale: 2 }).default("0"),
-  maxReward: decimal("max_reward", { precision: 10, scale: 2 }).default("0"),
+  codename: text("codename"),
+  status: text("status").notNull().default("planning"), // planning, active, paused, completed
+  type: text("type").notNull(), // penetration-test, red-team, purple-team, assumed-breach
   description: text("description"),
   priority: text("priority").default("medium"), // low, medium, high, critical
   tags: json("tags").$type<string[]>().default([]),
-  rules: text("rules"), // Program rules and policies
-  outOfScope: json("out_of_scope").$type<string[]>().default([]), // Out of scope items
-  vulnerabilityTypes: json("vulnerability_types").$type<string[]>().default([]), // Accepted vulnerability types
-  contactEmail: text("contact_email"),
-  contactName: text("contact_name"),
+  objectives: json("objectives").$type<string[]>().default([]), // Operation objectives
+  scope: json("scope").$type<string[]>().default([]), // IP ranges, domains, etc.
+  rulesOfEngagement: text("rules_of_engagement"), // ROE documentation
+  clientContact: text("client_contact"),
+  teamLead: text("team_lead"),
   startDate: timestamp("start_date"),
   endDate: timestamp("end_date"),
   notes: text("notes"), // Internal notes
-  lastChecked: timestamp("last_checked").defaultNow(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
-export const targets = pgTable("targets", {
+// Compromised Systems/Hosts
+export const systems = pgTable("systems", {
   id: serial("id").primaryKey(),
-  programId: integer("program_id").references(() => programs.id).notNull(),
-  url: text("url").notNull(),
-  type: text("type").notNull(), // web, mobile, api, etc.
-  scope: text("scope").notNull().default("in-scope"), // in-scope, out-of-scope
+  operationId: integer("operation_id").references(() => operations.id).notNull(),
+  hostname: text("hostname"),
+  ipAddress: text("ip_address").notNull(),
+  operatingSystem: text("operating_system"),
+  status: text("status").notNull().default("discovered"), // discovered, scanned, compromised, pivoted
+  accessLevel: text("access_level"), // none, user, admin, system, domain-admin
   tags: json("tags").$type<string[]>().default([]),
+  services: json("services").$type<any[]>().default([]), // Running services
   notes: text("notes"),
-  lastTested: timestamp("last_tested"),
+  lastSeen: timestamp("last_seen").defaultNow(),
+  compromisedAt: timestamp("compromised_at"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
-export const vulnerabilities = pgTable("vulnerabilities", {
+// C2 Beacons
+export const beacons = pgTable("beacons", {
   id: serial("id").primaryKey(),
-  programId: integer("program_id").references(() => programs.id).notNull(),
-  targetId: integer("target_id").references(() => targets.id),
-  title: text("title").notNull(),
-  description: text("description").notNull(),
-  severity: text("severity").notNull(), // P1, P2, P3, P4
-  status: text("status").notNull().default("new"), // new, triaged, resolved, duplicate, etc.
-  cvssScore: decimal("cvss_score", { precision: 3, scale: 1 }),
-  reward: decimal("reward", { precision: 10, scale: 2 }),
-  proofOfConcept: text("proof_of_concept"),
-  recommendations: text("recommendations"),
-  attachments: json("attachments").$type<string[]>().default([]),
-  submittedAt: timestamp("submitted_at").defaultNow().notNull(),
+  operationId: integer("operation_id").references(() => operations.id).notNull(),
+  systemId: integer("system_id").references(() => systems.id),
+  beaconId: text("beacon_id").notNull().unique(), // Unique beacon identifier
+  type: text("type").notNull(), // cobalt-strike, metasploit, empire, custom
+  status: text("status").notNull().default("active"), // active, sleeping, dead, lost
+  hostname: text("hostname"),
+  username: text("username"),
+  pid: integer("pid"),
+  architecture: text("architecture"), // x86, x64
+  integrity: text("integrity"), // low, medium, high, system
+  lastCheckin: timestamp("last_checkin").defaultNow(),
+  sleepTime: integer("sleep_time"), // in seconds
+  jitter: integer("jitter"), // percentage
+  externalIp: text("external_ip"),
+  internalIp: text("internal_ip"),
+  metadata: json("metadata").$type<Record<string, any>>().default({}),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+// Network Discovery Results
+export const networkDiscoveries = pgTable("network_discoveries", {
+  id: serial("id").primaryKey(),
+  operationId: integer("operation_id").references(() => operations.id).notNull(),
+  systemId: integer("system_id").references(() => systems.id),
+  type: text("type").notNull(), // arp-scan, port-scan, service-scan, vulnerability-scan
+  target: text("target").notNull(), // IP, range, or hostname
+  results: json("results").$type<any>().notNull(),
+  toolUsed: text("tool_used"), // nmap, masscan, arp-scan, etc.
+  commandLine: text("command_line"),
+  scanDuration: integer("scan_duration"), // in seconds
+  discoveredHosts: integer("discovered_hosts").default(0),
+  discoveredServices: integer("discovered_services").default(0),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+// Remote Desktop Sessions (RustDesk)
+export const remoteSessions = pgTable("remote_sessions", {
+  id: serial("id").primaryKey(),
+  operationId: integer("operation_id").references(() => operations.id).notNull(),
+  systemId: integer("system_id").references(() => systems.id).notNull(),
+  sessionType: text("session_type").notNull(), // rustdesk, rdp, vnc, ssh
+  connectionId: text("connection_id").notNull(),
+  status: text("status").notNull().default("inactive"), // active, inactive, connecting
+  remoteAddress: text("remote_address"),
+  remotePort: integer("remote_port"),
+  rustdeskId: text("rustdesk_id"), // RustDesk ID
+  rustdeskPassword: text("rustdesk_password"), // Encrypted
+  notes: text("notes"),
+  startedAt: timestamp("started_at"),
+  endedAt: timestamp("ended_at"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
 export const aiAgents = pgTable("ai_agents", {
@@ -98,9 +141,12 @@ export const aiAgents = pgTable("ai_agents", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+// Operation Reports
 export const reports = pgTable("reports", {
   id: serial("id").primaryKey(),
-  vulnerabilityId: integer("vulnerability_id").references(() => vulnerabilities.id).notNull(),
+  operationId: integer("operation_id").references(() => operations.id).notNull(),
+  type: text("type").notNull(), // initial-access, lateral-movement, persistence, exfiltration, post-exploitation
+  title: text("title").notNull(),
   content: text("content").notNull(),
   format: text("format").notNull().default("markdown"), // markdown, html, json
   aiGenerated: boolean("ai_generated").default(false),
@@ -133,35 +179,62 @@ export const globalConfig = pgTable("global_config", {
 });
 
 // Relations
-export const programsRelations = relations(programs, ({ many }) => ({
-  targets: many(targets),
-  vulnerabilities: many(vulnerabilities),
-}));
-
-export const targetsRelations = relations(targets, ({ one, many }) => ({
-  program: one(programs, {
-    fields: [targets.programId],
-    references: [programs.id],
-  }),
-  vulnerabilities: many(vulnerabilities),
-}));
-
-export const vulnerabilitiesRelations = relations(vulnerabilities, ({ one, many }) => ({
-  program: one(programs, {
-    fields: [vulnerabilities.programId],
-    references: [programs.id],
-  }),
-  target: one(targets, {
-    fields: [vulnerabilities.targetId],
-    references: [targets.id],
-  }),
+// Relations for Red Team entities
+export const operationsRelations = relations(operations, ({ many }) => ({
+  systems: many(systems),
+  beacons: many(beacons),
+  networkDiscoveries: many(networkDiscoveries),
+  remoteSessions: many(remoteSessions),
   reports: many(reports),
 }));
 
+export const systemsRelations = relations(systems, ({ one, many }) => ({
+  operation: one(operations, {
+    fields: [systems.operationId],
+    references: [operations.id],
+  }),
+  beacons: many(beacons),
+  networkDiscoveries: many(networkDiscoveries),
+  remoteSessions: many(remoteSessions),
+}));
+
+export const beaconsRelations = relations(beacons, ({ one }) => ({
+  operation: one(operations, {
+    fields: [beacons.operationId],
+    references: [operations.id],
+  }),
+  system: one(systems, {
+    fields: [beacons.systemId],
+    references: [systems.id],
+  }),
+}));
+
+export const networkDiscoveriesRelations = relations(networkDiscoveries, ({ one }) => ({
+  operation: one(operations, {
+    fields: [networkDiscoveries.operationId],
+    references: [operations.id],
+  }),
+  system: one(systems, {
+    fields: [networkDiscoveries.systemId],
+    references: [systems.id],
+  }),
+}));
+
+export const remoteSessionsRelations = relations(remoteSessions, ({ one }) => ({
+  operation: one(operations, {
+    fields: [remoteSessions.operationId],
+    references: [operations.id],
+  }),
+  system: one(systems, {
+    fields: [remoteSessions.systemId],
+    references: [systems.id],
+  }),
+}));
+
 export const reportsRelations = relations(reports, ({ one }) => ({
-  vulnerability: one(vulnerabilities, {
-    fields: [reports.vulnerabilityId],
-    references: [vulnerabilities.id],
+  operation: one(operations, {
+    fields: [reports.operationId],
+    references: [operations.id],
   }),
 }));
 
@@ -173,11 +246,14 @@ export const aiAgentsRelations = relations(aiAgents, ({ one }) => ({
 }));
 
 // Insert schemas
+// Insert schemas
 export const insertUserSchema = createInsertSchema(users).omit({ createdAt: true, updatedAt: true });
 export const upsertUserSchema = createInsertSchema(users).omit({ createdAt: true, updatedAt: true });
-export const insertProgramSchema = createInsertSchema(programs).omit({ id: true, createdAt: true, updatedAt: true });
-export const insertTargetSchema = createInsertSchema(targets).omit({ id: true, createdAt: true });
-export const insertVulnerabilitySchema = createInsertSchema(vulnerabilities).omit({ id: true, submittedAt: true, updatedAt: true });
+export const insertOperationSchema = createInsertSchema(operations).omit({ id: true, createdAt: true, updatedAt: true });
+export const insertSystemSchema = createInsertSchema(systems).omit({ id: true, createdAt: true });
+export const insertBeaconSchema = createInsertSchema(beacons).omit({ id: true, createdAt: true, updatedAt: true });
+export const insertNetworkDiscoverySchema = createInsertSchema(networkDiscoveries).omit({ id: true, createdAt: true });
+export const insertRemoteSessionSchema = createInsertSchema(remoteSessions).omit({ id: true, createdAt: true });
 export const insertAiAgentSchema = createInsertSchema(aiAgents).omit({ id: true, createdAt: true });
 export const insertReportSchema = createInsertSchema(reports).omit({ id: true, createdAt: true });
 export const insertClientCertificateSchema = createInsertSchema(clientCertificates).omit({ id: true, createdAt: true, updatedAt: true });
@@ -187,12 +263,16 @@ export const insertGlobalConfigSchema = createInsertSchema(globalConfig).omit({ 
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type UpsertUser = z.infer<typeof upsertUserSchema>;
 export type User = typeof users.$inferSelect;
-export type InsertProgram = z.infer<typeof insertProgramSchema>;
-export type Program = typeof programs.$inferSelect;
-export type InsertTarget = z.infer<typeof insertTargetSchema>;
-export type Target = typeof targets.$inferSelect;
-export type InsertVulnerability = z.infer<typeof insertVulnerabilitySchema>;
-export type Vulnerability = typeof vulnerabilities.$inferSelect;
+export type InsertOperation = z.infer<typeof insertOperationSchema>;
+export type Operation = typeof operations.$inferSelect;
+export type InsertSystem = z.infer<typeof insertSystemSchema>;
+export type System = typeof systems.$inferSelect;
+export type InsertBeacon = z.infer<typeof insertBeaconSchema>;
+export type Beacon = typeof beacons.$inferSelect;
+export type InsertNetworkDiscovery = z.infer<typeof insertNetworkDiscoverySchema>;
+export type NetworkDiscovery = typeof networkDiscoveries.$inferSelect;
+export type InsertRemoteSession = z.infer<typeof insertRemoteSessionSchema>;
+export type RemoteSession = typeof remoteSessions.$inferSelect;
 export type InsertAiAgent = z.infer<typeof insertAiAgentSchema>;
 export type AiAgent = typeof aiAgents.$inferSelect;
 export type InsertReport = z.infer<typeof insertReportSchema>;

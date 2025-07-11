@@ -17,20 +17,20 @@ export default function Dashboard() {
     queryKey: ["/api/dashboard/stats"],
   });
 
-  const { data: vulnerabilities, isLoading: vulnsLoading } = useQuery({
-    queryKey: ["/api/vulnerabilities"],
+  const { data: beacons, isLoading: beaconsLoading } = useQuery({
+    queryKey: ["/api/beacons"],
   });
 
-  const { data: programs, isLoading: programsLoading } = useQuery({
-    queryKey: ["/api/programs"],
+  const { data: operations, isLoading: operationsLoading } = useQuery({
+    queryKey: ["/api/operations"],
   });
 
   const { data: aiAgents, isLoading: agentsLoading } = useQuery({
     queryKey: ["/api/ai-agents"],
   });
 
-  const recentVulnerabilities = vulnerabilities?.slice(0, 3) || [];
-  const activePrograms = programs?.filter((p: any) => p.status === 'active').slice(0, 3) || [];
+  const recentBeacons = beacons?.slice(0, 3) || [];
+  const activeOperations = operations?.filter((p: any) => p.status === 'active').slice(0, 3) || [];
   const agentsList = aiAgents?.slice(0, 3) || [];
 
   // Sample notifications data
@@ -233,13 +233,13 @@ export default function Dashboard() {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {recentVulnerabilities.length === 0 ? (
+                {recentBeacons.length === 0 ? (
                   <div className="text-center py-8 text-gray-400">
-                    No vulnerabilities found. Create your first report to get started.
+                    No beacons found. Create your first beacon to get started.
                   </div>
                 ) : (
-                  recentVulnerabilities.map((vulnerability: any) => (
-                    <VulnerabilityCard key={vulnerability.id} vulnerability={vulnerability} />
+                  recentBeacons.map((beacon: any) => (
+                    <VulnerabilityCard key={beacon.id} vulnerability={beacon} />
                   ))
                 )}
               </div>
@@ -290,43 +290,43 @@ export default function Dashboard() {
                 </div>
               </CardHeader>
               <CardContent>
-                {activePrograms.length === 0 ? (
+                {activeOperations.length === 0 ? (
                   <div className="text-center py-8 text-gray-400">
-                    No active programs found. Add your first program to get started.
+                    No active operations found. Add your first operation to get started.
                   </div>
                 ) : (
                   <div className="overflow-x-auto">
                     <table className="w-full">
                       <thead>
                         <tr className="border-b border-gray-700">
-                          <th className="text-left text-gray-400 font-medium pb-3">Program</th>
+                          <th className="text-left text-gray-400 font-medium pb-3">Operation</th>
                           <th className="text-left text-gray-400 font-medium pb-3">Platform</th>
                           <th className="text-left text-gray-400 font-medium pb-3">Status</th>
                           <th className="text-left text-gray-400 font-medium pb-3">Rewards</th>
                         </tr>
                       </thead>
                       <tbody>
-                        {activePrograms.map((program: any) => (
-                          <tr key={program.id} className="border-b border-gray-700 hover:bg-card">
+                        {activeOperations.map((operation: any) => (
+                          <tr key={operation.id} className="border-b border-gray-700 hover:bg-card">
                             <td className="py-3">
                               <div className="flex items-center">
                                 <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center text-white text-xs font-medium mr-3">
-                                  {program.name.charAt(0)}
+                                  {operation.name.charAt(0)}
                                 </div>
                                 <div>
-                                  <p className="font-medium text-gray-100">{program.name}</p>
-                                  <p className="text-sm text-gray-400">{program.url}</p>
+                                  <p className="font-medium text-gray-100">{operation.name}</p>
+                                  <p className="text-sm text-gray-400">{operation.url}</p>
                                 </div>
                               </div>
                             </td>
-                            <td className="py-3 text-gray-300">{program.platform}</td>
+                            <td className="py-3 text-gray-300">{operation.platform}</td>
                             <td className="py-3">
                               <Badge className="bg-success/10 text-success">
-                                {program.status}
+                                {operation.status}
                               </Badge>
                             </td>
                             <td className="py-3 text-gray-300">
-                              ${program.minReward} - ${program.maxReward}
+                              ${operation.minReward} - ${operation.maxReward}
                             </td>
                           </tr>
                         ))}

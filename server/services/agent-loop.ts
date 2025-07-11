@@ -6,7 +6,7 @@ export interface LoopExecution {
   id: string;
   agentId: number;
   partnerId: number;
-  vulnerabilityId: number;
+  beaconId: number;
   currentIteration: number;
   maxIterations: number;
   exitCondition: string;
@@ -32,7 +32,7 @@ class AgentLoopService {
 
   async startLoop(
     agentId: number,
-    vulnerabilityId: number,
+    beaconId: number,
     initialInput: string
   ): Promise<LoopExecution | null> {
     const agent = await storage.getAiAgent(agentId);
@@ -51,7 +51,7 @@ class AgentLoopService {
       id: loopId,
       agentId,
       partnerId: partner.id,
-      vulnerabilityId,
+      beaconId,
       currentIteration: 0,
       maxIterations: agent.maxLoopIterations || 5,
       exitCondition: agent.loopExitCondition || 'functional_poc',
@@ -83,7 +83,7 @@ class AgentLoopService {
 
       try {
         // Execute current agent
-        const output = await this.executeAgent(agent, currentInput, loop.vulnerabilityId);
+        const output = await this.executeAgent(agent, currentInput, loop.beaconId);
         
         // Check exit condition
         const exitConditionMet = await this.checkExitCondition(
@@ -139,27 +139,27 @@ class AgentLoopService {
     }
   }
 
-  private async executeAgent(agent: any, input: string, vulnerabilityId: number): Promise<string> {
-    const vulnerability = await storage.getVulnerability(vulnerabilityId);
-    if (!vulnerability) {
-      throw new Error('Vulnerability not found');
+  private async executeAgent(agent: any, input: string, beaconId: number): Promise<string> {
+    const beacon = await storage.getBeacon(beaconId);
+    if (!beacon) {
+      throw new Error('Beacon not found');
     }
 
     const prompt = agent.modelPrompt 
-      ? `${agent.modelPrompt}\n\nPrevious iteration output: ${input}\n\nVulnerability: ${vulnerability.description}`
-      : `Previous iteration output: ${input}\n\nVulnerability: ${vulnerability.description}`;
+      ? `${agent.modelPrompt}\n\nPrevious iteration output: ${input}\n\nBeacon: ${beacon.protocol} on ${beacon.hostname}:${beacon.port}`
+      : `Previous iteration output: ${input}\n\nBeacon: ${beacon.protocol} on ${beacon.hostname}:${beacon.port}`;
 
     switch (agent.type) {
       case 'openai':
-        return await openaiGenerate(vulnerability, prompt);
+        return await openaiGenerate(beacon as any, prompt);
       case 'anthropic':
-        return await anthropicGenerate(vulnerability, prompt);
+        return await anthropicGenerate(beacon as any, prompt);
       case 'local':
         // For local agents, return enhanced input (placeholder)
         return `[Local Agent Processing]\nInput: ${input}\nEnhanced analysis: Vulnerability pattern analysis complete.\nRecommendation: Continue iteration for POC development.`;
       case 'burp':
         // For Burp Suite integration (placeholder)
-        return `[Burp Suite Analysis]\nInput: ${input}\nScanning results: Additional attack vectors identified.\nPayload suggestions: ${this.generatePayloadSuggestions(vulnerability)}`;
+        return `[Burp Suite Analysis]\nInput: ${input}\nScanning results: Additional attack vectors identified.\nPayload suggestions: ${this.generatePayloadSuggestions(beacon)}`;
       default:
         throw new Error(`Unsupported agent type: ${agent.type}`);
     }
@@ -193,7 +193,7 @@ class AgentLoopService {
     }
   }
 
-  private generatePayloadSuggestions(vulnerability: any): string {
+  private generatePayloadSuggestions(beacon: any): string {
     const suggestions = [
       'SQL injection variations',
       'XSS payload mutations',

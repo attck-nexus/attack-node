@@ -1,8 +1,10 @@
 import {
   users,
-  programs,
-  targets,
-  vulnerabilities,
+  operations,
+  systems,
+  beacons,
+  networkDiscoveries,
+  remoteSessions,
   aiAgents,
   reports,
   clientCertificates,
@@ -10,12 +12,16 @@ import {
   type User,
   type InsertUser,
   type UpsertUser,
-  type Program,
-  type InsertProgram,
-  type Target,
-  type InsertTarget,
-  type Vulnerability,
-  type InsertVulnerability,
+  type Operation,
+  type InsertOperation,
+  type System,
+  type InsertSystem,
+  type Beacon,
+  type InsertBeacon,
+  type NetworkDiscovery,
+  type InsertNetworkDiscovery,
+  type RemoteSession,
+  type InsertRemoteSession,
   type AiAgent,
   type InsertAiAgent,
   type Report,
@@ -35,26 +41,40 @@ export interface IStorage {
   createUser(user: InsertUser): Promise<User>;
   upsertUser(user: UpsertUser): Promise<User>;
 
-  // Program operations
-  getPrograms(): Promise<Program[]>;
-  getProgram(id: number): Promise<Program | undefined>;
-  createProgram(program: InsertProgram): Promise<Program>;
-  updateProgram(id: number, program: Partial<InsertProgram>): Promise<Program>;
-  deleteProgram(id: number): Promise<void>;
+  // Operation operations
+  getOperations(): Promise<Operation[]>;
+  getOperation(id: number): Promise<Operation | undefined>;
+  createOperation(operation: InsertOperation): Promise<Operation>;
+  updateOperation(id: number, operation: Partial<InsertOperation>): Promise<Operation>;
+  deleteOperation(id: number): Promise<void>;
 
-  // Target operations
-  getTargets(programId?: number): Promise<Target[]>;
-  getTarget(id: number): Promise<Target | undefined>;
-  createTarget(target: InsertTarget): Promise<Target>;
-  updateTarget(id: number, target: Partial<InsertTarget>): Promise<Target>;
-  deleteTarget(id: number): Promise<void>;
+  // System operations
+  getSystems(operationId?: number): Promise<System[]>;
+  getSystem(id: number): Promise<System | undefined>;
+  createSystem(system: InsertSystem): Promise<System>;
+  updateSystem(id: number, system: Partial<InsertSystem>): Promise<System>;
+  deleteSystem(id: number): Promise<void>;
 
-  // Vulnerability operations
-  getVulnerabilities(programId?: number): Promise<Vulnerability[]>;
-  getVulnerability(id: number): Promise<Vulnerability | undefined>;
-  createVulnerability(vulnerability: InsertVulnerability): Promise<Vulnerability>;
-  updateVulnerability(id: number, vulnerability: Partial<InsertVulnerability>): Promise<Vulnerability>;
-  deleteVulnerability(id: number): Promise<void>;
+  // Beacon operations
+  getBeacons(operationId?: number): Promise<Beacon[]>;
+  getBeacon(id: number): Promise<Beacon | undefined>;
+  createBeacon(beacon: InsertBeacon): Promise<Beacon>;
+  updateBeacon(id: number, beacon: Partial<InsertBeacon>): Promise<Beacon>;
+  deleteBeacon(id: number): Promise<void>;
+
+  // Network Discovery operations
+  getNetworkDiscoveries(operationId?: number): Promise<NetworkDiscovery[]>;
+  getNetworkDiscovery(id: number): Promise<NetworkDiscovery | undefined>;
+  createNetworkDiscovery(discovery: InsertNetworkDiscovery): Promise<NetworkDiscovery>;
+  updateNetworkDiscovery(id: number, discovery: Partial<InsertNetworkDiscovery>): Promise<NetworkDiscovery>;
+  deleteNetworkDiscovery(id: number): Promise<void>;
+
+  // Remote Session operations
+  getRemoteSessions(operationId?: number): Promise<RemoteSession[]>;
+  getRemoteSession(id: number): Promise<RemoteSession | undefined>;
+  createRemoteSession(session: InsertRemoteSession): Promise<RemoteSession>;
+  updateRemoteSession(id: number, session: Partial<InsertRemoteSession>): Promise<RemoteSession>;
+  deleteRemoteSession(id: number): Promise<void>;
 
   // AI Agent operations
   getAiAgents(): Promise<AiAgent[]>;
@@ -64,7 +84,7 @@ export interface IStorage {
   deleteAiAgent(id: number): Promise<void>;
 
   // Report operations
-  getReports(vulnerabilityId?: number): Promise<Report[]>;
+  getReports(operationId?: number): Promise<Report[]>;
   getReport(id: number): Promise<Report | undefined>;
   createReport(report: InsertReport): Promise<Report>;
   updateReport(id: number, report: Partial<InsertReport>): Promise<Report>;
@@ -79,11 +99,11 @@ export interface IStorage {
 
   // Analytics operations
   getDashboardStats(): Promise<{
-    totalPrograms: number;
-    totalVulnerabilities: number;
-    totalRewards: number;
-    avgResponseTime: number;
-    vulnerabilityTrends: { severity: string; count: number }[];
+    totalOperations: number;
+    totalSystems: number;
+    activeBeacons: number;
+    completedOperations: number;
+    systemsByAccessLevel: { level: string; count: number }[];
   }>;
 
   // Global Config operations
@@ -127,145 +147,171 @@ export class DatabaseStorage implements IStorage {
     return user;
   }
 
-  // Program operations
-  async getPrograms(): Promise<Program[]> {
-    return await db.select().from(programs).orderBy(desc(programs.createdAt));
+  // Operation operations
+  async getOperations(): Promise<Operation[]> {
+    return await db.select().from(operations).orderBy(desc(operations.createdAt));
   }
 
-  async getProgram(id: number): Promise<Program | undefined> {
-    const [program] = await db.select().from(programs).where(eq(programs.id, id));
-    return program || undefined;
+  async getOperation(id: number): Promise<Operation | undefined> {
+    const [operation] = await db.select().from(operations).where(eq(operations.id, id));
+    return operation || undefined;
   }
 
-  async createProgram(insertProgram: InsertProgram): Promise<Program> {
-    const [program] = await db
-      .insert(programs)
-      .values(insertProgram)
+  async createOperation(insertOperation: InsertOperation): Promise<Operation> {
+    const [operation] = await db
+      .insert(operations)
+      .values(insertOperation)
       .returning();
-    return program;
+    return operation;
   }
 
-  async updateProgram(id: number, updateProgram: Partial<InsertProgram>): Promise<Program> {
-    const [program] = await db
-      .update(programs)
-      .set({ ...updateProgram, updatedAt: new Date() })
-      .where(eq(programs.id, id))
+  async updateOperation(id: number, updateOperation: Partial<InsertOperation>): Promise<Operation> {
+    const [operation] = await db
+      .update(operations)
+      .set({ ...updateOperation, updatedAt: new Date() })
+      .where(eq(operations.id, id))
       .returning();
-    return program;
+    return operation;
   }
 
-  async deleteProgram(id: number): Promise<void> {
-    await db.delete(programs).where(eq(programs.id, id));
+  async deleteOperation(id: number): Promise<void> {
+    await db.delete(operations).where(eq(operations.id, id));
   }
 
-  // Target operations
-  async getTargets(programId?: number): Promise<Target[]> {
-    if (programId) {
-      return await db.select().from(targets).where(eq(targets.programId, programId));
+  // System operations
+  async getSystems(operationId?: number): Promise<System[]> {
+    if (operationId) {
+      return await db.select().from(systems).where(eq(systems.operationId, operationId));
     }
-    return await db.select().from(targets).orderBy(desc(targets.createdAt));
+    return await db.select().from(systems).orderBy(desc(systems.createdAt));
   }
 
-  async getTarget(id: number): Promise<Target | undefined> {
-    const [target] = await db.select().from(targets).where(eq(targets.id, id));
-    return target || undefined;
+  async getSystem(id: number): Promise<System | undefined> {
+    const [system] = await db.select().from(systems).where(eq(systems.id, id));
+    return system || undefined;
   }
 
-  async createTarget(insertTarget: InsertTarget): Promise<Target> {
-    const [target] = await db
-      .insert(targets)
-      .values({
-        programId: insertTarget.programId,
-        url: insertTarget.url,
-        type: insertTarget.type,
-        scope: insertTarget.scope || "in-scope",
-        tags: insertTarget.tags || [],
-        notes: insertTarget.notes,
-        lastTested: insertTarget.lastTested
-      } as any)
+  async createSystem(insertSystem: InsertSystem): Promise<System> {
+    const [system] = await db
+      .insert(systems)
+      .values(insertSystem)
       .returning();
-    return target;
+    return system;
   }
 
-  async updateTarget(id: number, updateTarget: Partial<InsertTarget>): Promise<Target> {
-    const updateData: any = {};
-    if (updateTarget.programId !== undefined) updateData.programId = updateTarget.programId;
-    if (updateTarget.url !== undefined) updateData.url = updateTarget.url;
-    if (updateTarget.type !== undefined) updateData.type = updateTarget.type;
-    if (updateTarget.scope !== undefined) updateData.scope = updateTarget.scope;
-    if (updateTarget.tags !== undefined) updateData.tags = updateTarget.tags;
-    if (updateTarget.notes !== undefined) updateData.notes = updateTarget.notes;
-    if (updateTarget.lastTested !== undefined) updateData.lastTested = updateTarget.lastTested;
-    
-    const [target] = await db
-      .update(targets)
-      .set(updateData)
-      .where(eq(targets.id, id))
+  async updateSystem(id: number, updateSystem: Partial<InsertSystem>): Promise<System> {
+    const [system] = await db
+      .update(systems)
+      .set(updateSystem)
+      .where(eq(systems.id, id))
       .returning();
-    return target;
+    return system;
   }
 
-  async deleteTarget(id: number): Promise<void> {
-    await db.delete(targets).where(eq(targets.id, id));
+  async deleteSystem(id: number): Promise<void> {
+    await db.delete(systems).where(eq(systems.id, id));
   }
 
-  // Vulnerability operations
-  async getVulnerabilities(programId?: number): Promise<Vulnerability[]> {
-    if (programId) {
-      return await db.select().from(vulnerabilities).where(eq(vulnerabilities.programId, programId));
+  // Beacon operations
+  async getBeacons(operationId?: number): Promise<Beacon[]> {
+    if (operationId) {
+      return await db.select().from(beacons).where(eq(beacons.operationId, operationId));
     }
-    return await db.select().from(vulnerabilities).orderBy(desc(vulnerabilities.submittedAt));
+    return await db.select().from(beacons).orderBy(desc(beacons.createdAt));
   }
 
-  async getVulnerability(id: number): Promise<Vulnerability | undefined> {
-    const [vulnerability] = await db.select().from(vulnerabilities).where(eq(vulnerabilities.id, id));
-    return vulnerability || undefined;
+  async getBeacon(id: number): Promise<Beacon | undefined> {
+    const [beacon] = await db.select().from(beacons).where(eq(beacons.id, id));
+    return beacon || undefined;
   }
 
-  async createVulnerability(insertVulnerability: InsertVulnerability): Promise<Vulnerability> {
-    const [vulnerability] = await db
-      .insert(vulnerabilities)
-      .values({
-        programId: insertVulnerability.programId,
-        targetId: insertVulnerability.targetId,
-        title: insertVulnerability.title,
-        description: insertVulnerability.description,
-        severity: insertVulnerability.severity,
-        status: insertVulnerability.status || "new",
-        cvssScore: insertVulnerability.cvssScore,
-        reward: insertVulnerability.reward,
-        proofOfConcept: insertVulnerability.proofOfConcept,
-        recommendations: insertVulnerability.recommendations,
-        attachments: insertVulnerability.attachments || []
-      } as any)
+  async createBeacon(insertBeacon: InsertBeacon): Promise<Beacon> {
+    const [beacon] = await db
+      .insert(beacons)
+      .values(insertBeacon)
       .returning();
-    return vulnerability;
+    return beacon;
   }
 
-  async updateVulnerability(id: number, updateVulnerability: Partial<InsertVulnerability>): Promise<Vulnerability> {
-    const updateData: any = { updatedAt: new Date() };
-    if (updateVulnerability.programId !== undefined) updateData.programId = updateVulnerability.programId;
-    if (updateVulnerability.targetId !== undefined) updateData.targetId = updateVulnerability.targetId;
-    if (updateVulnerability.title !== undefined) updateData.title = updateVulnerability.title;
-    if (updateVulnerability.description !== undefined) updateData.description = updateVulnerability.description;
-    if (updateVulnerability.severity !== undefined) updateData.severity = updateVulnerability.severity;
-    if (updateVulnerability.status !== undefined) updateData.status = updateVulnerability.status;
-    if (updateVulnerability.cvssScore !== undefined) updateData.cvssScore = updateVulnerability.cvssScore;
-    if (updateVulnerability.reward !== undefined) updateData.reward = updateVulnerability.reward;
-    if (updateVulnerability.proofOfConcept !== undefined) updateData.proofOfConcept = updateVulnerability.proofOfConcept;
-    if (updateVulnerability.recommendations !== undefined) updateData.recommendations = updateVulnerability.recommendations;
-    if (updateVulnerability.attachments !== undefined) updateData.attachments = updateVulnerability.attachments;
-    
-    const [vulnerability] = await db
-      .update(vulnerabilities)
-      .set(updateData)
-      .where(eq(vulnerabilities.id, id))
+  async updateBeacon(id: number, updateBeacon: Partial<InsertBeacon>): Promise<Beacon> {
+    const [beacon] = await db
+      .update(beacons)
+      .set({ ...updateBeacon, updatedAt: new Date() })
+      .where(eq(beacons.id, id))
       .returning();
-    return vulnerability;
+    return beacon;
   }
 
-  async deleteVulnerability(id: number): Promise<void> {
-    await db.delete(vulnerabilities).where(eq(vulnerabilities.id, id));
+  async deleteBeacon(id: number): Promise<void> {
+    await db.delete(beacons).where(eq(beacons.id, id));
+  }
+
+  // Network Discovery operations
+  async getNetworkDiscoveries(operationId?: number): Promise<NetworkDiscovery[]> {
+    if (operationId) {
+      return await db.select().from(networkDiscoveries).where(eq(networkDiscoveries.operationId, operationId));
+    }
+    return await db.select().from(networkDiscoveries).orderBy(desc(networkDiscoveries.createdAt));
+  }
+
+  async getNetworkDiscovery(id: number): Promise<NetworkDiscovery | undefined> {
+    const [discovery] = await db.select().from(networkDiscoveries).where(eq(networkDiscoveries.id, id));
+    return discovery || undefined;
+  }
+
+  async createNetworkDiscovery(insertDiscovery: InsertNetworkDiscovery): Promise<NetworkDiscovery> {
+    const [discovery] = await db
+      .insert(networkDiscoveries)
+      .values(insertDiscovery)
+      .returning();
+    return discovery;
+  }
+
+  async updateNetworkDiscovery(id: number, updateDiscovery: Partial<InsertNetworkDiscovery>): Promise<NetworkDiscovery> {
+    const [discovery] = await db
+      .update(networkDiscoveries)
+      .set(updateDiscovery)
+      .where(eq(networkDiscoveries.id, id))
+      .returning();
+    return discovery;
+  }
+
+  async deleteNetworkDiscovery(id: number): Promise<void> {
+    await db.delete(networkDiscoveries).where(eq(networkDiscoveries.id, id));
+  }
+
+  // Remote Session operations
+  async getRemoteSessions(operationId?: number): Promise<RemoteSession[]> {
+    if (operationId) {
+      return await db.select().from(remoteSessions).where(eq(remoteSessions.operationId, operationId));
+    }
+    return await db.select().from(remoteSessions).orderBy(desc(remoteSessions.createdAt));
+  }
+
+  async getRemoteSession(id: number): Promise<RemoteSession | undefined> {
+    const [session] = await db.select().from(remoteSessions).where(eq(remoteSessions.id, id));
+    return session || undefined;
+  }
+
+  async createRemoteSession(insertSession: InsertRemoteSession): Promise<RemoteSession> {
+    const [session] = await db
+      .insert(remoteSessions)
+      .values(insertSession)
+      .returning();
+    return session;
+  }
+
+  async updateRemoteSession(id: number, updateSession: Partial<InsertRemoteSession>): Promise<RemoteSession> {
+    const [session] = await db
+      .update(remoteSessions)
+      .set(updateSession)
+      .where(eq(remoteSessions.id, id))
+      .returning();
+    return session;
+  }
+
+  async deleteRemoteSession(id: number): Promise<void> {
+    await db.delete(remoteSessions).where(eq(remoteSessions.id, id));
   }
 
   // AI Agent operations
@@ -300,9 +346,9 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Report operations
-  async getReports(vulnerabilityId?: number): Promise<Report[]> {
-    if (vulnerabilityId) {
-      return await db.select().from(reports).where(eq(reports.vulnerabilityId, vulnerabilityId));
+  async getReports(operationId?: number): Promise<Report[]> {
+    if (operationId) {
+      return await db.select().from(reports).where(eq(reports.operationId, operationId));
     }
     return await db.select().from(reports).orderBy(desc(reports.createdAt));
   }
@@ -366,36 +412,43 @@ export class DatabaseStorage implements IStorage {
 
   // Analytics operations
   async getDashboardStats(): Promise<{
-    totalPrograms: number;
-    totalVulnerabilities: number;
-    totalRewards: number;
-    avgResponseTime: number;
-    vulnerabilityTrends: { severity: string; count: number }[];
+    totalOperations: number;
+    totalSystems: number;
+    activeBeacons: number;
+    completedOperations: number;
+    systemsByAccessLevel: { level: string; count: number }[];
   }> {
-    const [programCount] = await db.select({ count: count() }).from(programs);
-    const [vulnerabilityCount] = await db.select({ count: count() }).from(vulnerabilities);
+    const [operationCount] = await db.select({ count: count() }).from(operations);
+    const [systemCount] = await db.select({ count: count() }).from(systems);
     
-    const rewardResults = await db
-      .select({ reward: vulnerabilities.reward })
-      .from(vulnerabilities)
-      .where(and(eq(vulnerabilities.status, "resolved")));
+    const [beaconCount] = await db
+      .select({ count: count() })
+      .from(beacons)
+      .where(eq(beacons.status, "active"));
     
-    const totalRewards = rewardResults.reduce((sum, row) => sum + (parseFloat(row.reward || "0")), 0);
+    const [completedCount] = await db
+      .select({ count: count() })
+      .from(operations)
+      .where(eq(operations.status, "completed"));
     
-    const vulnerabilityTrends = await db
+    const systemsByAccessLevel = await db
       .select({
-        severity: vulnerabilities.severity,
+        level: systems.accessLevel,
         count: count(),
       })
-      .from(vulnerabilities)
-      .groupBy(vulnerabilities.severity);
+      .from(systems)
+      .where(systems.accessLevel !== null)
+      .groupBy(systems.accessLevel);
 
     return {
-      totalPrograms: programCount.count,
-      totalVulnerabilities: vulnerabilityCount.count,
-      totalRewards,
-      avgResponseTime: 2.3, // This would be calculated from actual response times
-      vulnerabilityTrends,
+      totalOperations: operationCount.count,
+      totalSystems: systemCount.count,
+      activeBeacons: beaconCount.count,
+      completedOperations: completedCount.count,
+      systemsByAccessLevel: systemsByAccessLevel.map(stat => ({
+        level: stat.level || 'unknown',
+        count: stat.count
+      }))
     };
   }
 

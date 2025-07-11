@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertProgramSchema, insertTargetSchema, insertVulnerabilitySchema, insertAiAgentSchema, insertReportSchema, insertClientCertificateSchema } from "@shared/schema";
+import { insertOperationSchema, insertSystemSchema, insertBeaconSchema, insertNetworkDiscoverySchema, insertRemoteSessionSchema, insertAiAgentSchema, insertReportSchema, insertClientCertificateSchema } from "@shared/schema";
 import { generateVulnerabilityReport } from "./services/openai";
 import { testConnection as testAnthropicConnection } from "./services/anthropic";
 import { dockerService } from "./services/docker";
@@ -61,177 +61,234 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Programs routes
-  app.get("/api/programs", async (req, res) => {
+  // Operations routes
+  app.get("/api/operations", async (req, res) => {
     try {
-      const programs = await storage.getPrograms();
-      res.json(programs);
+      const operations = await storage.getOperations();
+      res.json(operations);
     } catch (error) {
-      res.status(500).json({ message: "Failed to fetch programs" });
+      res.status(500).json({ message: "Failed to fetch operations" });
     }
   });
 
-  app.get("/api/programs/:id", async (req, res) => {
+  app.get("/api/operations/:id", async (req, res) => {
     try {
       const id = parseInt(req.params.id);
-      const program = await storage.getProgram(id);
-      if (!program) {
-        return res.status(404).json({ message: "Program not found" });
+      const operation = await storage.getOperation(id);
+      if (!operation) {
+        return res.status(404).json({ message: "Operation not found" });
       }
-      res.json(program);
+      res.json(operation);
     } catch (error) {
-      res.status(500).json({ message: "Failed to fetch program" });
+      res.status(500).json({ message: "Failed to fetch operation" });
     }
   });
 
-  app.post("/api/programs", async (req, res) => {
+  app.post("/api/operations", async (req, res) => {
     try {
-      const programData = insertProgramSchema.parse(req.body);
-      const program = await storage.createProgram(programData);
-      res.status(201).json(program);
+      const operationData = insertOperationSchema.parse(req.body);
+      const operation = await storage.createOperation(operationData);
+      res.status(201).json(operation);
     } catch (error) {
       if (error instanceof z.ZodError) {
-        return res.status(400).json({ message: "Invalid program data", errors: error.errors });
+        return res.status(400).json({ message: "Invalid operation data", errors: error.errors });
       }
-      res.status(500).json({ message: "Failed to create program" });
+      res.status(500).json({ message: "Failed to create operation" });
     }
   });
 
-  app.put("/api/programs/:id", async (req, res) => {
+  app.put("/api/operations/:id", async (req, res) => {
     try {
       const id = parseInt(req.params.id);
-      const programData = insertProgramSchema.partial().parse(req.body);
-      const program = await storage.updateProgram(id, programData);
-      res.json(program);
+      const operationData = insertOperationSchema.partial().parse(req.body);
+      const operation = await storage.updateOperation(id, operationData);
+      res.json(operation);
     } catch (error) {
       if (error instanceof z.ZodError) {
-        return res.status(400).json({ message: "Invalid program data", errors: error.errors });
+        return res.status(400).json({ message: "Invalid operation data", errors: error.errors });
       }
-      res.status(500).json({ message: "Failed to update program" });
+      res.status(500).json({ message: "Failed to update operation" });
     }
   });
 
-  app.delete("/api/programs/:id", async (req, res) => {
+  app.delete("/api/operations/:id", async (req, res) => {
     try {
       const id = parseInt(req.params.id);
-      await storage.deleteProgram(id);
+      await storage.deleteOperation(id);
       res.status(204).send();
     } catch (error) {
-      res.status(500).json({ message: "Failed to delete program" });
+      res.status(500).json({ message: "Failed to delete operation" });
     }
   });
 
-  // Targets routes
-  app.get("/api/targets", async (req, res) => {
+  // Systems routes
+  app.get("/api/systems", async (req, res) => {
     try {
-      const programId = req.query.programId ? parseInt(req.query.programId as string) : undefined;
-      const targets = await storage.getTargets(programId);
-      res.json(targets);
+      const operationId = req.query.operationId ? parseInt(req.query.operationId as string) : undefined;
+      const systems = await storage.getSystems(operationId);
+      res.json(systems);
     } catch (error) {
-      res.status(500).json({ message: "Failed to fetch targets" });
+      res.status(500).json({ message: "Failed to fetch systems" });
     }
   });
 
-  app.post("/api/targets", async (req, res) => {
+  app.post("/api/systems", async (req, res) => {
     try {
-      const targetData = insertTargetSchema.parse(req.body);
-      const target = await storage.createTarget(targetData);
-      res.status(201).json(target);
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        return res.status(400).json({ message: "Invalid target data", errors: error.errors });
-      }
-      res.status(500).json({ message: "Failed to create target" });
-    }
-  });
-
-  app.put("/api/targets/:id", async (req, res) => {
-    try {
-      const id = parseInt(req.params.id);
-      const targetData = insertTargetSchema.partial().parse(req.body);
-      const target = await storage.updateTarget(id, targetData);
-      res.json(target);
+      const systemData = insertSystemSchema.parse(req.body);
+      const system = await storage.createSystem(systemData);
+      res.status(201).json(system);
     } catch (error) {
       if (error instanceof z.ZodError) {
-        return res.status(400).json({ message: "Invalid target data", errors: error.errors });
+        return res.status(400).json({ message: "Invalid system data", errors: error.errors });
       }
-      res.status(500).json({ message: "Failed to update target" });
+      res.status(500).json({ message: "Failed to create system" });
     }
   });
 
-  app.delete("/api/targets/:id", async (req, res) => {
+  app.put("/api/systems/:id", async (req, res) => {
     try {
       const id = parseInt(req.params.id);
-      await storage.deleteTarget(id);
+      const systemData = insertSystemSchema.partial().parse(req.body);
+      const system = await storage.updateSystem(id, systemData);
+      res.json(system);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid system data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to update system" });
+    }
+  });
+
+  app.delete("/api/systems/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      await storage.deleteSystem(id);
       res.status(204).send();
     } catch (error) {
-      res.status(500).json({ message: "Failed to delete target" });
+      res.status(500).json({ message: "Failed to delete system" });
     }
   });
 
-  // Vulnerabilities routes
-  app.get("/api/vulnerabilities", async (req, res) => {
+  // Beacons routes
+  app.get("/api/beacons", async (req, res) => {
     try {
-      const programId = req.query.programId ? parseInt(req.query.programId as string) : undefined;
-      const vulnerabilities = await storage.getVulnerabilities(programId);
-      res.json(vulnerabilities);
+      const operationId = req.query.operationId ? parseInt(req.query.operationId as string) : undefined;
+      const beacons = await storage.getBeacons(operationId);
+      res.json(beacons);
     } catch (error) {
-      res.status(500).json({ message: "Failed to fetch vulnerabilities" });
+      res.status(500).json({ message: "Failed to fetch beacons" });
     }
   });
 
-  app.get("/api/vulnerabilities/:id", async (req, res) => {
+  app.get("/api/beacons/:id", async (req, res) => {
     try {
       const id = parseInt(req.params.id);
-      const vulnerability = await storage.getVulnerability(id);
-      if (!vulnerability) {
-        return res.status(404).json({ message: "Vulnerability not found" });
+      const beacon = await storage.getBeacon(id);
+      if (!beacon) {
+        return res.status(404).json({ message: "Beacon not found" });
       }
-      res.json(vulnerability);
+      res.json(beacon);
     } catch (error) {
-      res.status(500).json({ message: "Failed to fetch vulnerability" });
+      res.status(500).json({ message: "Failed to fetch beacon" });
     }
   });
 
-  app.post("/api/vulnerabilities", upload.array("attachments"), async (req, res) => {
+  app.post("/api/beacons", async (req, res) => {
     try {
-      const vulnerabilityData = insertVulnerabilitySchema.parse(req.body);
-      
-      // Handle file uploads
-      const attachments = (req.files as Express.Multer.File[])?.map(file => file.filename) || [];
-      vulnerabilityData.attachments = attachments;
-      
-      const vulnerability = await storage.createVulnerability(vulnerabilityData);
-      res.status(201).json(vulnerability);
+      const beaconData = insertBeaconSchema.parse(req.body);
+      const beacon = await storage.createBeacon(beaconData);
+      res.status(201).json(beacon);
     } catch (error) {
       if (error instanceof z.ZodError) {
-        return res.status(400).json({ message: "Invalid vulnerability data", errors: error.errors });
+        return res.status(400).json({ message: "Invalid beacon data", errors: error.errors });
       }
-      res.status(500).json({ message: "Failed to create vulnerability" });
+      res.status(500).json({ message: "Failed to create beacon" });
     }
   });
 
-  app.put("/api/vulnerabilities/:id", async (req, res) => {
+  app.put("/api/beacons/:id", async (req, res) => {
     try {
       const id = parseInt(req.params.id);
-      const vulnerabilityData = insertVulnerabilitySchema.partial().parse(req.body);
-      const vulnerability = await storage.updateVulnerability(id, vulnerabilityData);
-      res.json(vulnerability);
+      const beaconData = insertBeaconSchema.partial().parse(req.body);
+      const beacon = await storage.updateBeacon(id, beaconData);
+      res.json(beacon);
     } catch (error) {
       if (error instanceof z.ZodError) {
-        return res.status(400).json({ message: "Invalid vulnerability data", errors: error.errors });
+        return res.status(400).json({ message: "Invalid beacon data", errors: error.errors });
       }
-      res.status(500).json({ message: "Failed to update vulnerability" });
+      res.status(500).json({ message: "Failed to update beacon" });
     }
   });
 
-  app.delete("/api/vulnerabilities/:id", async (req, res) => {
+  app.delete("/api/beacons/:id", async (req, res) => {
     try {
       const id = parseInt(req.params.id);
-      await storage.deleteVulnerability(id);
+      await storage.deleteBeacon(id);
       res.status(204).send();
     } catch (error) {
-      res.status(500).json({ message: "Failed to delete vulnerability" });
+      res.status(500).json({ message: "Failed to delete beacon" });
+    }
+  });
+
+  // Network Discoveries routes
+  app.get("/api/network-discoveries", async (req, res) => {
+    try {
+      const operationId = req.query.operationId ? parseInt(req.query.operationId as string) : undefined;
+      const discoveries = await storage.getNetworkDiscoveries(operationId);
+      res.json(discoveries);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch network discoveries" });
+    }
+  });
+
+  app.post("/api/network-discoveries", async (req, res) => {
+    try {
+      const discoveryData = insertNetworkDiscoverySchema.parse(req.body);
+      const discovery = await storage.createNetworkDiscovery(discoveryData);
+      res.status(201).json(discovery);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid network discovery data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to create network discovery" });
+    }
+  });
+
+  // Remote Sessions routes
+  app.get("/api/remote-sessions", async (req, res) => {
+    try {
+      const operationId = req.query.operationId ? parseInt(req.query.operationId as string) : undefined;
+      const sessions = await storage.getRemoteSessions(operationId);
+      res.json(sessions);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch remote sessions" });
+    }
+  });
+
+  app.post("/api/remote-sessions", async (req, res) => {
+    try {
+      const sessionData = insertRemoteSessionSchema.parse(req.body);
+      const session = await storage.createRemoteSession(sessionData);
+      res.status(201).json(session);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid remote session data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to create remote session" });
+    }
+  });
+
+  app.put("/api/remote-sessions/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const sessionData = insertRemoteSessionSchema.partial().parse(req.body);
+      const session = await storage.updateRemoteSession(id, sessionData);
+      res.json(session);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid remote session data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to update remote session" });
     }
   });
 

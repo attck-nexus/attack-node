@@ -2,7 +2,7 @@
 
 ## Overview
 
-Attack Node is a multi-agent security platform designed for security researchers and penetration testers. It provides a comprehensive suite of tools for managing security testing programs, tracking vulnerabilities, and leveraging AI agents for automated security analysis and report generation.
+Attack Node is a comprehensive Red Team operations platform designed for security professionals. It provides advanced tools for managing offensive security operations, beacon monitoring, network discovery, and leveraging AI agents for automated exploitation and analysis. The platform features integrated security tools like Kali Linux and Burp Suite with remote access capabilities through RustDesk.
 
 ## System Architecture
 
@@ -26,21 +26,23 @@ Attack Node is a multi-agent security platform designed for security researchers
 ### Database Schema
 The application uses a relational database with the following core entities:
 - **Users**: Authentication and user management
-- **Programs**: Bug bounty programs from various platforms
-- **Targets**: Specific URLs/assets within programs
-- **Vulnerabilities**: Discovered security issues with detailed tracking
-- **AI Agents**: Automated security testing agents
-- **Reports**: Generated vulnerability reports
+- **Operations**: Red Team operations and engagements
+- **Systems**: Target systems within operations
+- **Beacons**: Active command and control beacons
+- **Network Discoveries**: Network scanning and discovery results
+- **Remote Sessions**: RustDesk and remote access sessions
+- **AI Agents**: Automated exploitation and analysis agents
+- **Reports**: Generated operation reports
 
 ## Key Components
 
 ### Core Features
-1. **Program Management**: Track bug bounty programs from HackerOne, Bugcrowd, and other platforms
+1. **Operation Management**: Track Red Team operations and engagements
    - Enhanced multi-step creation wizard with progress tracking
-   - Comprehensive program details including priority, tags, vulnerability types, and scope
-   - Click-to-inspect program cards with detailed view and edit capabilities
-   - Support for program rules, out-of-scope items, and contact information
-2. **Vulnerability Tracking**: Comprehensive vulnerability lifecycle management with severity classification
+   - Comprehensive operation details including priority, tags, target systems, and scope
+   - Click-to-inspect operation cards with detailed view and edit capabilities
+   - Support for operation rules, engagement terms, and contact information
+2. **Beacon Tracking**: Comprehensive beacon lifecycle management with protocol monitoring
 3. **AI-Powered Reporting**: Automated vulnerability report generation using OpenAI
 4. **Multi-Agent System**: Support for various AI agents including OpenAI, local agents, and Burp Suite integration
 5. **Analytics Dashboard**: Performance metrics and earnings tracking
@@ -57,9 +59,11 @@ The application uses a relational database with the following core entities:
 
 ### API Structure
 RESTful API endpoints organized by resource:
-- `/api/programs` - Program CRUD operations
-- `/api/targets` - Target management
-- `/api/vulnerabilities` - Vulnerability tracking
+- `/api/operations` - Red Team operation CRUD operations
+- `/api/systems` - Target system management
+- `/api/beacons` - Beacon tracking and management
+- `/api/network-discoveries` - Network discovery results
+- `/api/remote-sessions` - Remote access session management
 - `/api/ai-agents` - AI agent management
 - `/api/reports` - Report generation and retrieval
 
