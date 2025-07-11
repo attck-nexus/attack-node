@@ -162,7 +162,7 @@ export default function KaliEnvironment() {
                       className="bg-card border-gray-600 text-gray-100"
                     />
                   </div>
-                  <Button className="w-full bg-primary hover:bg-primary/90">
+                  <Button className="w-full bg-primary hover:bg-primary/90 text-white">
                     Save Configuration
                   </Button>
                 </div>
@@ -427,7 +427,7 @@ export default function KaliEnvironment() {
               </div>
 
               <div className="flex gap-3">
-                <Button className="bg-primary hover:bg-primary/90">
+                <Button className="bg-primary hover:bg-primary/90 text-white">
                   <RefreshCw className="h-4 w-4 mr-2" />
                   Update Image
                 </Button>

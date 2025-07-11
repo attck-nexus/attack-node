@@ -249,7 +249,7 @@ export default function BurpSuite() {
                       className="bg-card border-gray-600 text-gray-100"
                     />
                   </div>
-                  <Button className="w-full bg-primary hover:bg-primary/90">
+                  <Button className="w-full bg-primary hover:bg-primary/90 text-white">
                     Create Project
                   </Button>
                 </div>
@@ -280,7 +280,7 @@ export default function BurpSuite() {
                 <Button 
                   onClick={handleStartScan}
                   disabled={!targetUrl}
-                  className="bg-primary hover:bg-primary/90"
+                  className="bg-primary hover:bg-primary/90 text-white"
                 >
                   <Play className="h-4 w-4 mr-2" />
                   Start Scan
@@ -626,7 +626,7 @@ export default function BurpSuite() {
                 <p className="text-gray-400 mb-6">
                   Start the Burp Suite container to access the web interface
                 </p>
-                <Button className="bg-primary hover:bg-primary/90">
+                <Button className="bg-primary hover:bg-primary/90 text-white">
                   <Play className="h-4 w-4 mr-2" />
                   Launch Burp Suite
                 </Button>
