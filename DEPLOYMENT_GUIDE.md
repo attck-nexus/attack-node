@@ -222,6 +222,43 @@ docker --version
 docker-compose --version
 ```
 
+### 4. Docker Integration Features
+
+#### Kali Linux Environment
+
+**Access Information:**
+- **URL**: `https://localhost:6902` (HTTPS required)
+- **Username**: `kasm_user`
+- **Password**: `password`
+- **SSL Certificate**: Self-signed (accept browser security warning)
+
+**Usage Steps:**
+1. Navigate to the Integrations tab or Kali Environment page in Attack Node
+2. Click "Start Environment" to launch the Kali Linux container
+3. Wait for the container to fully start (typically 1-2 minutes)
+4. Open your browser and go to `https://localhost:6902`
+5. Accept the SSL certificate warning (click "Advanced" → "Proceed to localhost")
+6. Login with username `kasm_user` and password `password`
+7. Access the full Kali Linux desktop with pre-installed security tools
+
+**Troubleshooting Docker Issues:**
+- **HTTP 401 Unauthorized**: Ensure you're using `https://` (not `http://`) and correct credentials
+- **Container won't start**: Check Docker daemon is running with `sudo systemctl status docker`
+- **Port conflicts**: Verify port 6902 is not already in use with `sudo lsof -i :6902`
+- **SSL certificate errors**: Accept the self-signed certificate to proceed
+- **Connection refused**: Wait for container to fully initialize (check logs in Docker Dashboard)
+
+#### Burp Suite Professional
+
+**Setup Requirements:**
+- Burp Suite Professional .jar file (not included)
+- Optional: Burp Suite license file for full functionality
+- Choose between GUI mode (VNC) or headless mode (API)
+
+**Access Methods:**
+- **GUI Mode**: Web-based VNC interface for full Burp Suite desktop access
+- **Headless Mode**: REST API integration for automated scanning workflows
+
 ## Troubleshooting
 
 ### Common Issues and Solutions

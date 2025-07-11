@@ -170,16 +170,36 @@ npm run db:push      # Push database schema changes
 ## 🐳 Docker Integration
 
 ### Kali Linux Environment
-```bash
-# Access Kali Linux via VNC
-# Default: http://localhost:6901
-# Password: vncpassword
-```
+
+**Access Information:**
+- **URL**: `https://localhost:6902` (HTTPS required)
+- **Username**: `kasm_user`
+- **Password**: `password`
+- **SSL Certificate**: Self-signed (accept browser security warning)
+
+**Getting Started:**
+1. Start Kali Linux container from the Integrations tab or Kali Environment page
+2. Navigate to `https://localhost:6902` in your browser
+3. Accept the SSL certificate warning (click "Advanced" → "Proceed to localhost")
+4. Login with username `kasm_user` and password `password`
+5. Access full Kali Linux desktop with pre-installed security tools
+
+**Troubleshooting:**
+- **HTTP 401 Error**: Ensure you're using HTTPS (not HTTP) and correct credentials
+- **Connection Refused**: Verify container is running via Docker Dashboard
+- **SSL Warning**: Accept the self-signed certificate to proceed
 
 ### Burp Suite Professional
-```bash
-# Upload your Burp Suite .jar file
-# Access via the Burp Suite page in the application
+
+**Setup:**
+1. Upload your Burp Suite Professional .jar file via the Burp Suite page
+2. Optionally upload your license file for full functionality
+3. Choose between GUI mode (VNC access) or headless mode (API only)
+4. Access via the application's integrated interface
+
+**Access Methods:**
+- **GUI Mode**: Web-based VNC interface for full Burp Suite desktop
+- **Headless Mode**: API integration for automated scanning
 ```
 
 ## 🤖 AI Agent Configuration
