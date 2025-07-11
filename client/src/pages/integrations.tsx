@@ -399,8 +399,7 @@ export default function Integrations() {
       port: 6903,
       status: "running",
       category: "development"
-    },
-
+    }
   ];
 
   const getStatusColor = (status: string) => {
