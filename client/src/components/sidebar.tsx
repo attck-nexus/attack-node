@@ -14,7 +14,8 @@ import {
   Grid3X3,
   FolderOpen,
   LogOut,
-  FileKey
+  FileKey,
+  Container
 } from "lucide-react";
 
 const navigation = [
@@ -26,9 +27,10 @@ const navigation = [
 
 const integrations = [
   { name: "AI Agents", href: "/ai-agents", icon: Bot },
+  { name: "Container Management", href: "/containers", icon: Container },
   { name: "All Integrations", href: "/integrations", icon: Grid3X3 },
   { name: "Burp Suite", href: "/burp", icon: Shield },
-  { name: "Kali Environment", href: "/kali", icon: Monitor },
+  { name: "Kali Environment", href: "/kali-environment", icon: Monitor },
 ];
 
 const settings = [

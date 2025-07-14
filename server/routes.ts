@@ -5,6 +5,8 @@ import { insertOperationSchema, insertSystemSchema, insertBeaconSchema, insertNe
 import { generateVulnerabilityReport } from "./services/openai";
 import { testConnection as testAnthropicConnection } from "./services/anthropic";
 import { dockerService } from "./services/docker";
+import { dockerErrorMonitor } from "./services/docker-error-monitor";
+import { dockerRecoveryEngine } from "./services/docker-recovery-engine";
 import { agentLoopService } from "./services/agent-loop";
 import { setupGoogleAuth, isAuthenticated } from "./google-auth";
 import { fileManagerService } from "./services/file-manager";
@@ -436,7 +438,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const reportContent = await generateVulnerabilityReport(title, severity, description);
       
       const report = await storage.createReport({
-        vulnerabilityId,
+        type: "vulnerability",
+        operationId: vulnerabilityId,
+        title: title,
         content: reportContent,
         format: "markdown",
         aiGenerated: true,
@@ -498,7 +502,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(container);
     } catch (error) {
       console.error("Failed to start Burp Suite:", error);
-      if (error.code === 'LIMIT_FILE_SIZE') {
+      if (error && typeof error === 'object' && 'code' in error && error.code === 'LIMIT_FILE_SIZE') {
         return res.status(400).json({ error: "File too large. Maximum size is 1GB." });
       }
       res.status(500).json({ error: "Failed to start Burp Suite container" });
@@ -527,10 +531,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(container);
     } catch (error) {
       console.error("Failed to start headless Burp Suite:", error);
-      if (error.code === 'LIMIT_FILE_SIZE') {
+      if (error && typeof error === 'object' && 'code' in error && error.code === 'LIMIT_FILE_SIZE') {
         return res.status(400).json({ error: "File too large. Maximum size is 1GB." });
       }
-      res.status(500).json({ error: error.message || "Failed to start headless Burp Suite container" });
+      res.status(500).json({ error: error instanceof Error ? error.message : "Failed to start headless Burp Suite container" });
     }
   });
 
@@ -596,6 +600,236 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // New comprehensive container management routes
+  app.get("/api/docker/configs", async (req, res) => {
+    try {
+      const configs = await dockerService.getAllContainerConfigs();
+      res.json(configs);
+    } catch (error) {
+      console.error("Failed to get container configs:", error);
+      res.status(500).json({ error: "Failed to get container configurations" });
+    }
+  });
+
+  app.get("/api/docker/config/:name", async (req, res) => {
+    try {
+      const config = await dockerService.getContainerConfig(req.params.name);
+      if (!config) {
+        return res.status(404).json({ error: "Container configuration not found" });
+      }
+      res.json(config);
+    } catch (error) {
+      console.error("Failed to get container config:", error);
+      res.status(500).json({ error: "Failed to get container configuration" });
+    }
+  });
+
+  app.post("/api/docker/start/:name", async (req, res) => {
+    try {
+      const containerName = req.params.name;
+      const container = await dockerService.startContainer(containerName);
+      res.json(container);
+    } catch (error) {
+      console.error(`Failed to start container ${req.params.name}:`, error);
+      res.status(500).json({ error: `Failed to start container: ${error instanceof Error ? error.message : 'Unknown error'}` });
+    }
+  });
+
+  app.get("/api/docker/logs/:name", async (req, res) => {
+    try {
+      const containerName = req.params.name;
+      const logs = await dockerService.getContainerLogs(containerName);
+      res.json({ logs });
+    } catch (error) {
+      console.error(`Failed to get logs for container ${req.params.name}:`, error);
+      res.status(500).json({ error: "Failed to get container logs" });
+    }
+  });
+
+  // SSE log streaming endpoint
+  app.get("/api/docker/logs/:name/stream", async (req, res) => {
+    const containerName = req.params.name;
+    
+    // Set SSE headers
+    res.writeHead(200, {
+      'Content-Type': 'text/event-stream',
+      'Cache-Control': 'no-cache',
+      'Connection': 'keep-alive',
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Headers': 'Cache-Control'
+    });
+
+    // Send initial connection message
+    res.write(`data: Connected to log stream for ${containerName}\n\n`);
+
+    let logProcess: any = null;
+
+    try {
+      const { spawn } = await import('child_process');
+      
+      // Start docker logs with follow
+      const dockerCmd = process.platform === 'win32' ? 'docker.exe' : 'docker';
+      logProcess = spawn(dockerCmd, [
+        'logs', 
+        '--follow', 
+        '--tail', '100',
+        `attacknode-${containerName}`
+      ]);
+
+      // Handle stdout
+      logProcess.stdout?.on('data', (data: Buffer) => {
+        const lines = data.toString().split('\n').filter(line => line.trim());
+        lines.forEach(line => {
+          res.write(`data: ${JSON.stringify({ type: 'log', message: line, timestamp: new Date().toISOString() })}\n\n`);
+        });
+      });
+
+      // Handle stderr
+      logProcess.stderr?.on('data', (data: Buffer) => {
+        const lines = data.toString().split('\n').filter(line => line.trim());
+        lines.forEach(line => {
+          res.write(`data: ${JSON.stringify({ type: 'error', message: line, timestamp: new Date().toISOString() })}\n\n`);
+        });
+      });
+
+      // Handle process errors
+      logProcess.on('error', (error: Error) => {
+        console.error(`Log stream error for ${containerName}:`, error);
+        res.write(`data: ${JSON.stringify({ type: 'error', message: `Stream error: ${error.message}`, timestamp: new Date().toISOString() })}\n\n`);
+      });
+
+      // Handle process exit
+      logProcess.on('close', (code: number) => {
+        console.log(`Log stream closed for ${containerName} with code ${code}`);
+        res.write(`data: ${JSON.stringify({ type: 'info', message: 'Log stream ended', timestamp: new Date().toISOString() })}\n\n`);
+        res.end();
+      });
+
+    } catch (error) {
+      console.error(`Failed to start log stream for ${containerName}:`, error);
+      res.write(`data: ${JSON.stringify({ type: 'error', message: `Failed to start log stream: ${error instanceof Error ? error.message : 'Unknown error'}`, timestamp: new Date().toISOString() })}\n\n`);
+      res.end();
+    }
+
+    // Handle client disconnect
+    req.on('close', () => {
+      console.log(`Client disconnected from log stream for ${containerName}`);
+      if (logProcess) {
+        logProcess.kill('SIGTERM');
+      }
+    });
+
+    req.on('aborted', () => {
+      console.log(`Client aborted log stream for ${containerName}`);
+      if (logProcess) {
+        logProcess.kill('SIGTERM');
+      }
+    });
+  });
+
+  app.get("/api/docker/inspect/:name", async (req, res) => {
+    try {
+      const containerName = req.params.name;
+      const inspection = await dockerService.inspectContainer(containerName);
+      res.json(inspection);
+    } catch (error) {
+      console.error(`Failed to inspect container ${req.params.name}:`, error);
+      res.status(500).json({ error: "Failed to inspect container" });
+    }
+  });
+
+  app.post("/api/docker/exec/:name", async (req, res) => {
+    try {
+      const containerName = req.params.name;
+      const { command } = req.body;
+      
+      if (!command) {
+        return res.status(400).json({ error: "Command is required" });
+      }
+      
+      const output = await dockerService.execInContainer(containerName, command);
+      res.json({ output });
+    } catch (error) {
+      console.error(`Failed to execute command in container ${req.params.name}:`, error);
+      res.status(500).json({ error: "Failed to execute command" });
+    }
+  });
+
+  app.post("/api/docker/restart/:name", async (req, res) => {
+    try {
+      const containerName = req.params.name;
+      const success = await dockerService.restartContainer(containerName);
+      res.json({ success });
+    } catch (error) {
+      console.error(`Failed to restart container ${req.params.name}:`, error);
+      res.status(500).json({ error: "Failed to restart container" });
+    }
+  });
+
+  // Docker Error Monitoring and Recovery API
+  app.get("/api/docker/errors", async (req, res) => {
+    try {
+      const limit = req.query.limit ? parseInt(req.query.limit as string) : 50;
+      const errors = dockerErrorMonitor.getErrorHistory(limit);
+      res.json(errors);
+    } catch (error) {
+      console.error("Failed to get Docker errors:", error);
+      res.status(500).json({ error: "Failed to get Docker errors" });
+    }
+  });
+
+  app.get("/api/docker/errors/stats", async (req, res) => {
+    try {
+      const stats = dockerErrorMonitor.getErrorStats();
+      res.json(stats);
+    } catch (error) {
+      console.error("Failed to get Docker error stats:", error);
+      res.status(500).json({ error: "Failed to get Docker error stats" });
+    }
+  });
+
+  app.get("/api/docker/recovery", async (req, res) => {
+    try {
+      const limit = req.query.limit ? parseInt(req.query.limit as string) : 50;
+      const recoveryHistory = dockerRecoveryEngine.getRecoveryHistory(limit);
+      res.json(recoveryHistory);
+    } catch (error) {
+      console.error("Failed to get Docker recovery history:", error);
+      res.status(500).json({ error: "Failed to get Docker recovery history" });
+    }
+  });
+
+  app.get("/api/docker/recovery/stats", async (req, res) => {
+    try {
+      const stats = dockerRecoveryEngine.getRecoveryStats();
+      res.json(stats);
+    } catch (error) {
+      console.error("Failed to get Docker recovery stats:", error);
+      res.status(500).json({ error: "Failed to get Docker recovery stats" });
+    }
+  });
+
+  app.get("/api/docker/health", async (req, res) => {
+    try {
+      const health = await dockerErrorMonitor.getSystemHealth();
+      res.json(health);
+    } catch (error) {
+      console.error("Failed to get Docker system health:", error);
+      res.status(500).json({ error: "Failed to get Docker system health" });
+    }
+  });
+
+  app.post("/api/docker/errors/:id/resolve", async (req, res) => {
+    try {
+      const errorId = req.params.id;
+      dockerErrorMonitor.markErrorResolved(errorId);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Failed to mark error as resolved:", error);
+      res.status(500).json({ error: "Failed to mark error as resolved" });
+    }
+  });
+
   // Agent Loop routes
   app.post("/api/agent-loops/start", async (req, res) => {
     try {
@@ -614,7 +848,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(loopExecution);
     } catch (error) {
       console.error("Failed to start agent loop:", error);
-      res.status(500).json({ error: error.message });
+      res.status(500).json({ error: error instanceof Error ? error.message : 'Unknown error' });
     }
   });
 

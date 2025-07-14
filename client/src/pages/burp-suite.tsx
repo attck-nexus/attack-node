@@ -117,52 +117,9 @@ export default function BurpSuite() {
   const isBurpRunning = burpContainer?.status === 'running';
   const isHeadlessBurp = burpContainer?.name === 'attacknode-burpsuite-headless';
 
-  // Mock data for demonstration - would integrate with actual Burp Suite API
-  const scanResults = [
-    {
-      id: 1,
-      severity: "High",
-      title: "SQL Injection in login form",
-      url: "https://example.com/login",
-      confidence: "Certain",
-      status: "New"
-    },
-    {
-      id: 2,
-      severity: "Medium",
-      title: "Cross-Site Scripting (XSS)",
-      url: "https://example.com/search",
-      confidence: "Firm",
-      status: "Fixed"
-    },
-    {
-      id: 3,
-      severity: "Low",
-      title: "Missing Security Headers",
-      url: "https://example.com/",
-      confidence: "Certain",
-      status: "Acknowledged"
-    }
-  ];
-
-  const projects = [
-    {
-      id: 1,
-      name: "Main Application Scan",
-      target: "https://app.example.com",
-      status: "Active",
-      lastScan: "2024-01-07T10:30:00Z",
-      findings: 12
-    },
-    {
-      id: 2,
-      name: "API Security Assessment",
-      target: "https://api.example.com",
-      status: "Completed",
-      lastScan: "2024-01-06T15:45:00Z",
-      findings: 5
-    }
-  ];
+  // TODO: Integrate with actual Burp Suite API for real scan results and projects
+  const scanResults: any[] = [];
+  const projects: any[] = [];
 
   const handleStartScan = () => {
     if (targetUrl) {
@@ -316,7 +273,7 @@ export default function BurpSuite() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-gray-400 text-sm">Total Findings</p>
-                  <p className="text-2xl font-bold text-gray-100 mt-2">17</p>
+                  <p className="text-2xl font-bold text-gray-100 mt-2">{scanResults.length}</p>
                 </div>
                 <div className="bg-primary/10 p-3 rounded-lg">
                   <Bug className="text-primary h-6 w-6" />
@@ -330,7 +287,9 @@ export default function BurpSuite() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-gray-400 text-sm">High Severity</p>
-                  <p className="text-2xl font-bold text-error mt-2">3</p>
+                  <p className="text-2xl font-bold text-error mt-2">
+                    {scanResults.filter(r => r.severity?.toLowerCase() === 'high').length}
+                  </p>
                 </div>
                 <div className="bg-error/10 p-3 rounded-lg">
                   <AlertTriangle className="text-error h-6 w-6" />
@@ -344,7 +303,9 @@ export default function BurpSuite() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-gray-400 text-sm">Fixed Issues</p>
-                  <p className="text-2xl font-bold text-success mt-2">8</p>
+                  <p className="text-2xl font-bold text-success mt-2">
+                    {scanResults.filter(r => r.status?.toLowerCase() === 'fixed').length}
+                  </p>
                 </div>
                 <div className="bg-success/10 p-3 rounded-lg">
                   <CheckCircle className="text-success h-6 w-6" />
@@ -358,7 +319,9 @@ export default function BurpSuite() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-gray-400 text-sm">Scan Time</p>
-                  <p className="text-2xl font-bold text-gray-100 mt-2">2.3h</p>
+                  <p className="text-2xl font-bold text-gray-100 mt-2">
+                    {isScanning ? "Running..." : "0m"}
+                  </p>
                 </div>
                 <div className="bg-secondary/10 p-3 rounded-lg">
                   <Clock className="text-secondary h-6 w-6" />
@@ -381,33 +344,41 @@ export default function BurpSuite() {
               </div>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                {scanResults.map((result) => (
-                  <div key={result.id} className="border border-gray-700 rounded-lg p-4">
-                    <div className="flex items-start justify-between mb-2">
-                      <div className="flex-1">
-                        <h4 className="text-gray-100 font-medium">{result.title}</h4>
-                        <p className="text-gray-400 text-sm mt-1">{result.url}</p>
+              {scanResults.length === 0 ? (
+                <div className="text-center py-8">
+                  <Bug className="h-12 w-12 text-gray-500 mx-auto mb-4" />
+                  <p className="text-gray-400">No scan results yet</p>
+                  <p className="text-gray-500 text-sm mt-2">Run a scan to see vulnerability findings</p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {scanResults.map((result) => (
+                    <div key={result.id} className="border border-gray-700 rounded-lg p-4">
+                      <div className="flex items-start justify-between mb-2">
+                        <div className="flex-1">
+                          <h4 className="text-gray-100 font-medium">{result.title}</h4>
+                          <p className="text-gray-400 text-sm mt-1">{result.url}</p>
+                        </div>
+                        <div className="flex flex-col items-end space-y-1">
+                          <Badge className={getSeverityColor(result.severity)}>
+                            {result.severity}
+                          </Badge>
+                          <Badge className={getStatusColor(result.status)} variant="outline">
+                            {result.status}
+                          </Badge>
+                        </div>
                       </div>
-                      <div className="flex flex-col items-end space-y-1">
-                        <Badge className={getSeverityColor(result.severity)}>
-                          {result.severity}
-                        </Badge>
-                        <Badge className={getStatusColor(result.status)} variant="outline">
-                          {result.status}
-                        </Badge>
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-gray-400">Confidence: {result.confidence}</span>
+                        <Button size="sm" variant="outline" className="border-gray-600 text-gray-300">
+                          <ExternalLink className="h-3 w-3 mr-1" />
+                          Details
+                        </Button>
                       </div>
                     </div>
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-gray-400">Confidence: {result.confidence}</span>
-                      <Button size="sm" variant="outline" className="border-gray-600 text-gray-300">
-                        <ExternalLink className="h-3 w-3 mr-1" />
-                        Details
-                      </Button>
-                    </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
             </CardContent>
           </Card>
 
@@ -422,27 +393,35 @@ export default function BurpSuite() {
               </div>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                {projects.map((project) => (
-                  <div key={project.id} className="border border-gray-700 rounded-lg p-4">
-                    <div className="flex items-start justify-between mb-2">
-                      <div>
-                        <h4 className="text-gray-100 font-medium">{project.name}</h4>
-                        <p className="text-gray-400 text-sm">{project.target}</p>
+              {projects.length === 0 ? (
+                <div className="text-center py-8">
+                  <Target className="h-12 w-12 text-gray-500 mx-auto mb-4" />
+                  <p className="text-gray-400">No active projects</p>
+                  <p className="text-gray-500 text-sm mt-2">Create a new project to get started</p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {projects.map((project) => (
+                    <div key={project.id} className="border border-gray-700 rounded-lg p-4">
+                      <div className="flex items-start justify-between mb-2">
+                        <div>
+                          <h4 className="text-gray-100 font-medium">{project.name}</h4>
+                          <p className="text-gray-400 text-sm">{project.target}</p>
+                        </div>
+                        <Badge className={project.status === 'Active' ? 'bg-success/10 text-success' : 'bg-gray-500/10 text-gray-500'}>
+                          {project.status}
+                        </Badge>
                       </div>
-                      <Badge className={project.status === 'Active' ? 'bg-success/10 text-success' : 'bg-gray-500/10 text-gray-500'}>
-                        {project.status}
-                      </Badge>
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-gray-400">{project.findings} findings</span>
+                        <span className="text-gray-400">
+                          {new Date(project.lastScan).toLocaleDateString()}
+                        </span>
+                      </div>
                     </div>
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-gray-400">{project.findings} findings</span>
-                      <span className="text-gray-400">
-                        {new Date(project.lastScan).toLocaleDateString()}
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>

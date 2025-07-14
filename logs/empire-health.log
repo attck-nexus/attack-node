@@ -1,0 +1,1550 @@
+[2025-07-14T21:39:59.763Z] [INFO] Starting Empire health monitoring
+[2025-07-14T21:39:59.831Z] [ERROR] Empire health check failed (1/3): Health check failed: Error: Container attacknode-empire not found or not accessible
+[2025-07-14T21:40:30.162Z] [ERROR] Empire health check failed (2/3): Empire setup has not completed successfully, Empire API is not responding on port 1337, Empire database connection failed
+[2025-07-14T21:40:30.163Z] [WARN] Empire warnings: Starkiller UI may not be accessible, Warning detected: [33;1m[WARNING]: Using SQLite may result in performance issues and some functions may be disabled. [0m, Warning detected: [33;1m[WARNING]: Consider using MySQL instead. [0m
+[2025-07-14T21:41:00.178Z] [ERROR] Empire health check failed (3/3): Empire setup has not completed successfully, Empire API is not responding on port 1337, Empire database connection failed
+[2025-07-14T21:41:00.178Z] [ERROR] Maximum consecutive failures reached, attempting recovery
+[2025-07-14T21:41:00.179Z] [INFO] Starting Empire recovery process
+[2025-07-14T21:41:00.179Z] [INFO] Stopping Empire container
+[2025-07-14T21:41:10.419Z] [INFO] Removing Empire container
+[2025-07-14T21:41:10.491Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/data
+[2025-07-14T21:41:10.499Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/downloads
+[2025-07-14T21:41:10.499Z] [INFO] Starting new Empire container
+[2025-07-14T21:41:10.499Z] [INFO] Pulling Empire image...
+[2025-07-14T21:41:10.920Z] [INFO] Creating Empire data container...
+[2025-07-14T21:41:11.010Z] [ERROR] Empire recovery failed: Error: Command failed: sudo docker create -v /empire --name empire-data bcsecurity/empire:latest
+Error response from daemon: Conflict. The container name "/empire-data" is already in use by container "fd7431428ead84d9546be2191e58bcc4ccdb7c6ae6a585131cd8843e8fd807ae". You have to remove (or rename) that container to be able to reuse that name.
+
+[2025-07-14T21:41:11.010Z] [INFO] Starting aggressive Empire recovery
+[2025-07-14T21:41:12.065Z] [ERROR] Aggressive recovery failed: Error: Command failed: sudo docker run -d --name attacknode-empire --restart unless-stopped -p 1337:1337 -p 5000:5000 bcsecurity/empire:latest sh -c cd /empire && python3 empire.py setup --reset -y && python3 empire.py server
+docker: Error response from daemon: Conflict. The container name "/attacknode-empire" is already in use by container "54a1698afeee5699463031af10d99b30d3e13f38fcd9ac103b449b1a354fcc30". You have to remove (or rename) that container to be able to reuse that name.
+
+Run 'docker run --help' for more information
+
+[2025-07-14T21:41:12.065Z] [ERROR] Health check failed: Error: Command failed: sudo docker run -d --name attacknode-empire --restart unless-stopped -p 1337:1337 -p 5000:5000 bcsecurity/empire:latest sh -c cd /empire && python3 empire.py setup --reset -y && python3 empire.py server
+docker: Error response from daemon: Conflict. The container name "/attacknode-empire" is already in use by container "54a1698afeee5699463031af10d99b30d3e13f38fcd9ac103b449b1a354fcc30". You have to remove (or rename) that container to be able to reuse that name.
+
+Run 'docker run --help' for more information
+
+[2025-07-14T21:41:30.084Z] [ERROR] Empire health check failed (4/3): Empire setup has not completed successfully, Empire API is not responding on port 1337, Empire database connection failed
+[2025-07-14T21:41:30.084Z] [ERROR] Maximum consecutive failures reached, attempting recovery
+[2025-07-14T21:41:30.084Z] [INFO] Starting Empire recovery process
+[2025-07-14T21:41:30.085Z] [INFO] Stopping Empire container
+[2025-07-14T21:41:40.406Z] [INFO] Removing Empire container
+[2025-07-14T21:41:40.477Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/data
+[2025-07-14T21:41:40.485Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/downloads
+[2025-07-14T21:41:40.486Z] [INFO] Starting new Empire container
+[2025-07-14T21:41:40.486Z] [INFO] Pulling Empire image...
+[2025-07-14T21:41:41.021Z] [INFO] Creating Empire data container...
+[2025-07-14T21:41:41.088Z] [ERROR] Empire recovery failed: Error: Command failed: sudo docker create -v /empire --name empire-data bcsecurity/empire:latest
+Error response from daemon: Conflict. The container name "/empire-data" is already in use by container "689f13c3637d09233b99c7981b74593732b9d08641c5a2a93902f8812d046007". You have to remove (or rename) that container to be able to reuse that name.
+
+[2025-07-14T21:41:41.089Z] [INFO] Starting aggressive Empire recovery
+[2025-07-14T21:41:41.990Z] [ERROR] Aggressive recovery failed: Error: Command failed: sudo docker run -d --name attacknode-empire --restart unless-stopped -p 1337:1337 -p 5000:5000 bcsecurity/empire:latest sh -c cd /empire && python3 empire.py setup --reset -y && python3 empire.py server
+docker: Error response from daemon: Conflict. The container name "/attacknode-empire" is already in use by container "df3e227ee91064cd686776980502402ec7262feb84e3fc053b53b1bafa5a462e". You have to remove (or rename) that container to be able to reuse that name.
+
+Run 'docker run --help' for more information
+
+[2025-07-14T21:41:41.990Z] [ERROR] Health check failed: Error: Command failed: sudo docker run -d --name attacknode-empire --restart unless-stopped -p 1337:1337 -p 5000:5000 bcsecurity/empire:latest sh -c cd /empire && python3 empire.py setup --reset -y && python3 empire.py server
+docker: Error response from daemon: Conflict. The container name "/attacknode-empire" is already in use by container "df3e227ee91064cd686776980502402ec7262feb84e3fc053b53b1bafa5a462e". You have to remove (or rename) that container to be able to reuse that name.
+
+Run 'docker run --help' for more information
+
+[2025-07-14T21:41:59.796Z] [ERROR] Empire health check failed (5/3): Empire container is not running
+[2025-07-14T21:41:59.797Z] [ERROR] Maximum consecutive failures reached, attempting recovery
+[2025-07-14T21:41:59.797Z] [INFO] Starting Empire recovery process
+[2025-07-14T21:41:59.798Z] [INFO] Stopping Empire container
+[2025-07-14T21:41:59.836Z] [INFO] Removing Empire container
+[2025-07-14T21:41:59.878Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/data
+[2025-07-14T21:41:59.886Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/downloads
+[2025-07-14T21:41:59.896Z] [INFO] Starting new Empire container
+[2025-07-14T21:41:59.897Z] [INFO] Pulling Empire image...
+[2025-07-14T21:42:00.334Z] [INFO] Creating Empire data container...
+[2025-07-14T21:42:00.591Z] [INFO] Starting Empire main container...
+[2025-07-14T21:42:30.204Z] [ERROR] Empire health check failed (6/3): Empire setup has not completed successfully, Empire API is not responding on port 1337, Empire database connection failed
+[2025-07-14T21:42:30.204Z] [ERROR] Maximum consecutive failures reached, attempting recovery
+[2025-07-14T21:42:30.204Z] [INFO] Starting Empire recovery process
+[2025-07-14T21:42:30.205Z] [INFO] Stopping Empire container
+[2025-07-14T21:42:40.498Z] [INFO] Removing Empire container
+[2025-07-14T21:42:40.571Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/data
+[2025-07-14T21:42:40.578Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/downloads
+[2025-07-14T21:42:40.578Z] [INFO] Starting new Empire container
+[2025-07-14T21:42:40.579Z] [INFO] Pulling Empire image...
+[2025-07-14T21:42:41.058Z] [INFO] Creating Empire data container...
+[2025-07-14T21:42:41.125Z] [ERROR] Empire recovery failed: Error: Command failed: sudo docker create -v /empire --name empire-data bcsecurity/empire:latest
+Error response from daemon: Conflict. The container name "/empire-data" is already in use by container "7e86f73f5edc7080a61b143f4c3f99f495ca4de85d8c5eb8346220209df4ffb0". You have to remove (or rename) that container to be able to reuse that name.
+
+[2025-07-14T21:42:41.125Z] [INFO] Starting aggressive Empire recovery
+[2025-07-14T21:42:42.078Z] [ERROR] Aggressive recovery failed: Error: Command failed: sudo docker run -d --name attacknode-empire --restart unless-stopped -p 1337:1337 -p 5000:5000 bcsecurity/empire:latest sh -c cd /empire && python3 empire.py setup --reset -y && python3 empire.py server
+docker: Error response from daemon: Conflict. The container name "/attacknode-empire" is already in use by container "724da3211dcc29f863c2c86925fa6a6d58e6731b013c4a425271b802e72b215b". You have to remove (or rename) that container to be able to reuse that name.
+
+Run 'docker run --help' for more information
+
+[2025-07-14T21:42:42.078Z] [ERROR] Health check failed: Error: Command failed: sudo docker run -d --name attacknode-empire --restart unless-stopped -p 1337:1337 -p 5000:5000 bcsecurity/empire:latest sh -c cd /empire && python3 empire.py setup --reset -y && python3 empire.py server
+docker: Error response from daemon: Conflict. The container name "/attacknode-empire" is already in use by container "724da3211dcc29f863c2c86925fa6a6d58e6731b013c4a425271b802e72b215b". You have to remove (or rename) that container to be able to reuse that name.
+
+Run 'docker run --help' for more information
+
+[2025-07-14T21:42:59.794Z] [ERROR] Empire health check failed (7/3): Empire container is not running
+[2025-07-14T21:42:59.794Z] [ERROR] Maximum consecutive failures reached, attempting recovery
+[2025-07-14T21:42:59.794Z] [INFO] Starting Empire recovery process
+[2025-07-14T21:42:59.794Z] [INFO] Stopping Empire container
+[2025-07-14T21:42:59.833Z] [INFO] Removing Empire container
+[2025-07-14T21:42:59.870Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/data
+[2025-07-14T21:42:59.878Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/downloads
+[2025-07-14T21:42:59.878Z] [INFO] Starting new Empire container
+[2025-07-14T21:42:59.878Z] [INFO] Pulling Empire image...
+[2025-07-14T21:43:00.318Z] [INFO] Creating Empire data container...
+[2025-07-14T21:43:00.594Z] [INFO] Starting Empire main container...
+[2025-07-14T21:43:30.115Z] [ERROR] Empire health check failed (8/3): Empire setup has not completed successfully, Empire API is not responding on port 1337, Empire database connection failed
+[2025-07-14T21:43:30.115Z] [ERROR] Maximum consecutive failures reached, attempting recovery
+[2025-07-14T21:43:30.115Z] [INFO] Starting Empire recovery process
+[2025-07-14T21:43:30.116Z] [INFO] Stopping Empire container
+[2025-07-14T21:43:40.382Z] [INFO] Removing Empire container
+[2025-07-14T21:43:40.436Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/data
+[2025-07-14T21:43:40.443Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/downloads
+[2025-07-14T21:43:40.443Z] [INFO] Starting new Empire container
+[2025-07-14T21:43:40.444Z] [INFO] Pulling Empire image...
+[2025-07-14T21:43:40.979Z] [INFO] Creating Empire data container...
+[2025-07-14T21:43:41.032Z] [ERROR] Empire recovery failed: Error: Command failed: sudo docker create -v /empire --name empire-data bcsecurity/empire:latest
+Error response from daemon: Conflict. The container name "/empire-data" is already in use by container "b95c76cdfadd5ed95bfbeb368d66b98ff34a08c2f55c5968758d6d698b168191". You have to remove (or rename) that container to be able to reuse that name.
+
+[2025-07-14T21:43:41.032Z] [INFO] Starting aggressive Empire recovery
+[2025-07-14T21:43:41.930Z] [ERROR] Aggressive recovery failed: Error: Command failed: sudo docker run -d --name attacknode-empire --restart unless-stopped -p 1337:1337 -p 5000:5000 bcsecurity/empire:latest sh -c cd /empire && python3 empire.py setup --reset -y && python3 empire.py server
+docker: Error response from daemon: Conflict. The container name "/attacknode-empire" is already in use by container "af97df4ba1f4dcb027f825546e8f9bca027efdce5dbdc9b6d3c6fd1818211c8e". You have to remove (or rename) that container to be able to reuse that name.
+
+Run 'docker run --help' for more information
+
+[2025-07-14T21:43:41.931Z] [ERROR] Health check failed: Error: Command failed: sudo docker run -d --name attacknode-empire --restart unless-stopped -p 1337:1337 -p 5000:5000 bcsecurity/empire:latest sh -c cd /empire && python3 empire.py setup --reset -y && python3 empire.py server
+docker: Error response from daemon: Conflict. The container name "/attacknode-empire" is already in use by container "af97df4ba1f4dcb027f825546e8f9bca027efdce5dbdc9b6d3c6fd1818211c8e". You have to remove (or rename) that container to be able to reuse that name.
+
+Run 'docker run --help' for more information
+
+[2025-07-14T21:43:59.790Z] [ERROR] Empire health check failed (9/3): Empire container is not running
+[2025-07-14T21:43:59.790Z] [ERROR] Maximum consecutive failures reached, attempting recovery
+[2025-07-14T21:43:59.790Z] [INFO] Starting Empire recovery process
+[2025-07-14T21:43:59.791Z] [INFO] Stopping Empire container
+[2025-07-14T21:43:59.817Z] [INFO] Removing Empire container
+[2025-07-14T21:43:59.848Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/data
+[2025-07-14T21:43:59.854Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/downloads
+[2025-07-14T21:43:59.854Z] [INFO] Starting new Empire container
+[2025-07-14T21:43:59.854Z] [INFO] Pulling Empire image...
+[2025-07-14T21:44:00.309Z] [INFO] Creating Empire data container...
+[2025-07-14T21:44:00.553Z] [INFO] Starting Empire main container...
+[2025-07-14T21:44:01.321Z] [ERROR] Empire recovery failed: Error: Empire container failed to become ready within timeout
+[2025-07-14T21:44:01.322Z] [INFO] Starting aggressive Empire recovery
+[2025-07-14T21:44:07.585Z] [ERROR] Aggressive recovery failed: Error: Command failed: sudo docker run -d --name attacknode-empire --restart unless-stopped -p 1337:1337 -p 5000:5000 bcsecurity/empire:latest sh -c cd /empire && python3 empire.py setup --reset -y && python3 empire.py server
+docker: Error response from daemon: Conflict. The container name "/attacknode-empire" is already in use by container "5c55bf5569ef0924494f1a561477661eb345911de1424f9e8921df60431f9b7e". You have to remove (or rename) that container to be able to reuse that name.
+
+Run 'docker run --help' for more information
+
+[2025-07-14T21:44:07.586Z] [ERROR] Health check failed: Error: Command failed: sudo docker run -d --name attacknode-empire --restart unless-stopped -p 1337:1337 -p 5000:5000 bcsecurity/empire:latest sh -c cd /empire && python3 empire.py setup --reset -y && python3 empire.py server
+docker: Error response from daemon: Conflict. The container name "/attacknode-empire" is already in use by container "5c55bf5569ef0924494f1a561477661eb345911de1424f9e8921df60431f9b7e". You have to remove (or rename) that container to be able to reuse that name.
+
+Run 'docker run --help' for more information
+
+[2025-07-14T21:44:29.791Z] [ERROR] Empire health check failed (10/3): Empire container is not running
+[2025-07-14T21:44:29.791Z] [ERROR] Maximum consecutive failures reached, attempting recovery
+[2025-07-14T21:44:29.791Z] [INFO] Starting Empire recovery process
+[2025-07-14T21:44:29.791Z] [INFO] Stopping Empire container
+[2025-07-14T21:44:29.820Z] [INFO] Removing Empire container
+[2025-07-14T21:44:29.852Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/data
+[2025-07-14T21:44:29.859Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/downloads
+[2025-07-14T21:44:29.859Z] [INFO] Starting new Empire container
+[2025-07-14T21:44:29.859Z] [INFO] Pulling Empire image...
+[2025-07-14T21:44:30.335Z] [INFO] Creating Empire data container...
+[2025-07-14T21:44:30.591Z] [INFO] Starting Empire main container...
+[2025-07-14T21:45:00.119Z] [ERROR] Empire health check failed (11/3): Empire setup has not completed successfully, Empire API is not responding on port 1337, Empire database connection failed
+[2025-07-14T21:45:00.120Z] [ERROR] Maximum consecutive failures reached, attempting recovery
+[2025-07-14T21:45:00.120Z] [INFO] Starting Empire recovery process
+[2025-07-14T21:45:00.120Z] [INFO] Stopping Empire container
+[2025-07-14T21:45:10.367Z] [INFO] Removing Empire container
+[2025-07-14T21:45:10.421Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/data
+[2025-07-14T21:45:10.428Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/downloads
+[2025-07-14T21:45:10.428Z] [INFO] Starting new Empire container
+[2025-07-14T21:45:10.429Z] [INFO] Pulling Empire image...
+[2025-07-14T21:45:10.909Z] [INFO] Creating Empire data container...
+[2025-07-14T21:45:10.969Z] [ERROR] Empire recovery failed: Error: Command failed: sudo docker create -v /empire --name empire-data bcsecurity/empire:latest
+Error response from daemon: Conflict. The container name "/empire-data" is already in use by container "7325ac1e408e4a5102a51e4bfb62a7f41d31a6b33938162e216a317893130392". You have to remove (or rename) that container to be able to reuse that name.
+
+[2025-07-14T21:45:10.969Z] [INFO] Starting aggressive Empire recovery
+[2025-07-14T21:45:11.161Z] [ERROR] Empire recovery failed: Error: Empire container failed to become ready within timeout
+[2025-07-14T21:45:11.162Z] [INFO] Starting aggressive Empire recovery
+[2025-07-14T21:45:11.795Z] [ERROR] Aggressive recovery failed: Error: Command failed: sudo docker run -d --name attacknode-empire --restart unless-stopped -p 1337:1337 -p 5000:5000 bcsecurity/empire:latest sh -c cd /empire && python3 empire.py setup --reset -y && python3 empire.py server
+docker: Error response from daemon: Conflict. The container name "/attacknode-empire" is already in use by container "694ada39a0013363c28ced375207efe1f7d4b9f0dacda69e5997fe16234051d2". You have to remove (or rename) that container to be able to reuse that name.
+
+Run 'docker run --help' for more information
+
+[2025-07-14T21:45:11.796Z] [ERROR] Health check failed: Error: Command failed: sudo docker run -d --name attacknode-empire --restart unless-stopped -p 1337:1337 -p 5000:5000 bcsecurity/empire:latest sh -c cd /empire && python3 empire.py setup --reset -y && python3 empire.py server
+docker: Error response from daemon: Conflict. The container name "/attacknode-empire" is already in use by container "694ada39a0013363c28ced375207efe1f7d4b9f0dacda69e5997fe16234051d2". You have to remove (or rename) that container to be able to reuse that name.
+
+Run 'docker run --help' for more information
+
+[2025-07-14T21:45:11.825Z] [ERROR] Aggressive recovery failed: Error: Command failed: sudo docker run -d --name attacknode-empire --restart unless-stopped -p 1337:1337 -p 5000:5000 bcsecurity/empire:latest sh -c cd /empire && python3 empire.py setup --reset -y && python3 empire.py server
+docker: Error response from daemon: Conflict. The container name "/attacknode-empire" is already in use by container "694ada39a0013363c28ced375207efe1f7d4b9f0dacda69e5997fe16234051d2". You have to remove (or rename) that container to be able to reuse that name.
+
+Run 'docker run --help' for more information
+
+[2025-07-14T21:45:11.825Z] [ERROR] Health check failed: Error: Command failed: sudo docker run -d --name attacknode-empire --restart unless-stopped -p 1337:1337 -p 5000:5000 bcsecurity/empire:latest sh -c cd /empire && python3 empire.py setup --reset -y && python3 empire.py server
+docker: Error response from daemon: Conflict. The container name "/attacknode-empire" is already in use by container "694ada39a0013363c28ced375207efe1f7d4b9f0dacda69e5997fe16234051d2". You have to remove (or rename) that container to be able to reuse that name.
+
+Run 'docker run --help' for more information
+
+[2025-07-14T21:45:29.798Z] [ERROR] Empire health check failed (12/3): Empire container is not running
+[2025-07-14T21:45:29.799Z] [ERROR] Maximum consecutive failures reached, attempting recovery
+[2025-07-14T21:45:29.799Z] [INFO] Starting Empire recovery process
+[2025-07-14T21:45:29.799Z] [INFO] Stopping Empire container
+[2025-07-14T21:45:29.827Z] [INFO] Removing Empire container
+[2025-07-14T21:45:29.861Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/data
+[2025-07-14T21:45:29.867Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/downloads
+[2025-07-14T21:45:29.868Z] [INFO] Starting new Empire container
+[2025-07-14T21:45:29.868Z] [INFO] Pulling Empire image...
+[2025-07-14T21:45:30.375Z] [INFO] Creating Empire data container...
+[2025-07-14T21:45:30.623Z] [INFO] Starting Empire main container...
+[2025-07-14T21:46:00.140Z] [ERROR] Empire health check failed (13/3): Empire setup has not completed successfully, Empire API is not responding on port 1337, Empire database connection failed
+[2025-07-14T21:46:00.141Z] [ERROR] Maximum consecutive failures reached, attempting recovery
+[2025-07-14T21:46:00.141Z] [INFO] Starting Empire recovery process
+[2025-07-14T21:46:00.141Z] [INFO] Stopping Empire container
+[2025-07-14T21:46:10.392Z] [INFO] Removing Empire container
+[2025-07-14T21:46:10.448Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/data
+[2025-07-14T21:46:10.455Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/downloads
+[2025-07-14T21:46:10.455Z] [INFO] Starting new Empire container
+[2025-07-14T21:46:10.455Z] [INFO] Pulling Empire image...
+[2025-07-14T21:46:10.917Z] [INFO] Creating Empire data container...
+[2025-07-14T21:46:10.969Z] [ERROR] Empire recovery failed: Error: Command failed: sudo docker create -v /empire --name empire-data bcsecurity/empire:latest
+Error response from daemon: Conflict. The container name "/empire-data" is already in use by container "ed461a08d9f69434020404da7f1002fe41350ca85f7acea23e5d0f1658ef0f60". You have to remove (or rename) that container to be able to reuse that name.
+
+[2025-07-14T21:46:10.970Z] [INFO] Starting aggressive Empire recovery
+[2025-07-14T21:46:11.157Z] [ERROR] Empire recovery failed: Error: Empire container failed to become ready within timeout
+[2025-07-14T21:46:11.157Z] [INFO] Starting aggressive Empire recovery
+[2025-07-14T21:46:11.785Z] [ERROR] Aggressive recovery failed: Error: Command failed: sudo docker run -d --name attacknode-empire --restart unless-stopped -p 1337:1337 -p 5000:5000 bcsecurity/empire:latest sh -c cd /empire && python3 empire.py setup --reset -y && python3 empire.py server
+docker: Error response from daemon: Conflict. The container name "/attacknode-empire" is already in use by container "90419b931a1cf6e9798f38babd47f9dbca4473b72a2ffc546d18597240870e6c". You have to remove (or rename) that container to be able to reuse that name.
+
+Run 'docker run --help' for more information
+
+[2025-07-14T21:46:11.786Z] [ERROR] Health check failed: Error: Command failed: sudo docker run -d --name attacknode-empire --restart unless-stopped -p 1337:1337 -p 5000:5000 bcsecurity/empire:latest sh -c cd /empire && python3 empire.py setup --reset -y && python3 empire.py server
+docker: Error response from daemon: Conflict. The container name "/attacknode-empire" is already in use by container "90419b931a1cf6e9798f38babd47f9dbca4473b72a2ffc546d18597240870e6c". You have to remove (or rename) that container to be able to reuse that name.
+
+Run 'docker run --help' for more information
+
+[2025-07-14T21:46:11.844Z] [ERROR] Aggressive recovery failed: Error: Command failed: sudo docker run -d --name attacknode-empire --restart unless-stopped -p 1337:1337 -p 5000:5000 bcsecurity/empire:latest sh -c cd /empire && python3 empire.py setup --reset -y && python3 empire.py server
+docker: Error response from daemon: Conflict. The container name "/attacknode-empire" is already in use by container "90419b931a1cf6e9798f38babd47f9dbca4473b72a2ffc546d18597240870e6c". You have to remove (or rename) that container to be able to reuse that name.
+
+Run 'docker run --help' for more information
+
+[2025-07-14T21:46:11.845Z] [ERROR] Health check failed: Error: Command failed: sudo docker run -d --name attacknode-empire --restart unless-stopped -p 1337:1337 -p 5000:5000 bcsecurity/empire:latest sh -c cd /empire && python3 empire.py setup --reset -y && python3 empire.py server
+docker: Error response from daemon: Conflict. The container name "/attacknode-empire" is already in use by container "90419b931a1cf6e9798f38babd47f9dbca4473b72a2ffc546d18597240870e6c". You have to remove (or rename) that container to be able to reuse that name.
+
+Run 'docker run --help' for more information
+
+[2025-07-14T21:46:29.802Z] [ERROR] Empire health check failed (14/3): Empire container is not running
+[2025-07-14T21:46:29.802Z] [ERROR] Maximum consecutive failures reached, attempting recovery
+[2025-07-14T21:46:29.802Z] [INFO] Starting Empire recovery process
+[2025-07-14T21:46:29.803Z] [INFO] Stopping Empire container
+[2025-07-14T21:46:29.831Z] [INFO] Removing Empire container
+[2025-07-14T21:46:29.863Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/data
+[2025-07-14T21:46:29.870Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/downloads
+[2025-07-14T21:46:29.871Z] [INFO] Starting new Empire container
+[2025-07-14T21:46:29.871Z] [INFO] Pulling Empire image...
+[2025-07-14T21:46:30.347Z] [INFO] Creating Empire data container...
+[2025-07-14T21:46:30.601Z] [INFO] Starting Empire main container...
+[2025-07-14T21:46:31.274Z] [ERROR] Empire recovery failed: Error: Empire container failed to become ready within timeout
+[2025-07-14T21:46:31.275Z] [INFO] Starting aggressive Empire recovery
+[2025-07-14T21:46:37.427Z] [ERROR] Aggressive recovery failed: Error: Command failed: sudo docker run -d --name attacknode-empire --restart unless-stopped -p 1337:1337 -p 5000:5000 bcsecurity/empire:latest sh -c cd /empire && python3 empire.py setup --reset -y && python3 empire.py server
+docker: Error response from daemon: Conflict. The container name "/attacknode-empire" is already in use by container "73be3572c44c70ed55d7031533da5c55bf08ec55c90ae383b39b8938b49d760a". You have to remove (or rename) that container to be able to reuse that name.
+
+Run 'docker run --help' for more information
+
+[2025-07-14T21:46:37.427Z] [ERROR] Health check failed: Error: Command failed: sudo docker run -d --name attacknode-empire --restart unless-stopped -p 1337:1337 -p 5000:5000 bcsecurity/empire:latest sh -c cd /empire && python3 empire.py setup --reset -y && python3 empire.py server
+docker: Error response from daemon: Conflict. The container name "/attacknode-empire" is already in use by container "73be3572c44c70ed55d7031533da5c55bf08ec55c90ae383b39b8938b49d760a". You have to remove (or rename) that container to be able to reuse that name.
+
+Run 'docker run --help' for more information
+
+[2025-07-14T21:46:59.809Z] [ERROR] Empire health check failed (15/3): Empire container is not running
+[2025-07-14T21:46:59.809Z] [ERROR] Maximum consecutive failures reached, attempting recovery
+[2025-07-14T21:46:59.810Z] [INFO] Starting Empire recovery process
+[2025-07-14T21:46:59.810Z] [INFO] Stopping Empire container
+[2025-07-14T21:46:59.844Z] [INFO] Removing Empire container
+[2025-07-14T21:46:59.882Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/data
+[2025-07-14T21:46:59.889Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/downloads
+[2025-07-14T21:46:59.890Z] [INFO] Starting new Empire container
+[2025-07-14T21:46:59.890Z] [INFO] Pulling Empire image...
+[2025-07-14T21:47:00.379Z] [INFO] Creating Empire data container...
+[2025-07-14T21:47:00.706Z] [INFO] Starting Empire main container...
+[2025-07-14T21:47:30.114Z] [ERROR] Empire health check failed (16/3): Empire setup has not completed successfully, Empire API is not responding on port 1337, Empire database connection failed
+[2025-07-14T21:47:30.114Z] [ERROR] Maximum consecutive failures reached, attempting recovery
+[2025-07-14T21:47:30.115Z] [INFO] Starting Empire recovery process
+[2025-07-14T21:47:30.115Z] [INFO] Stopping Empire container
+[2025-07-14T21:47:40.362Z] [INFO] Removing Empire container
+[2025-07-14T21:47:40.417Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/data
+[2025-07-14T21:47:40.424Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/downloads
+[2025-07-14T21:47:40.424Z] [INFO] Starting new Empire container
+[2025-07-14T21:47:40.425Z] [INFO] Pulling Empire image...
+[2025-07-14T21:47:40.888Z] [INFO] Creating Empire data container...
+[2025-07-14T21:47:40.940Z] [ERROR] Empire recovery failed: Error: Command failed: sudo docker create -v /empire --name empire-data bcsecurity/empire:latest
+Error response from daemon: Conflict. The container name "/empire-data" is already in use by container "52a4525d4d9740d40fc8c6197c2a06052410b9af0ed30afc19287c585ee3c0c4". You have to remove (or rename) that container to be able to reuse that name.
+
+[2025-07-14T21:47:40.941Z] [INFO] Starting aggressive Empire recovery
+[2025-07-14T21:47:41.218Z] [ERROR] Empire recovery failed: Error: Empire container failed to become ready within timeout
+[2025-07-14T21:47:41.219Z] [INFO] Starting aggressive Empire recovery
+[2025-07-14T21:47:41.805Z] [ERROR] Aggressive recovery failed: Error: Command failed: sudo docker run -d --name attacknode-empire --restart unless-stopped -p 1337:1337 -p 5000:5000 bcsecurity/empire:latest sh -c cd /empire && python3 empire.py setup --reset -y && python3 empire.py server
+docker: Error response from daemon: Conflict. The container name "/attacknode-empire" is already in use by container "6891dba276e5f5df0d47b7954cf5b56dfaf56f6a06e60082556b400239f9a992". You have to remove (or rename) that container to be able to reuse that name.
+
+Run 'docker run --help' for more information
+
+[2025-07-14T21:47:41.805Z] [ERROR] Health check failed: Error: Command failed: sudo docker run -d --name attacknode-empire --restart unless-stopped -p 1337:1337 -p 5000:5000 bcsecurity/empire:latest sh -c cd /empire && python3 empire.py setup --reset -y && python3 empire.py server
+docker: Error response from daemon: Conflict. The container name "/attacknode-empire" is already in use by container "6891dba276e5f5df0d47b7954cf5b56dfaf56f6a06e60082556b400239f9a992". You have to remove (or rename) that container to be able to reuse that name.
+
+Run 'docker run --help' for more information
+
+[2025-07-14T21:47:41.806Z] [ERROR] Aggressive recovery failed: Error: Command failed: sudo docker run -d --name attacknode-empire --restart unless-stopped -p 1337:1337 -p 5000:5000 bcsecurity/empire:latest sh -c cd /empire && python3 empire.py setup --reset -y && python3 empire.py server
+docker: Error response from daemon: Conflict. The container name "/attacknode-empire" is already in use by container "6891dba276e5f5df0d47b7954cf5b56dfaf56f6a06e60082556b400239f9a992". You have to remove (or rename) that container to be able to reuse that name.
+
+Run 'docker run --help' for more information
+
+[2025-07-14T21:47:41.807Z] [ERROR] Health check failed: Error: Command failed: sudo docker run -d --name attacknode-empire --restart unless-stopped -p 1337:1337 -p 5000:5000 bcsecurity/empire:latest sh -c cd /empire && python3 empire.py setup --reset -y && python3 empire.py server
+docker: Error response from daemon: Conflict. The container name "/attacknode-empire" is already in use by container "6891dba276e5f5df0d47b7954cf5b56dfaf56f6a06e60082556b400239f9a992". You have to remove (or rename) that container to be able to reuse that name.
+
+Run 'docker run --help' for more information
+
+[2025-07-14T21:47:59.803Z] [ERROR] Empire health check failed (17/3): Empire container is not running
+[2025-07-14T21:47:59.804Z] [ERROR] Maximum consecutive failures reached, attempting recovery
+[2025-07-14T21:47:59.804Z] [INFO] Starting Empire recovery process
+[2025-07-14T21:47:59.804Z] [INFO] Stopping Empire container
+[2025-07-14T21:47:59.835Z] [INFO] Removing Empire container
+[2025-07-14T21:47:59.866Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/data
+[2025-07-14T21:47:59.872Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/downloads
+[2025-07-14T21:47:59.873Z] [INFO] Starting new Empire container
+[2025-07-14T21:47:59.873Z] [INFO] Pulling Empire image...
+[2025-07-14T21:48:00.305Z] [INFO] Creating Empire data container...
+[2025-07-14T21:48:00.558Z] [INFO] Starting Empire main container...
+[2025-07-14T21:48:30.136Z] [ERROR] Empire health check failed (18/3): Empire setup has not completed successfully, Empire API is not responding on port 1337, Empire database connection failed
+[2025-07-14T21:48:30.137Z] [ERROR] Maximum consecutive failures reached, attempting recovery
+[2025-07-14T21:48:30.137Z] [INFO] Starting Empire recovery process
+[2025-07-14T21:48:30.137Z] [INFO] Stopping Empire container
+[2025-07-14T21:48:40.392Z] [INFO] Removing Empire container
+[2025-07-14T21:48:40.446Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/data
+[2025-07-14T21:48:40.455Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/downloads
+[2025-07-14T21:48:40.456Z] [INFO] Starting new Empire container
+[2025-07-14T21:48:40.457Z] [INFO] Pulling Empire image...
+[2025-07-14T21:48:40.969Z] [INFO] Creating Empire data container...
+[2025-07-14T21:48:41.028Z] [ERROR] Empire recovery failed: Error: Command failed: sudo docker create -v /empire --name empire-data bcsecurity/empire:latest
+Error response from daemon: Conflict. The container name "/empire-data" is already in use by container "bc04db3dfb35ca1f4d8fb03a76982b0ac0a7da5b81882d8506b834531e7f28a4". You have to remove (or rename) that container to be able to reuse that name.
+
+[2025-07-14T21:48:41.029Z] [INFO] Starting aggressive Empire recovery
+[2025-07-14T21:48:41.240Z] [ERROR] Empire recovery failed: Error: Empire container failed to become ready within timeout
+[2025-07-14T21:48:41.240Z] [INFO] Starting aggressive Empire recovery
+[2025-07-14T21:48:41.867Z] [ERROR] Aggressive recovery failed: Error: Command failed: sudo docker run -d --name attacknode-empire --restart unless-stopped -p 1337:1337 -p 5000:5000 bcsecurity/empire:latest sh -c cd /empire && python3 empire.py setup --reset -y && python3 empire.py server
+docker: Error response from daemon: Conflict. The container name "/attacknode-empire" is already in use by container "05011ab1af26383c1fd697b378b03744d10160a8763ab5d595e3d34c131a6189". You have to remove (or rename) that container to be able to reuse that name.
+
+Run 'docker run --help' for more information
+
+[2025-07-14T21:48:41.868Z] [ERROR] Health check failed: Error: Command failed: sudo docker run -d --name attacknode-empire --restart unless-stopped -p 1337:1337 -p 5000:5000 bcsecurity/empire:latest sh -c cd /empire && python3 empire.py setup --reset -y && python3 empire.py server
+docker: Error response from daemon: Conflict. The container name "/attacknode-empire" is already in use by container "05011ab1af26383c1fd697b378b03744d10160a8763ab5d595e3d34c131a6189". You have to remove (or rename) that container to be able to reuse that name.
+
+Run 'docker run --help' for more information
+
+[2025-07-14T21:48:41.903Z] [ERROR] Aggressive recovery failed: Error: Command failed: sudo docker run -d --name attacknode-empire --restart unless-stopped -p 1337:1337 -p 5000:5000 bcsecurity/empire:latest sh -c cd /empire && python3 empire.py setup --reset -y && python3 empire.py server
+docker: Error response from daemon: Conflict. The container name "/attacknode-empire" is already in use by container "05011ab1af26383c1fd697b378b03744d10160a8763ab5d595e3d34c131a6189". You have to remove (or rename) that container to be able to reuse that name.
+
+Run 'docker run --help' for more information
+
+[2025-07-14T21:48:41.905Z] [ERROR] Health check failed: Error: Command failed: sudo docker run -d --name attacknode-empire --restart unless-stopped -p 1337:1337 -p 5000:5000 bcsecurity/empire:latest sh -c cd /empire && python3 empire.py setup --reset -y && python3 empire.py server
+docker: Error response from daemon: Conflict. The container name "/attacknode-empire" is already in use by container "05011ab1af26383c1fd697b378b03744d10160a8763ab5d595e3d34c131a6189". You have to remove (or rename) that container to be able to reuse that name.
+
+Run 'docker run --help' for more information
+
+[2025-07-14T21:48:59.815Z] [ERROR] Empire health check failed (19/3): Empire container is not running
+[2025-07-14T21:48:59.815Z] [ERROR] Maximum consecutive failures reached, attempting recovery
+[2025-07-14T21:48:59.816Z] [INFO] Starting Empire recovery process
+[2025-07-14T21:48:59.816Z] [INFO] Stopping Empire container
+[2025-07-14T21:48:59.850Z] [INFO] Removing Empire container
+[2025-07-14T21:48:59.886Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/data
+[2025-07-14T21:48:59.893Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/downloads
+[2025-07-14T21:48:59.893Z] [INFO] Starting new Empire container
+[2025-07-14T21:48:59.894Z] [INFO] Pulling Empire image...
+[2025-07-14T21:49:00.331Z] [INFO] Creating Empire data container...
+[2025-07-14T21:49:00.653Z] [INFO] Starting Empire main container...
+[2025-07-14T21:49:01.397Z] [ERROR] Empire recovery failed: Error: Empire container failed to become ready within timeout
+[2025-07-14T21:49:01.397Z] [INFO] Starting aggressive Empire recovery
+[2025-07-14T21:49:07.568Z] [ERROR] Aggressive recovery failed: Error: Command failed: sudo docker run -d --name attacknode-empire --restart unless-stopped -p 1337:1337 -p 5000:5000 bcsecurity/empire:latest sh -c cd /empire && python3 empire.py setup --reset -y && python3 empire.py server
+docker: Error response from daemon: Conflict. The container name "/attacknode-empire" is already in use by container "aa2b3aaadf1ee449557d1d3ad2f67e7103d1aa0be4d55116344c202daf0df5d7". You have to remove (or rename) that container to be able to reuse that name.
+
+Run 'docker run --help' for more information
+
+[2025-07-14T21:49:07.568Z] [ERROR] Health check failed: Error: Command failed: sudo docker run -d --name attacknode-empire --restart unless-stopped -p 1337:1337 -p 5000:5000 bcsecurity/empire:latest sh -c cd /empire && python3 empire.py setup --reset -y && python3 empire.py server
+docker: Error response from daemon: Conflict. The container name "/attacknode-empire" is already in use by container "aa2b3aaadf1ee449557d1d3ad2f67e7103d1aa0be4d55116344c202daf0df5d7". You have to remove (or rename) that container to be able to reuse that name.
+
+Run 'docker run --help' for more information
+
+[2025-07-14T21:49:29.817Z] [ERROR] Empire health check failed (20/3): Empire container is not running
+[2025-07-14T21:49:29.817Z] [ERROR] Maximum consecutive failures reached, attempting recovery
+[2025-07-14T21:49:29.818Z] [INFO] Starting Empire recovery process
+[2025-07-14T21:49:29.818Z] [INFO] Stopping Empire container
+[2025-07-14T21:49:29.851Z] [INFO] Removing Empire container
+[2025-07-14T21:49:29.888Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/data
+[2025-07-14T21:49:29.896Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/downloads
+[2025-07-14T21:49:29.896Z] [INFO] Starting new Empire container
+[2025-07-14T21:49:29.896Z] [INFO] Pulling Empire image...
+[2025-07-14T21:49:30.366Z] [INFO] Creating Empire data container...
+[2025-07-14T21:49:30.687Z] [INFO] Starting Empire main container...
+[2025-07-14T21:50:00.225Z] [ERROR] Empire health check failed (21/3): Empire setup has not completed successfully, Empire API is not responding on port 1337, Empire database connection failed
+[2025-07-14T21:50:00.225Z] [ERROR] Maximum consecutive failures reached, attempting recovery
+[2025-07-14T21:50:00.225Z] [INFO] Starting Empire recovery process
+[2025-07-14T21:50:00.225Z] [INFO] Stopping Empire container
+[2025-07-14T21:50:10.552Z] [INFO] Removing Empire container
+[2025-07-14T21:50:10.627Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/data
+[2025-07-14T21:50:10.635Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/downloads
+[2025-07-14T21:50:10.635Z] [INFO] Starting new Empire container
+[2025-07-14T21:50:10.636Z] [INFO] Pulling Empire image...
+[2025-07-14T21:50:11.101Z] [INFO] Creating Empire data container...
+[2025-07-14T21:50:11.168Z] [ERROR] Empire recovery failed: Error: Command failed: sudo docker create -v /empire --name empire-data bcsecurity/empire:latest
+Error response from daemon: Conflict. The container name "/empire-data" is already in use by container "3849a2365913356058feab2d1bf5e7b19c3f41d070dc59faa7ea26eaf26e6510". You have to remove (or rename) that container to be able to reuse that name.
+
+[2025-07-14T21:50:11.168Z] [INFO] Starting aggressive Empire recovery
+[2025-07-14T21:50:11.364Z] [ERROR] Empire recovery failed: Error: Empire container failed to become ready within timeout
+[2025-07-14T21:50:11.364Z] [INFO] Starting aggressive Empire recovery
+[2025-07-14T21:50:11.994Z] [ERROR] Aggressive recovery failed: Error: Command failed: sudo docker run -d --name attacknode-empire --restart unless-stopped -p 1337:1337 -p 5000:5000 bcsecurity/empire:latest sh -c cd /empire && python3 empire.py setup --reset -y && python3 empire.py server
+docker: Error response from daemon: Conflict. The container name "/attacknode-empire" is already in use by container "7cde869d99cafc1d1227939bee02ade870f0b136a87e3af389796f09085ada41". You have to remove (or rename) that container to be able to reuse that name.
+
+Run 'docker run --help' for more information
+
+[2025-07-14T21:50:11.994Z] [ERROR] Health check failed: Error: Command failed: sudo docker run -d --name attacknode-empire --restart unless-stopped -p 1337:1337 -p 5000:5000 bcsecurity/empire:latest sh -c cd /empire && python3 empire.py setup --reset -y && python3 empire.py server
+docker: Error response from daemon: Conflict. The container name "/attacknode-empire" is already in use by container "7cde869d99cafc1d1227939bee02ade870f0b136a87e3af389796f09085ada41". You have to remove (or rename) that container to be able to reuse that name.
+
+Run 'docker run --help' for more information
+
+[2025-07-14T21:50:12.046Z] [ERROR] Aggressive recovery failed: Error: Command failed: sudo docker run -d --name attacknode-empire --restart unless-stopped -p 1337:1337 -p 5000:5000 bcsecurity/empire:latest sh -c cd /empire && python3 empire.py setup --reset -y && python3 empire.py server
+docker: Error response from daemon: Conflict. The container name "/attacknode-empire" is already in use by container "7cde869d99cafc1d1227939bee02ade870f0b136a87e3af389796f09085ada41". You have to remove (or rename) that container to be able to reuse that name.
+
+Run 'docker run --help' for more information
+
+[2025-07-14T21:50:12.047Z] [ERROR] Health check failed: Error: Command failed: sudo docker run -d --name attacknode-empire --restart unless-stopped -p 1337:1337 -p 5000:5000 bcsecurity/empire:latest sh -c cd /empire && python3 empire.py setup --reset -y && python3 empire.py server
+docker: Error response from daemon: Conflict. The container name "/attacknode-empire" is already in use by container "7cde869d99cafc1d1227939bee02ade870f0b136a87e3af389796f09085ada41". You have to remove (or rename) that container to be able to reuse that name.
+
+Run 'docker run --help' for more information
+
+[2025-07-14T21:50:29.815Z] [ERROR] Empire health check failed (22/3): Empire container is not running
+[2025-07-14T21:50:29.816Z] [ERROR] Maximum consecutive failures reached, attempting recovery
+[2025-07-14T21:50:29.816Z] [INFO] Starting Empire recovery process
+[2025-07-14T21:50:29.816Z] [INFO] Stopping Empire container
+[2025-07-14T21:50:29.849Z] [INFO] Removing Empire container
+[2025-07-14T21:50:29.884Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/data
+[2025-07-14T21:50:29.891Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/downloads
+[2025-07-14T21:50:29.891Z] [INFO] Starting new Empire container
+[2025-07-14T21:50:29.891Z] [INFO] Pulling Empire image...
+[2025-07-14T21:50:30.368Z] [INFO] Creating Empire data container...
+[2025-07-14T21:50:30.692Z] [INFO] Starting Empire main container...
+[2025-07-14T21:51:00.223Z] [ERROR] Empire health check failed (23/3): Empire setup has not completed successfully, Empire API is not responding on port 1337, Empire database connection failed
+[2025-07-14T21:51:00.224Z] [ERROR] Maximum consecutive failures reached, attempting recovery
+[2025-07-14T21:51:00.224Z] [INFO] Starting Empire recovery process
+[2025-07-14T21:51:00.224Z] [INFO] Stopping Empire container
+[2025-07-14T21:51:10.543Z] [INFO] Removing Empire container
+[2025-07-14T21:51:10.614Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/data
+[2025-07-14T21:51:10.621Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/downloads
+[2025-07-14T21:51:10.622Z] [INFO] Starting new Empire container
+[2025-07-14T21:51:10.622Z] [INFO] Pulling Empire image...
+[2025-07-14T21:51:11.095Z] [INFO] Creating Empire data container...
+[2025-07-14T21:51:11.161Z] [ERROR] Empire recovery failed: Error: Command failed: sudo docker create -v /empire --name empire-data bcsecurity/empire:latest
+Error response from daemon: Conflict. The container name "/empire-data" is already in use by container "b18fd118a15d3333ef4e575b027e1d3204ba27b740ab5ed97e97a1749e9529ab". You have to remove (or rename) that container to be able to reuse that name.
+
+[2025-07-14T21:51:11.161Z] [INFO] Starting aggressive Empire recovery
+[2025-07-14T21:51:11.466Z] [ERROR] Empire recovery failed: Error: Empire container failed to become ready within timeout
+[2025-07-14T21:51:11.467Z] [INFO] Starting aggressive Empire recovery
+[2025-07-14T21:51:12.040Z] [ERROR] Aggressive recovery failed: Error: Command failed: sudo docker run -d --name attacknode-empire --restart unless-stopped -p 1337:1337 -p 5000:5000 bcsecurity/empire:latest sh -c cd /empire && python3 empire.py setup --reset -y && python3 empire.py server
+docker: Error response from daemon: Conflict. The container name "/attacknode-empire" is already in use by container "f6aa7785d3af450855303e75e795747e0ce5301fc7d40a8fc1eaa2e85ea0f8d3". You have to remove (or rename) that container to be able to reuse that name.
+
+Run 'docker run --help' for more information
+
+[2025-07-14T21:51:12.041Z] [ERROR] Health check failed: Error: Command failed: sudo docker run -d --name attacknode-empire --restart unless-stopped -p 1337:1337 -p 5000:5000 bcsecurity/empire:latest sh -c cd /empire && python3 empire.py setup --reset -y && python3 empire.py server
+docker: Error response from daemon: Conflict. The container name "/attacknode-empire" is already in use by container "f6aa7785d3af450855303e75e795747e0ce5301fc7d40a8fc1eaa2e85ea0f8d3". You have to remove (or rename) that container to be able to reuse that name.
+
+Run 'docker run --help' for more information
+
+[2025-07-14T21:51:12.042Z] [ERROR] Aggressive recovery failed: Error: Command failed: sudo docker run -d --name attacknode-empire --restart unless-stopped -p 1337:1337 -p 5000:5000 bcsecurity/empire:latest sh -c cd /empire && python3 empire.py setup --reset -y && python3 empire.py server
+docker: Error response from daemon: Conflict. The container name "/attacknode-empire" is already in use by container "f6aa7785d3af450855303e75e795747e0ce5301fc7d40a8fc1eaa2e85ea0f8d3". You have to remove (or rename) that container to be able to reuse that name.
+
+Run 'docker run --help' for more information
+
+[2025-07-14T21:51:12.042Z] [ERROR] Health check failed: Error: Command failed: sudo docker run -d --name attacknode-empire --restart unless-stopped -p 1337:1337 -p 5000:5000 bcsecurity/empire:latest sh -c cd /empire && python3 empire.py setup --reset -y && python3 empire.py server
+docker: Error response from daemon: Conflict. The container name "/attacknode-empire" is already in use by container "f6aa7785d3af450855303e75e795747e0ce5301fc7d40a8fc1eaa2e85ea0f8d3". You have to remove (or rename) that container to be able to reuse that name.
+
+Run 'docker run --help' for more information
+
+[2025-07-14T21:51:29.821Z] [ERROR] Empire health check failed (24/3): Empire container is not running
+[2025-07-14T21:51:29.821Z] [ERROR] Maximum consecutive failures reached, attempting recovery
+[2025-07-14T21:51:29.821Z] [INFO] Starting Empire recovery process
+[2025-07-14T21:51:29.822Z] [INFO] Stopping Empire container
+[2025-07-14T21:51:29.855Z] [INFO] Removing Empire container
+[2025-07-14T21:51:29.895Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/data
+[2025-07-14T21:51:29.903Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/downloads
+[2025-07-14T21:51:29.903Z] [INFO] Starting new Empire container
+[2025-07-14T21:51:29.903Z] [INFO] Pulling Empire image...
+[2025-07-14T21:51:30.400Z] [INFO] Creating Empire data container...
+[2025-07-14T21:51:30.722Z] [INFO] Starting Empire main container...
+[2025-07-14T21:51:31.370Z] [ERROR] Empire recovery failed: Error: Empire container failed to become ready within timeout
+[2025-07-14T21:51:31.370Z] [INFO] Starting aggressive Empire recovery
+[2025-07-14T21:51:37.614Z] [ERROR] Aggressive recovery failed: Error: Command failed: sudo docker run -d --name attacknode-empire --restart unless-stopped -p 1337:1337 -p 5000:5000 bcsecurity/empire:latest sh -c cd /empire && python3 empire.py setup --reset -y && python3 empire.py server
+docker: Error response from daemon: Conflict. The container name "/attacknode-empire" is already in use by container "7d368d64fb618c8d06139e78d7ab40face2fd9eb19d70d245ab1144e0c08096e". You have to remove (or rename) that container to be able to reuse that name.
+
+Run 'docker run --help' for more information
+
+[2025-07-14T21:51:37.615Z] [ERROR] Health check failed: Error: Command failed: sudo docker run -d --name attacknode-empire --restart unless-stopped -p 1337:1337 -p 5000:5000 bcsecurity/empire:latest sh -c cd /empire && python3 empire.py setup --reset -y && python3 empire.py server
+docker: Error response from daemon: Conflict. The container name "/attacknode-empire" is already in use by container "7d368d64fb618c8d06139e78d7ab40face2fd9eb19d70d245ab1144e0c08096e". You have to remove (or rename) that container to be able to reuse that name.
+
+Run 'docker run --help' for more information
+
+[2025-07-14T21:51:59.819Z] [ERROR] Empire health check failed (25/3): Empire container is not running
+[2025-07-14T21:51:59.820Z] [ERROR] Maximum consecutive failures reached, attempting recovery
+[2025-07-14T21:51:59.820Z] [INFO] Starting Empire recovery process
+[2025-07-14T21:51:59.820Z] [INFO] Stopping Empire container
+[2025-07-14T21:51:59.854Z] [INFO] Removing Empire container
+[2025-07-14T21:51:59.890Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/data
+[2025-07-14T21:51:59.896Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/downloads
+[2025-07-14T21:51:59.897Z] [INFO] Starting new Empire container
+[2025-07-14T21:51:59.897Z] [INFO] Pulling Empire image...
+[2025-07-14T21:52:00.337Z] [INFO] Creating Empire data container...
+[2025-07-14T21:52:00.664Z] [INFO] Starting Empire main container...
+[2025-07-14T21:52:30.236Z] [ERROR] Empire health check failed (26/3): Empire setup has not completed successfully, Empire API is not responding on port 1337, Empire database connection failed
+[2025-07-14T21:52:30.236Z] [ERROR] Maximum consecutive failures reached, attempting recovery
+[2025-07-14T21:52:30.237Z] [INFO] Starting Empire recovery process
+[2025-07-14T21:52:30.237Z] [INFO] Stopping Empire container
+[2025-07-14T21:52:40.544Z] [INFO] Removing Empire container
+[2025-07-14T21:52:40.613Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/data
+[2025-07-14T21:52:40.620Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/downloads
+[2025-07-14T21:52:40.621Z] [INFO] Starting new Empire container
+[2025-07-14T21:52:40.621Z] [INFO] Pulling Empire image...
+[2025-07-14T21:52:41.090Z] [INFO] Creating Empire data container...
+[2025-07-14T21:52:41.162Z] [ERROR] Empire recovery failed: Error: Command failed: sudo docker create -v /empire --name empire-data bcsecurity/empire:latest
+Error response from daemon: Conflict. The container name "/empire-data" is already in use by container "a8c90e23a5425741b9a40a72e7f97c0b2a05c62b248eff5dce1e9a40ecf58e77". You have to remove (or rename) that container to be able to reuse that name.
+
+[2025-07-14T21:52:41.163Z] [INFO] Starting aggressive Empire recovery
+[2025-07-14T21:52:41.307Z] [ERROR] Empire recovery failed: Error: Empire container failed to become ready within timeout
+[2025-07-14T21:52:41.308Z] [INFO] Starting aggressive Empire recovery
+[2025-07-14T21:52:41.955Z] [ERROR] Aggressive recovery failed: Error: Command failed: sudo docker run -d --name attacknode-empire --restart unless-stopped -p 1337:1337 -p 5000:5000 bcsecurity/empire:latest sh -c cd /empire && python3 empire.py setup --reset -y && python3 empire.py server
+docker: Error response from daemon: Conflict. The container name "/attacknode-empire" is already in use by container "443f79234c229b75ba0d3e41632ed33aaf072cedce454c538875fa9d9f8ce6f0". You have to remove (or rename) that container to be able to reuse that name.
+
+Run 'docker run --help' for more information
+
+[2025-07-14T21:52:41.955Z] [ERROR] Health check failed: Error: Command failed: sudo docker run -d --name attacknode-empire --restart unless-stopped -p 1337:1337 -p 5000:5000 bcsecurity/empire:latest sh -c cd /empire && python3 empire.py setup --reset -y && python3 empire.py server
+docker: Error response from daemon: Conflict. The container name "/attacknode-empire" is already in use by container "443f79234c229b75ba0d3e41632ed33aaf072cedce454c538875fa9d9f8ce6f0". You have to remove (or rename) that container to be able to reuse that name.
+
+Run 'docker run --help' for more information
+
+[2025-07-14T21:52:42.102Z] [ERROR] Aggressive recovery failed: Error: Command failed: sudo docker run -d --name attacknode-empire --restart unless-stopped -p 1337:1337 -p 5000:5000 bcsecurity/empire:latest sh -c cd /empire && python3 empire.py setup --reset -y && python3 empire.py server
+docker: Error response from daemon: Conflict. The container name "/attacknode-empire" is already in use by container "443f79234c229b75ba0d3e41632ed33aaf072cedce454c538875fa9d9f8ce6f0". You have to remove (or rename) that container to be able to reuse that name.
+
+Run 'docker run --help' for more information
+
+[2025-07-14T21:52:42.102Z] [ERROR] Health check failed: Error: Command failed: sudo docker run -d --name attacknode-empire --restart unless-stopped -p 1337:1337 -p 5000:5000 bcsecurity/empire:latest sh -c cd /empire && python3 empire.py setup --reset -y && python3 empire.py server
+docker: Error response from daemon: Conflict. The container name "/attacknode-empire" is already in use by container "443f79234c229b75ba0d3e41632ed33aaf072cedce454c538875fa9d9f8ce6f0". You have to remove (or rename) that container to be able to reuse that name.
+
+Run 'docker run --help' for more information
+
+[2025-07-14T21:52:59.824Z] [ERROR] Empire health check failed (27/3): Empire container is not running
+[2025-07-14T21:52:59.825Z] [ERROR] Maximum consecutive failures reached, attempting recovery
+[2025-07-14T21:52:59.825Z] [INFO] Starting Empire recovery process
+[2025-07-14T21:52:59.826Z] [INFO] Stopping Empire container
+[2025-07-14T21:52:59.859Z] [INFO] Removing Empire container
+[2025-07-14T21:52:59.895Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/data
+[2025-07-14T21:52:59.902Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/downloads
+[2025-07-14T21:52:59.902Z] [INFO] Starting new Empire container
+[2025-07-14T21:52:59.902Z] [INFO] Pulling Empire image...
+[2025-07-14T21:53:00.330Z] [INFO] Creating Empire data container...
+[2025-07-14T21:53:00.651Z] [INFO] Starting Empire main container...
+[2025-07-14T21:53:30.154Z] [ERROR] Empire health check failed (28/3): Empire setup has not completed successfully, Empire API is not responding on port 1337, Empire database connection failed
+[2025-07-14T21:53:30.154Z] [ERROR] Maximum consecutive failures reached, attempting recovery
+[2025-07-14T21:53:30.155Z] [INFO] Starting Empire recovery process
+[2025-07-14T21:53:30.155Z] [INFO] Stopping Empire container
+[2025-07-14T21:53:40.442Z] [INFO] Removing Empire container
+[2025-07-14T21:53:40.514Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/data
+[2025-07-14T21:53:40.521Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/downloads
+[2025-07-14T21:53:40.522Z] [INFO] Starting new Empire container
+[2025-07-14T21:53:40.522Z] [INFO] Pulling Empire image...
+[2025-07-14T21:53:41.150Z] [INFO] Creating Empire data container...
+[2025-07-14T21:53:41.215Z] [ERROR] Empire recovery failed: Error: Command failed: sudo docker create -v /empire --name empire-data bcsecurity/empire:latest
+Error response from daemon: Conflict. The container name "/empire-data" is already in use by container "c9851b2537b56fef10dd359e6ec1528dd1f5998d0c4867e6995e9345fb46ca33". You have to remove (or rename) that container to be able to reuse that name.
+
+[2025-07-14T21:53:41.216Z] [INFO] Starting aggressive Empire recovery
+[2025-07-14T21:53:42.269Z] [ERROR] Aggressive recovery failed: Error: Command failed: sudo docker run -d --name attacknode-empire --restart unless-stopped -p 1337:1337 -p 5000:5000 bcsecurity/empire:latest sh -c cd /empire && python3 empire.py setup --reset -y && python3 empire.py server
+docker: Error response from daemon: Conflict. The container name "/attacknode-empire" is already in use by container "19af4428ede56552064bfd1516c512621e1da6db3384d53bd0a5db5d3caf65ca". You have to remove (or rename) that container to be able to reuse that name.
+
+Run 'docker run --help' for more information
+
+[2025-07-14T21:53:42.269Z] [ERROR] Health check failed: Error: Command failed: sudo docker run -d --name attacknode-empire --restart unless-stopped -p 1337:1337 -p 5000:5000 bcsecurity/empire:latest sh -c cd /empire && python3 empire.py setup --reset -y && python3 empire.py server
+docker: Error response from daemon: Conflict. The container name "/attacknode-empire" is already in use by container "19af4428ede56552064bfd1516c512621e1da6db3384d53bd0a5db5d3caf65ca". You have to remove (or rename) that container to be able to reuse that name.
+
+Run 'docker run --help' for more information
+
+[2025-07-14T21:53:46.656Z] [ERROR] Empire recovery failed: Error: Empire container failed to become ready within timeout
+[2025-07-14T21:53:46.657Z] [INFO] Starting aggressive Empire recovery
+[2025-07-14T21:53:47.581Z] [ERROR] Aggressive recovery failed: Error: Command failed: sudo docker run -d --name attacknode-empire --restart unless-stopped -p 1337:1337 -p 5000:5000 bcsecurity/empire:latest sh -c cd /empire && python3 empire.py setup --reset -y && python3 empire.py server
+docker: Error response from daemon: Conflict. The container name "/attacknode-empire" is already in use by container "6b6fedd966efd08c5278f4bfab5dc0fbc710c80357095778cc154384327ad91c". You have to remove (or rename) that container to be able to reuse that name.
+
+Run 'docker run --help' for more information
+
+[2025-07-14T21:53:47.581Z] [ERROR] Health check failed: Error: Command failed: sudo docker run -d --name attacknode-empire --restart unless-stopped -p 1337:1337 -p 5000:5000 bcsecurity/empire:latest sh -c cd /empire && python3 empire.py setup --reset -y && python3 empire.py server
+docker: Error response from daemon: Conflict. The container name "/attacknode-empire" is already in use by container "6b6fedd966efd08c5278f4bfab5dc0fbc710c80357095778cc154384327ad91c". You have to remove (or rename) that container to be able to reuse that name.
+
+Run 'docker run --help' for more information
+
+[2025-07-14T21:53:59.820Z] [ERROR] Empire health check failed (29/3): Empire container is not running
+[2025-07-14T21:53:59.821Z] [ERROR] Maximum consecutive failures reached, attempting recovery
+[2025-07-14T21:53:59.830Z] [INFO] Starting Empire recovery process
+[2025-07-14T21:53:59.830Z] [INFO] Stopping Empire container
+[2025-07-14T21:53:59.864Z] [INFO] Removing Empire container
+[2025-07-14T21:53:59.901Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/data
+[2025-07-14T21:53:59.908Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/downloads
+[2025-07-14T21:53:59.908Z] [INFO] Starting new Empire container
+[2025-07-14T21:53:59.909Z] [INFO] Pulling Empire image...
+[2025-07-14T21:54:00.357Z] [INFO] Creating Empire data container...
+[2025-07-14T21:54:00.679Z] [INFO] Starting Empire main container...
+[2025-07-14T21:54:11.669Z] [ERROR] Empire recovery failed: Error: Empire container failed to become ready within timeout
+[2025-07-14T21:54:11.670Z] [INFO] Starting aggressive Empire recovery
+[2025-07-14T21:54:17.982Z] [ERROR] Aggressive recovery failed: Error: Command failed: sudo docker run -d --name attacknode-empire --restart unless-stopped -p 1337:1337 -p 5000:5000 bcsecurity/empire:latest sh -c cd /empire && python3 empire.py setup --reset -y && python3 empire.py server
+docker: Error response from daemon: Conflict. The container name "/attacknode-empire" is already in use by container "a62010557465e26368819d2fb31409aebeabee5647b0b011b3072aafcbaba3ad". You have to remove (or rename) that container to be able to reuse that name.
+
+Run 'docker run --help' for more information
+
+[2025-07-14T21:54:17.983Z] [ERROR] Health check failed: Error: Command failed: sudo docker run -d --name attacknode-empire --restart unless-stopped -p 1337:1337 -p 5000:5000 bcsecurity/empire:latest sh -c cd /empire && python3 empire.py setup --reset -y && python3 empire.py server
+docker: Error response from daemon: Conflict. The container name "/attacknode-empire" is already in use by container "a62010557465e26368819d2fb31409aebeabee5647b0b011b3072aafcbaba3ad". You have to remove (or rename) that container to be able to reuse that name.
+
+Run 'docker run --help' for more information
+
+[2025-07-14T21:54:29.814Z] [ERROR] Empire health check failed (30/3): Empire container is not running
+[2025-07-14T21:54:29.814Z] [ERROR] Maximum consecutive failures reached, attempting recovery
+[2025-07-14T21:54:29.814Z] [INFO] Starting Empire recovery process
+[2025-07-14T21:54:29.814Z] [INFO] Stopping Empire container
+[2025-07-14T21:54:29.842Z] [INFO] Removing Empire container
+[2025-07-14T21:54:29.872Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/data
+[2025-07-14T21:54:29.877Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/downloads
+[2025-07-14T21:54:29.877Z] [INFO] Starting new Empire container
+[2025-07-14T21:54:29.877Z] [INFO] Pulling Empire image...
+[2025-07-14T21:54:30.289Z] [INFO] Creating Empire data container...
+[2025-07-14T21:54:30.528Z] [INFO] Starting Empire main container...
+[2025-07-14T21:55:00.226Z] [ERROR] Empire health check failed (31/3): Empire setup has not completed successfully, Empire API is not responding on port 1337, Empire database connection failed
+[2025-07-14T21:55:00.227Z] [ERROR] Maximum consecutive failures reached, attempting recovery
+[2025-07-14T21:55:00.227Z] [INFO] Starting Empire recovery process
+[2025-07-14T21:55:00.227Z] [INFO] Stopping Empire container
+[2025-07-14T21:55:10.514Z] [INFO] Removing Empire container
+[2025-07-14T21:55:10.585Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/data
+[2025-07-14T21:55:10.593Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/downloads
+[2025-07-14T21:55:10.593Z] [INFO] Starting new Empire container
+[2025-07-14T21:55:10.594Z] [INFO] Pulling Empire image...
+[2025-07-14T21:55:11.067Z] [INFO] Creating Empire data container...
+[2025-07-14T21:55:11.140Z] [ERROR] Empire recovery failed: Error: Command failed: sudo docker create -v /empire --name empire-data bcsecurity/empire:latest
+Error response from daemon: Conflict. The container name "/empire-data" is already in use by container "38acd05a9c48cad714861be4bb579750fc5cafa16396cd9572b54de9813a61f1". You have to remove (or rename) that container to be able to reuse that name.
+
+[2025-07-14T21:55:11.140Z] [INFO] Starting aggressive Empire recovery
+[2025-07-14T21:55:11.320Z] [ERROR] Empire recovery failed: Error: Empire container failed to become ready within timeout
+[2025-07-14T21:55:11.321Z] [INFO] Starting aggressive Empire recovery
+[2025-07-14T21:55:11.949Z] [ERROR] Aggressive recovery failed: Error: Command failed: sudo docker run -d --name attacknode-empire --restart unless-stopped -p 1337:1337 -p 5000:5000 bcsecurity/empire:latest sh -c cd /empire && python3 empire.py setup --reset -y && python3 empire.py server
+docker: Error response from daemon: Conflict. The container name "/attacknode-empire" is already in use by container "c612171c49399bfab63fee498b7bd6001c7306bb5e2186b2d596bc788a8825c2". You have to remove (or rename) that container to be able to reuse that name.
+
+Run 'docker run --help' for more information
+
+[2025-07-14T21:55:11.949Z] [ERROR] Health check failed: Error: Command failed: sudo docker run -d --name attacknode-empire --restart unless-stopped -p 1337:1337 -p 5000:5000 bcsecurity/empire:latest sh -c cd /empire && python3 empire.py setup --reset -y && python3 empire.py server
+docker: Error response from daemon: Conflict. The container name "/attacknode-empire" is already in use by container "c612171c49399bfab63fee498b7bd6001c7306bb5e2186b2d596bc788a8825c2". You have to remove (or rename) that container to be able to reuse that name.
+
+Run 'docker run --help' for more information
+
+[2025-07-14T21:55:12.073Z] [ERROR] Aggressive recovery failed: Error: Command failed: sudo docker run -d --name attacknode-empire --restart unless-stopped -p 1337:1337 -p 5000:5000 bcsecurity/empire:latest sh -c cd /empire && python3 empire.py setup --reset -y && python3 empire.py server
+docker: Error response from daemon: Conflict. The container name "/attacknode-empire" is already in use by container "c612171c49399bfab63fee498b7bd6001c7306bb5e2186b2d596bc788a8825c2". You have to remove (or rename) that container to be able to reuse that name.
+
+Run 'docker run --help' for more information
+
+[2025-07-14T21:55:12.073Z] [ERROR] Health check failed: Error: Command failed: sudo docker run -d --name attacknode-empire --restart unless-stopped -p 1337:1337 -p 5000:5000 bcsecurity/empire:latest sh -c cd /empire && python3 empire.py setup --reset -y && python3 empire.py server
+docker: Error response from daemon: Conflict. The container name "/attacknode-empire" is already in use by container "c612171c49399bfab63fee498b7bd6001c7306bb5e2186b2d596bc788a8825c2". You have to remove (or rename) that container to be able to reuse that name.
+
+Run 'docker run --help' for more information
+
+[2025-07-14T21:55:29.822Z] [ERROR] Empire health check failed (32/3): Empire container is not running
+[2025-07-14T21:55:29.823Z] [ERROR] Maximum consecutive failures reached, attempting recovery
+[2025-07-14T21:55:29.828Z] [INFO] Starting Empire recovery process
+[2025-07-14T21:55:29.829Z] [INFO] Stopping Empire container
+[2025-07-14T21:55:29.863Z] [INFO] Removing Empire container
+[2025-07-14T21:55:29.900Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/data
+[2025-07-14T21:55:29.907Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/downloads
+[2025-07-14T21:55:29.908Z] [INFO] Starting new Empire container
+[2025-07-14T21:55:29.908Z] [INFO] Pulling Empire image...
+[2025-07-14T21:55:30.354Z] [INFO] Creating Empire data container...
+[2025-07-14T21:55:30.649Z] [INFO] Starting Empire main container...
+[2025-07-14T21:56:00.239Z] [ERROR] Empire health check failed (33/3): Empire setup has not completed successfully, Empire API is not responding on port 1337, Empire database connection failed
+[2025-07-14T21:56:00.240Z] [ERROR] Maximum consecutive failures reached, attempting recovery
+[2025-07-14T21:56:00.240Z] [INFO] Starting Empire recovery process
+[2025-07-14T21:56:00.240Z] [INFO] Stopping Empire container
+[2025-07-14T21:56:10.550Z] [INFO] Removing Empire container
+[2025-07-14T21:56:10.623Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/data
+[2025-07-14T21:56:10.630Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/downloads
+[2025-07-14T21:56:10.631Z] [INFO] Starting new Empire container
+[2025-07-14T21:56:10.631Z] [INFO] Pulling Empire image...
+[2025-07-14T21:56:11.090Z] [INFO] Creating Empire data container...
+[2025-07-14T21:56:11.156Z] [ERROR] Empire recovery failed: Error: Command failed: sudo docker create -v /empire --name empire-data bcsecurity/empire:latest
+Error response from daemon: Conflict. The container name "/empire-data" is already in use by container "10e816405f59574445732984ba481b70a6dfff2cd8e67f0a8b77b0e1d4d8f0d6". You have to remove (or rename) that container to be able to reuse that name.
+
+[2025-07-14T21:56:11.156Z] [INFO] Starting aggressive Empire recovery
+[2025-07-14T21:56:11.490Z] [ERROR] Empire recovery failed: Error: Empire container failed to become ready within timeout
+[2025-07-14T21:56:11.491Z] [INFO] Starting aggressive Empire recovery
+[2025-07-14T21:56:12.035Z] [ERROR] Aggressive recovery failed: Error: Command failed: sudo docker run -d --name attacknode-empire --restart unless-stopped -p 1337:1337 -p 5000:5000 bcsecurity/empire:latest sh -c cd /empire && python3 empire.py setup --reset -y && python3 empire.py server
+docker: Error response from daemon: Conflict. The container name "/attacknode-empire" is already in use by container "06e023cc3b93e590b3eee0f82c7ba4afa288b812389d482081993116688bcd0c". You have to remove (or rename) that container to be able to reuse that name.
+
+Run 'docker run --help' for more information
+
+[2025-07-14T21:56:12.036Z] [ERROR] Health check failed: Error: Command failed: sudo docker run -d --name attacknode-empire --restart unless-stopped -p 1337:1337 -p 5000:5000 bcsecurity/empire:latest sh -c cd /empire && python3 empire.py setup --reset -y && python3 empire.py server
+docker: Error response from daemon: Conflict. The container name "/attacknode-empire" is already in use by container "06e023cc3b93e590b3eee0f82c7ba4afa288b812389d482081993116688bcd0c". You have to remove (or rename) that container to be able to reuse that name.
+
+Run 'docker run --help' for more information
+
+[2025-07-14T21:56:12.059Z] [ERROR] Aggressive recovery failed: Error: Command failed: sudo docker run -d --name attacknode-empire --restart unless-stopped -p 1337:1337 -p 5000:5000 bcsecurity/empire:latest sh -c cd /empire && python3 empire.py setup --reset -y && python3 empire.py server
+docker: Error response from daemon: Conflict. The container name "/attacknode-empire" is already in use by container "06e023cc3b93e590b3eee0f82c7ba4afa288b812389d482081993116688bcd0c". You have to remove (or rename) that container to be able to reuse that name.
+
+Run 'docker run --help' for more information
+
+[2025-07-14T21:56:12.059Z] [ERROR] Health check failed: Error: Command failed: sudo docker run -d --name attacknode-empire --restart unless-stopped -p 1337:1337 -p 5000:5000 bcsecurity/empire:latest sh -c cd /empire && python3 empire.py setup --reset -y && python3 empire.py server
+docker: Error response from daemon: Conflict. The container name "/attacknode-empire" is already in use by container "06e023cc3b93e590b3eee0f82c7ba4afa288b812389d482081993116688bcd0c". You have to remove (or rename) that container to be able to reuse that name.
+
+Run 'docker run --help' for more information
+
+[2025-07-14T21:56:29.820Z] [ERROR] Empire health check failed (34/3): Empire container is not running
+[2025-07-14T21:56:29.821Z] [ERROR] Maximum consecutive failures reached, attempting recovery
+[2025-07-14T21:56:29.821Z] [INFO] Starting Empire recovery process
+[2025-07-14T21:56:29.821Z] [INFO] Stopping Empire container
+[2025-07-14T21:56:29.865Z] [INFO] Removing Empire container
+[2025-07-14T21:56:29.902Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/data
+[2025-07-14T21:56:29.910Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/downloads
+[2025-07-14T21:56:29.910Z] [INFO] Starting new Empire container
+[2025-07-14T21:56:29.910Z] [INFO] Pulling Empire image...
+[2025-07-14T21:56:31.362Z] [ERROR] Empire recovery failed: Error: Empire container failed to become ready within timeout
+[2025-07-14T21:56:31.362Z] [INFO] Starting aggressive Empire recovery
+[2025-07-14T21:56:32.226Z] [ERROR] Aggressive recovery failed: Error: Command failed: sudo docker run -d --name attacknode-empire --restart unless-stopped -p 1337:1337 -p 5000:5000 bcsecurity/empire:latest sh -c cd /empire && python3 empire.py setup --reset -y && python3 empire.py server
+docker: Error response from daemon: Conflict. The container name "/attacknode-empire" is already in use by container "fe5d2065713fedb397d75d39fd81baaf22a67aecc3e5ae38f0f802566e4d784d". You have to remove (or rename) that container to be able to reuse that name.
+
+Run 'docker run --help' for more information
+
+[2025-07-14T21:56:32.226Z] [ERROR] Health check failed: Error: Command failed: sudo docker run -d --name attacknode-empire --restart unless-stopped -p 1337:1337 -p 5000:5000 bcsecurity/empire:latest sh -c cd /empire && python3 empire.py setup --reset -y && python3 empire.py server
+docker: Error response from daemon: Conflict. The container name "/attacknode-empire" is already in use by container "fe5d2065713fedb397d75d39fd81baaf22a67aecc3e5ae38f0f802566e4d784d". You have to remove (or rename) that container to be able to reuse that name.
+
+Run 'docker run --help' for more information
+
+[2025-07-14T21:56:40.650Z] [INFO] Creating Empire data container...
+[2025-07-14T21:56:40.961Z] [INFO] Starting Empire main container...
+[2025-07-14T21:56:41.018Z] [ERROR] Empire recovery failed: Error: Command failed: sudo docker run -d -it --name attacknode-empire --restart unless-stopped -p 1337:1337 -p 5000:5000 --volumes-from empire-data bcsecurity/empire:latest
+docker: Error response from daemon: Conflict. The container name "/attacknode-empire" is already in use by container "fe5d2065713fedb397d75d39fd81baaf22a67aecc3e5ae38f0f802566e4d784d". You have to remove (or rename) that container to be able to reuse that name.
+
+Run 'docker run --help' for more information
+
+[2025-07-14T21:56:41.018Z] [INFO] Starting aggressive Empire recovery
+[2025-07-14T21:56:42.021Z] [ERROR] Aggressive recovery failed: Error: Command failed: sudo docker run -d --name attacknode-empire --restart unless-stopped -p 1337:1337 -p 5000:5000 bcsecurity/empire:latest sh -c cd /empire && python3 empire.py setup --reset -y && python3 empire.py server
+docker: Error response from daemon: Conflict. The container name "/attacknode-empire" is already in use by container "c82b208328ca77f08ff5486e7c2b3e9a1c01793f10292648da7010da669fcc1a". You have to remove (or rename) that container to be able to reuse that name.
+
+Run 'docker run --help' for more information
+
+[2025-07-14T21:56:42.021Z] [ERROR] Health check failed: Error: Command failed: sudo docker run -d --name attacknode-empire --restart unless-stopped -p 1337:1337 -p 5000:5000 bcsecurity/empire:latest sh -c cd /empire && python3 empire.py setup --reset -y && python3 empire.py server
+docker: Error response from daemon: Conflict. The container name "/attacknode-empire" is already in use by container "c82b208328ca77f08ff5486e7c2b3e9a1c01793f10292648da7010da669fcc1a". You have to remove (or rename) that container to be able to reuse that name.
+
+Run 'docker run --help' for more information
+
+[2025-07-14T21:56:59.819Z] [ERROR] Empire health check failed (35/3): Empire container is not running
+[2025-07-14T21:56:59.819Z] [ERROR] Maximum consecutive failures reached, attempting recovery
+[2025-07-14T21:56:59.819Z] [INFO] Starting Empire recovery process
+[2025-07-14T21:56:59.820Z] [INFO] Stopping Empire container
+[2025-07-14T21:56:59.853Z] [INFO] Removing Empire container
+[2025-07-14T21:56:59.889Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/data
+[2025-07-14T21:56:59.896Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/downloads
+[2025-07-14T21:56:59.897Z] [INFO] Starting new Empire container
+[2025-07-14T21:56:59.897Z] [INFO] Pulling Empire image...
+[2025-07-14T21:57:00.365Z] [INFO] Creating Empire data container...
+[2025-07-14T21:57:00.689Z] [INFO] Starting Empire main container...
+[2025-07-14T21:57:30.242Z] [ERROR] Empire health check failed (36/3): Empire setup has not completed successfully, Empire API is not responding on port 1337, Empire database connection failed
+[2025-07-14T21:57:30.243Z] [ERROR] Maximum consecutive failures reached, attempting recovery
+[2025-07-14T21:57:30.243Z] [INFO] Starting Empire recovery process
+[2025-07-14T21:57:30.243Z] [INFO] Stopping Empire container
+[2025-07-14T21:57:40.550Z] [INFO] Removing Empire container
+[2025-07-14T21:57:40.621Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/data
+[2025-07-14T21:57:40.629Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/downloads
+[2025-07-14T21:57:40.629Z] [INFO] Starting new Empire container
+[2025-07-14T21:57:40.630Z] [INFO] Pulling Empire image...
+[2025-07-14T21:57:41.088Z] [INFO] Creating Empire data container...
+[2025-07-14T21:57:41.154Z] [ERROR] Empire recovery failed: Error: Command failed: sudo docker create -v /empire --name empire-data bcsecurity/empire:latest
+Error response from daemon: Conflict. The container name "/empire-data" is already in use by container "c4dedddb78a343b8133b684b95f3f979ca8c42e1c078e4ff42e311c03a87bce9". You have to remove (or rename) that container to be able to reuse that name.
+
+[2025-07-14T21:57:41.154Z] [INFO] Starting aggressive Empire recovery
+[2025-07-14T21:57:41.406Z] [ERROR] Empire recovery failed: Error: Empire container failed to become ready within timeout
+[2025-07-14T21:57:41.407Z] [INFO] Starting aggressive Empire recovery
+[2025-07-14T21:57:42.083Z] [ERROR] Aggressive recovery failed: Error: Command failed: sudo docker run -d --name attacknode-empire --restart unless-stopped -p 1337:1337 -p 5000:5000 bcsecurity/empire:latest sh -c cd /empire && python3 empire.py setup --reset -y && python3 empire.py server
+docker: Error response from daemon: Conflict. The container name "/attacknode-empire" is already in use by container "19bbc5f36a568eb9e3e6f9e15befbd6ae607ee437c85ce54e455a566cca1aa72". You have to remove (or rename) that container to be able to reuse that name.
+
+Run 'docker run --help' for more information
+
+[2025-07-14T21:57:42.084Z] [ERROR] Health check failed: Error: Command failed: sudo docker run -d --name attacknode-empire --restart unless-stopped -p 1337:1337 -p 5000:5000 bcsecurity/empire:latest sh -c cd /empire && python3 empire.py setup --reset -y && python3 empire.py server
+docker: Error response from daemon: Conflict. The container name "/attacknode-empire" is already in use by container "19bbc5f36a568eb9e3e6f9e15befbd6ae607ee437c85ce54e455a566cca1aa72". You have to remove (or rename) that container to be able to reuse that name.
+
+Run 'docker run --help' for more information
+
+[2025-07-14T21:57:42.090Z] [ERROR] Aggressive recovery failed: Error: Command failed: sudo docker run -d --name attacknode-empire --restart unless-stopped -p 1337:1337 -p 5000:5000 bcsecurity/empire:latest sh -c cd /empire && python3 empire.py setup --reset -y && python3 empire.py server
+docker: Error response from daemon: Conflict. The container name "/attacknode-empire" is already in use by container "19bbc5f36a568eb9e3e6f9e15befbd6ae607ee437c85ce54e455a566cca1aa72". You have to remove (or rename) that container to be able to reuse that name.
+
+Run 'docker run --help' for more information
+
+[2025-07-14T21:57:42.090Z] [ERROR] Health check failed: Error: Command failed: sudo docker run -d --name attacknode-empire --restart unless-stopped -p 1337:1337 -p 5000:5000 bcsecurity/empire:latest sh -c cd /empire && python3 empire.py setup --reset -y && python3 empire.py server
+docker: Error response from daemon: Conflict. The container name "/attacknode-empire" is already in use by container "19bbc5f36a568eb9e3e6f9e15befbd6ae607ee437c85ce54e455a566cca1aa72". You have to remove (or rename) that container to be able to reuse that name.
+
+Run 'docker run --help' for more information
+
+[2025-07-14T21:57:59.829Z] [ERROR] Empire health check failed (37/3): Empire container is not running
+[2025-07-14T21:57:59.829Z] [ERROR] Maximum consecutive failures reached, attempting recovery
+[2025-07-14T21:57:59.830Z] [INFO] Starting Empire recovery process
+[2025-07-14T21:57:59.830Z] [INFO] Stopping Empire container
+[2025-07-14T21:57:59.865Z] [INFO] Removing Empire container
+[2025-07-14T21:57:59.903Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/data
+[2025-07-14T21:57:59.911Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/downloads
+[2025-07-14T21:57:59.911Z] [INFO] Starting new Empire container
+[2025-07-14T21:57:59.911Z] [INFO] Pulling Empire image...
+[2025-07-14T21:58:00.393Z] [INFO] Creating Empire data container...
+[2025-07-14T21:58:00.692Z] [INFO] Starting Empire main container...
+[2025-07-14T21:58:30.157Z] [ERROR] Empire health check failed (38/3): Empire setup has not completed successfully, Empire API is not responding on port 1337, Empire database connection failed
+[2025-07-14T21:58:30.157Z] [ERROR] Maximum consecutive failures reached, attempting recovery
+[2025-07-14T21:58:30.158Z] [INFO] Starting Empire recovery process
+[2025-07-14T21:58:30.158Z] [INFO] Stopping Empire container
+[2025-07-14T21:58:40.660Z] [INFO] Removing Empire container
+[2025-07-14T21:58:40.716Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/data
+[2025-07-14T21:58:40.723Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/downloads
+[2025-07-14T21:58:40.723Z] [INFO] Starting new Empire container
+[2025-07-14T21:58:40.723Z] [INFO] Pulling Empire image...
+[2025-07-14T21:58:41.166Z] [INFO] Creating Empire data container...
+[2025-07-14T21:58:41.222Z] [ERROR] Empire recovery failed: Error: Command failed: sudo docker create -v /empire --name empire-data bcsecurity/empire:latest
+Error response from daemon: Conflict. The container name "/empire-data" is already in use by container "aeb38a517bff85bf3b8601fdd3cc4dea001f64b9ec18c44dcc1648f1c5ab77ab". You have to remove (or rename) that container to be able to reuse that name.
+
+[2025-07-14T21:58:41.223Z] [INFO] Starting aggressive Empire recovery
+[2025-07-14T21:58:42.065Z] [ERROR] Aggressive recovery failed: Error: Command failed: sudo docker run -d --name attacknode-empire --restart unless-stopped -p 1337:1337 -p 5000:5000 bcsecurity/empire:latest sh -c cd /empire && python3 empire.py setup --reset -y && python3 empire.py server
+docker: Error response from daemon: Conflict. The container name "/attacknode-empire" is already in use by container "aee7d648f289a32324875cfa1d03b58836af2eabb0d6cfe336e3aa21aafb2d69". You have to remove (or rename) that container to be able to reuse that name.
+
+Run 'docker run --help' for more information
+
+[2025-07-14T21:58:42.066Z] [ERROR] Health check failed: Error: Command failed: sudo docker run -d --name attacknode-empire --restart unless-stopped -p 1337:1337 -p 5000:5000 bcsecurity/empire:latest sh -c cd /empire && python3 empire.py setup --reset -y && python3 empire.py server
+docker: Error response from daemon: Conflict. The container name "/attacknode-empire" is already in use by container "aee7d648f289a32324875cfa1d03b58836af2eabb0d6cfe336e3aa21aafb2d69". You have to remove (or rename) that container to be able to reuse that name.
+
+Run 'docker run --help' for more information
+
+[2025-07-14T21:58:59.825Z] [ERROR] Empire health check failed (39/3): Empire container is not running
+[2025-07-14T21:58:59.825Z] [ERROR] Maximum consecutive failures reached, attempting recovery
+[2025-07-14T21:58:59.829Z] [INFO] Starting Empire recovery process
+[2025-07-14T21:58:59.830Z] [INFO] Stopping Empire container
+[2025-07-14T21:58:59.854Z] [INFO] Removing Empire container
+[2025-07-14T21:58:59.885Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/data
+[2025-07-14T21:58:59.892Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/downloads
+[2025-07-14T21:58:59.892Z] [INFO] Starting new Empire container
+[2025-07-14T21:58:59.892Z] [INFO] Pulling Empire image...
+[2025-07-14T21:59:00.347Z] [INFO] Creating Empire data container...
+[2025-07-14T21:59:00.600Z] [INFO] Starting Empire main container...
+[2025-07-14T21:59:01.360Z] [ERROR] Empire recovery failed: Error: Empire container failed to become ready within timeout
+[2025-07-14T21:59:01.361Z] [INFO] Starting aggressive Empire recovery
+[2025-07-14T21:59:07.504Z] [ERROR] Aggressive recovery failed: Error: Command failed: sudo docker run -d --name attacknode-empire --restart unless-stopped -p 1337:1337 -p 5000:5000 bcsecurity/empire:latest sh -c cd /empire && python3 empire.py setup --reset -y && python3 empire.py server
+docker: Error response from daemon: Conflict. The container name "/attacknode-empire" is already in use by container "77ccddd5d36f333b632cf3f2a090f93a452982c587b60c5ffed16e48f110a34a". You have to remove (or rename) that container to be able to reuse that name.
+
+Run 'docker run --help' for more information
+
+[2025-07-14T21:59:07.504Z] [ERROR] Health check failed: Error: Command failed: sudo docker run -d --name attacknode-empire --restart unless-stopped -p 1337:1337 -p 5000:5000 bcsecurity/empire:latest sh -c cd /empire && python3 empire.py setup --reset -y && python3 empire.py server
+docker: Error response from daemon: Conflict. The container name "/attacknode-empire" is already in use by container "77ccddd5d36f333b632cf3f2a090f93a452982c587b60c5ffed16e48f110a34a". You have to remove (or rename) that container to be able to reuse that name.
+
+Run 'docker run --help' for more information
+
+[2025-07-14T21:59:29.829Z] [ERROR] Empire health check failed (40/3): Empire container is not running
+[2025-07-14T21:59:29.835Z] [ERROR] Maximum consecutive failures reached, attempting recovery
+[2025-07-14T21:59:29.835Z] [INFO] Starting Empire recovery process
+[2025-07-14T21:59:29.835Z] [INFO] Stopping Empire container
+[2025-07-14T21:59:29.865Z] [INFO] Removing Empire container
+[2025-07-14T21:59:29.894Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/data
+[2025-07-14T21:59:29.900Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/downloads
+[2025-07-14T21:59:29.901Z] [INFO] Starting new Empire container
+[2025-07-14T21:59:29.901Z] [INFO] Pulling Empire image...
+[2025-07-14T21:59:30.348Z] [INFO] Creating Empire data container...
+[2025-07-14T21:59:30.596Z] [INFO] Starting Empire main container...
+[2025-07-14T22:00:00.166Z] [ERROR] Empire health check failed (41/3): Empire setup has not completed successfully, Empire API is not responding on port 1337, Empire database connection failed
+[2025-07-14T22:00:00.167Z] [ERROR] Maximum consecutive failures reached, attempting recovery
+[2025-07-14T22:00:00.167Z] [INFO] Starting Empire recovery process
+[2025-07-14T22:00:00.167Z] [INFO] Stopping Empire container
+[2025-07-14T22:00:10.394Z] [INFO] Removing Empire container
+[2025-07-14T22:00:10.450Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/data
+[2025-07-14T22:00:10.458Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/downloads
+[2025-07-14T22:00:10.458Z] [INFO] Starting new Empire container
+[2025-07-14T22:00:10.459Z] [INFO] Pulling Empire image...
+[2025-07-14T22:00:10.898Z] [INFO] Creating Empire data container...
+[2025-07-14T22:00:10.963Z] [ERROR] Empire recovery failed: Error: Command failed: sudo docker create -v /empire --name empire-data bcsecurity/empire:latest
+Error response from daemon: Conflict. The container name "/empire-data" is already in use by container "6602e7aecb8b6bd21212ad322d8c925d2dc14700f2b6014ba7cf584071beb847". You have to remove (or rename) that container to be able to reuse that name.
+
+[2025-07-14T22:00:10.963Z] [INFO] Starting aggressive Empire recovery
+[2025-07-14T22:00:11.242Z] [ERROR] Empire recovery failed: Error: Empire container failed to become ready within timeout
+[2025-07-14T22:00:11.243Z] [INFO] Starting aggressive Empire recovery
+[2025-07-14T22:00:11.852Z] [ERROR] Aggressive recovery failed: Error: Command failed: sudo docker run -d --name attacknode-empire --restart unless-stopped -p 1337:1337 -p 5000:5000 bcsecurity/empire:latest sh -c cd /empire && python3 empire.py setup --reset -y && python3 empire.py server
+docker: Error response from daemon: Conflict. The container name "/attacknode-empire" is already in use by container "a89d2e1921be084a3d10ccbbcf636bfafa825bcf55764309ff49700dbd5a8cfb". You have to remove (or rename) that container to be able to reuse that name.
+
+Run 'docker run --help' for more information
+
+[2025-07-14T22:00:11.852Z] [ERROR] Health check failed: Error: Command failed: sudo docker run -d --name attacknode-empire --restart unless-stopped -p 1337:1337 -p 5000:5000 bcsecurity/empire:latest sh -c cd /empire && python3 empire.py setup --reset -y && python3 empire.py server
+docker: Error response from daemon: Conflict. The container name "/attacknode-empire" is already in use by container "a89d2e1921be084a3d10ccbbcf636bfafa825bcf55764309ff49700dbd5a8cfb". You have to remove (or rename) that container to be able to reuse that name.
+
+Run 'docker run --help' for more information
+
+[2025-07-14T22:00:11.857Z] [ERROR] Aggressive recovery failed: Error: Command failed: sudo docker run -d --name attacknode-empire --restart unless-stopped -p 1337:1337 -p 5000:5000 bcsecurity/empire:latest sh -c cd /empire && python3 empire.py setup --reset -y && python3 empire.py server
+docker: Error response from daemon: Conflict. The container name "/attacknode-empire" is already in use by container "a89d2e1921be084a3d10ccbbcf636bfafa825bcf55764309ff49700dbd5a8cfb". You have to remove (or rename) that container to be able to reuse that name.
+
+Run 'docker run --help' for more information
+
+[2025-07-14T22:00:11.858Z] [ERROR] Health check failed: Error: Command failed: sudo docker run -d --name attacknode-empire --restart unless-stopped -p 1337:1337 -p 5000:5000 bcsecurity/empire:latest sh -c cd /empire && python3 empire.py setup --reset -y && python3 empire.py server
+docker: Error response from daemon: Conflict. The container name "/attacknode-empire" is already in use by container "a89d2e1921be084a3d10ccbbcf636bfafa825bcf55764309ff49700dbd5a8cfb". You have to remove (or rename) that container to be able to reuse that name.
+
+Run 'docker run --help' for more information
+
+[2025-07-14T22:11:57.194Z] [INFO] Starting Empire health monitoring
+[2025-07-14T22:11:57.448Z] [ERROR] Empire health check failed (1/3): Health check failed: Error: Container attacknode-empire not found or not accessible
+[2025-07-14T22:12:27.729Z] [ERROR] Empire health check failed (2/3): Empire database connection failed
+[2025-07-14T22:12:27.730Z] [WARN] Empire warnings: Starkiller UI may not be accessible, Warning detected: [33;1m[WARNING]: Using SQLite may result in performance issues and some functions may be disabled. [0m, Warning detected: [33;1m[WARNING]: Consider using MySQL instead. [0m
+[2025-07-14T22:12:57.668Z] [ERROR] Empire health check failed (3/3): Empire database connection failed
+[2025-07-14T22:12:57.668Z] [ERROR] Maximum consecutive failures reached, attempting recovery
+[2025-07-14T22:12:57.669Z] [INFO] Starting Empire recovery process
+[2025-07-14T22:12:57.669Z] [INFO] Performing complete container cleanup
+[2025-07-14T22:13:03.319Z] [INFO] Container cleanup completed
+[2025-07-14T22:13:03.336Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/data
+[2025-07-14T22:13:03.344Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/downloads
+[2025-07-14T22:13:03.344Z] [INFO] Starting new Empire container
+[2025-07-14T22:13:03.345Z] [INFO] Pulling Empire image...
+[2025-07-14T22:13:03.806Z] [INFO] Creating Empire data container...
+[2025-07-14T22:13:04.027Z] [INFO] Starting Empire main container...
+[2025-07-14T22:13:19.271Z] [INFO] Empire container is ready
+[2025-07-14T22:13:19.271Z] [INFO] Empire recovery completed successfully
+[2025-07-14T22:13:19.271Z] [WARN] Empire warnings: Starkiller UI may not be accessible, Warning detected: [33;1m[WARNING]: Using SQLite may result in performance issues and some functions may be disabled. [0m, Warning detected: [33;1m[WARNING]: Consider using MySQL instead. [0m
+[2025-07-14T22:13:27.699Z] [ERROR] Empire health check failed (1/3): Empire database connection failed
+[2025-07-14T22:13:27.699Z] [WARN] Empire warnings: Starkiller UI may not be accessible, Warning detected: [33;1m[WARNING]: Using SQLite may result in performance issues and some functions may be disabled. [0m, Warning detected: [33;1m[WARNING]: Consider using MySQL instead. [0m
+[2025-07-14T22:13:57.679Z] [ERROR] Empire health check failed (2/3): Empire database connection failed
+[2025-07-14T22:13:57.680Z] [WARN] Empire warnings: Starkiller UI may not be accessible, Warning detected: [33;1m[WARNING]: Using SQLite may result in performance issues and some functions may be disabled. [0m, Warning detected: [33;1m[WARNING]: Consider using MySQL instead. [0m
+[2025-07-14T22:14:27.685Z] [ERROR] Empire health check failed (3/3): Empire database connection failed
+[2025-07-14T22:14:27.685Z] [ERROR] Maximum consecutive failures reached, attempting recovery
+[2025-07-14T22:14:27.686Z] [INFO] Starting Empire recovery process
+[2025-07-14T22:14:27.686Z] [INFO] Performing complete container cleanup
+[2025-07-14T22:14:33.344Z] [INFO] Container cleanup completed
+[2025-07-14T22:14:33.354Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/data
+[2025-07-14T22:14:33.364Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/downloads
+[2025-07-14T22:14:33.365Z] [INFO] Starting new Empire container
+[2025-07-14T22:14:33.365Z] [INFO] Pulling Empire image...
+[2025-07-14T22:14:33.882Z] [INFO] Creating Empire data container...
+[2025-07-14T22:14:34.191Z] [INFO] Starting Empire main container...
+[2025-07-14T22:14:49.439Z] [INFO] Empire container is ready
+[2025-07-14T22:14:49.439Z] [INFO] Empire recovery completed successfully
+[2025-07-14T22:14:49.439Z] [WARN] Empire warnings: Starkiller UI may not be accessible, Warning detected: [33;1m[WARNING]: Using SQLite may result in performance issues and some functions may be disabled. [0m, Warning detected: [33;1m[WARNING]: Consider using MySQL instead. [0m
+[2025-07-14T22:14:57.720Z] [ERROR] Empire health check failed (1/3): Empire database connection failed
+[2025-07-14T22:14:57.720Z] [WARN] Empire warnings: Starkiller UI may not be accessible, Warning detected: [33;1m[WARNING]: Using SQLite may result in performance issues and some functions may be disabled. [0m, Warning detected: [33;1m[WARNING]: Consider using MySQL instead. [0m
+[2025-07-14T22:15:27.673Z] [ERROR] Empire health check failed (2/3): Empire database connection failed
+[2025-07-14T22:15:27.674Z] [WARN] Empire warnings: Starkiller UI may not be accessible, Warning detected: [33;1m[WARNING]: Using SQLite may result in performance issues and some functions may be disabled. [0m, Warning detected: [33;1m[WARNING]: Consider using MySQL instead. [0m
+[2025-07-14T22:15:57.705Z] [ERROR] Empire health check failed (3/3): Empire database connection failed
+[2025-07-14T22:15:57.705Z] [ERROR] Maximum consecutive failures reached, attempting recovery
+[2025-07-14T22:15:57.706Z] [INFO] Starting Empire recovery process
+[2025-07-14T22:15:57.706Z] [INFO] Performing complete container cleanup
+[2025-07-14T22:16:03.352Z] [INFO] Container cleanup completed
+[2025-07-14T22:16:03.361Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/data
+[2025-07-14T22:16:03.369Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/downloads
+[2025-07-14T22:16:03.369Z] [INFO] Starting new Empire container
+[2025-07-14T22:16:03.370Z] [INFO] Pulling Empire image...
+[2025-07-14T22:16:03.836Z] [INFO] Creating Empire data container...
+[2025-07-14T22:16:04.129Z] [INFO] Starting Empire main container...
+[2025-07-14T22:16:19.366Z] [INFO] Empire container is ready
+[2025-07-14T22:16:19.367Z] [INFO] Empire recovery completed successfully
+[2025-07-14T22:16:19.367Z] [WARN] Empire warnings: Starkiller UI may not be accessible, Warning detected: [33;1m[WARNING]: Using SQLite may result in performance issues and some functions may be disabled. [0m, Warning detected: [33;1m[WARNING]: Consider using MySQL instead. [0m
+[2025-07-14T22:16:27.747Z] [ERROR] Empire health check failed (1/3): Empire database connection failed
+[2025-07-14T22:16:27.747Z] [WARN] Empire warnings: Starkiller UI may not be accessible, Warning detected: [33;1m[WARNING]: Using SQLite may result in performance issues and some functions may be disabled. [0m, Warning detected: [33;1m[WARNING]: Consider using MySQL instead. [0m
+[2025-07-14T22:16:57.697Z] [ERROR] Empire health check failed (2/3): Empire database connection failed
+[2025-07-14T22:16:57.697Z] [WARN] Empire warnings: Starkiller UI may not be accessible, Warning detected: [33;1m[WARNING]: Using SQLite may result in performance issues and some functions may be disabled. [0m, Warning detected: [33;1m[WARNING]: Consider using MySQL instead. [0m
+[2025-07-14T22:17:27.693Z] [ERROR] Empire health check failed (3/3): Empire database connection failed
+[2025-07-14T22:17:27.694Z] [ERROR] Maximum consecutive failures reached, attempting recovery
+[2025-07-14T22:17:27.694Z] [INFO] Starting Empire recovery process
+[2025-07-14T22:17:27.694Z] [INFO] Performing complete container cleanup
+[2025-07-14T22:17:33.331Z] [INFO] Container cleanup completed
+[2025-07-14T22:17:33.342Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/data
+[2025-07-14T22:17:33.352Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/downloads
+[2025-07-14T22:17:33.352Z] [INFO] Starting new Empire container
+[2025-07-14T22:17:33.352Z] [INFO] Pulling Empire image...
+[2025-07-14T22:17:33.838Z] [INFO] Creating Empire data container...
+[2025-07-14T22:17:34.120Z] [INFO] Starting Empire main container...
+[2025-07-14T22:17:49.366Z] [INFO] Empire container is ready
+[2025-07-14T22:17:49.367Z] [INFO] Empire recovery completed successfully
+[2025-07-14T22:17:49.367Z] [WARN] Empire warnings: Starkiller UI may not be accessible, Warning detected: [33;1m[WARNING]: Using SQLite may result in performance issues and some functions may be disabled. [0m, Warning detected: [33;1m[WARNING]: Consider using MySQL instead. [0m
+[2025-07-14T22:17:57.764Z] [ERROR] Empire health check failed (1/3): Empire database connection failed
+[2025-07-14T22:17:57.764Z] [WARN] Empire warnings: Starkiller UI may not be accessible, Warning detected: [33;1m[WARNING]: Using SQLite may result in performance issues and some functions may be disabled. [0m, Warning detected: [33;1m[WARNING]: Consider using MySQL instead. [0m
+[2025-07-14T22:18:27.711Z] [ERROR] Empire health check failed (2/3): Empire database connection failed
+[2025-07-14T22:18:27.712Z] [WARN] Empire warnings: Starkiller UI may not be accessible, Warning detected: [33;1m[WARNING]: Using SQLite may result in performance issues and some functions may be disabled. [0m, Warning detected: [33;1m[WARNING]: Consider using MySQL instead. [0m
+[2025-07-14T22:18:57.702Z] [ERROR] Empire health check failed (3/3): Empire database connection failed
+[2025-07-14T22:18:57.703Z] [ERROR] Maximum consecutive failures reached, attempting recovery
+[2025-07-14T22:18:57.703Z] [INFO] Starting Empire recovery process
+[2025-07-14T22:18:57.703Z] [INFO] Performing complete container cleanup
+[2025-07-14T22:19:03.365Z] [INFO] Container cleanup completed
+[2025-07-14T22:19:03.374Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/data
+[2025-07-14T22:19:03.382Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/downloads
+[2025-07-14T22:19:03.382Z] [INFO] Starting new Empire container
+[2025-07-14T22:19:03.382Z] [INFO] Pulling Empire image...
+[2025-07-14T22:19:03.871Z] [INFO] Creating Empire data container...
+[2025-07-14T22:19:04.150Z] [INFO] Starting Empire main container...
+[2025-07-14T22:19:19.394Z] [INFO] Empire container is ready
+[2025-07-14T22:19:19.395Z] [INFO] Empire recovery completed successfully
+[2025-07-14T22:19:19.395Z] [WARN] Empire warnings: Starkiller UI may not be accessible, Warning detected: [33;1m[WARNING]: Using SQLite may result in performance issues and some functions may be disabled. [0m, Warning detected: [33;1m[WARNING]: Consider using MySQL instead. [0m
+[2025-07-14T22:19:27.746Z] [ERROR] Empire health check failed (1/3): Empire database connection failed
+[2025-07-14T22:19:27.746Z] [WARN] Empire warnings: Starkiller UI may not be accessible, Warning detected: [33;1m[WARNING]: Using SQLite may result in performance issues and some functions may be disabled. [0m, Warning detected: [33;1m[WARNING]: Consider using MySQL instead. [0m
+[2025-07-14T22:19:57.711Z] [ERROR] Empire health check failed (2/3): Empire database connection failed
+[2025-07-14T22:19:57.711Z] [WARN] Empire warnings: Starkiller UI may not be accessible, Warning detected: [33;1m[WARNING]: Using SQLite may result in performance issues and some functions may be disabled. [0m, Warning detected: [33;1m[WARNING]: Consider using MySQL instead. [0m
+[2025-07-14T22:20:27.713Z] [ERROR] Empire health check failed (3/3): Empire database connection failed
+[2025-07-14T22:20:27.713Z] [ERROR] Maximum consecutive failures reached, attempting recovery
+[2025-07-14T22:20:27.713Z] [INFO] Starting Empire recovery process
+[2025-07-14T22:20:27.714Z] [INFO] Performing complete container cleanup
+[2025-07-14T22:20:33.385Z] [INFO] Container cleanup completed
+[2025-07-14T22:20:33.396Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/data
+[2025-07-14T22:20:33.406Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/downloads
+[2025-07-14T22:20:33.407Z] [INFO] Starting new Empire container
+[2025-07-14T22:20:33.407Z] [INFO] Pulling Empire image...
+[2025-07-14T22:20:33.894Z] [INFO] Creating Empire data container...
+[2025-07-14T22:20:34.176Z] [INFO] Starting Empire main container...
+[2025-07-14T22:20:49.415Z] [INFO] Empire container is ready
+[2025-07-14T22:20:49.415Z] [INFO] Empire recovery completed successfully
+[2025-07-14T22:20:49.416Z] [WARN] Empire warnings: Starkiller UI may not be accessible, Warning detected: [33;1m[WARNING]: Using SQLite may result in performance issues and some functions may be disabled. [0m, Warning detected: [33;1m[WARNING]: Consider using MySQL instead. [0m
+[2025-07-14T22:20:57.768Z] [ERROR] Empire health check failed (1/3): Empire database connection failed
+[2025-07-14T22:20:57.769Z] [WARN] Empire warnings: Starkiller UI may not be accessible, Warning detected: [33;1m[WARNING]: Using SQLite may result in performance issues and some functions may be disabled. [0m, Warning detected: [33;1m[WARNING]: Consider using MySQL instead. [0m
+[2025-07-14T22:21:27.723Z] [ERROR] Empire health check failed (2/3): Empire database connection failed
+[2025-07-14T22:21:27.724Z] [WARN] Empire warnings: Starkiller UI may not be accessible, Warning detected: [33;1m[WARNING]: Using SQLite may result in performance issues and some functions may be disabled. [0m, Warning detected: [33;1m[WARNING]: Consider using MySQL instead. [0m
+[2025-07-14T22:21:57.720Z] [ERROR] Empire health check failed (3/3): Empire database connection failed
+[2025-07-14T22:21:57.721Z] [ERROR] Maximum consecutive failures reached, attempting recovery
+[2025-07-14T22:21:57.721Z] [INFO] Starting Empire recovery process
+[2025-07-14T22:21:57.721Z] [INFO] Performing complete container cleanup
+[2025-07-14T22:22:03.386Z] [INFO] Container cleanup completed
+[2025-07-14T22:22:03.396Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/data
+[2025-07-14T22:22:03.406Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/downloads
+[2025-07-14T22:22:03.406Z] [INFO] Starting new Empire container
+[2025-07-14T22:22:03.406Z] [INFO] Pulling Empire image...
+[2025-07-14T22:22:03.861Z] [INFO] Creating Empire data container...
+[2025-07-14T22:22:04.157Z] [INFO] Starting Empire main container...
+[2025-07-14T22:22:19.413Z] [INFO] Empire container is ready
+[2025-07-14T22:22:19.413Z] [INFO] Empire recovery completed successfully
+[2025-07-14T22:22:19.414Z] [WARN] Empire warnings: Starkiller UI may not be accessible, Warning detected: [33;1m[WARNING]: Using SQLite may result in performance issues and some functions may be disabled. [0m, Warning detected: [33;1m[WARNING]: Consider using MySQL instead. [0m
+[2025-07-14T22:22:27.761Z] [ERROR] Empire health check failed (1/3): Empire database connection failed
+[2025-07-14T22:22:27.761Z] [WARN] Empire warnings: Starkiller UI may not be accessible, Warning detected: [33;1m[WARNING]: Using SQLite may result in performance issues and some functions may be disabled. [0m, Warning detected: [33;1m[WARNING]: Consider using MySQL instead. [0m
+[2025-07-14T22:22:57.722Z] [ERROR] Empire health check failed (2/3): Empire database connection failed
+[2025-07-14T22:22:57.722Z] [WARN] Empire warnings: Starkiller UI may not be accessible, Warning detected: [33;1m[WARNING]: Using SQLite may result in performance issues and some functions may be disabled. [0m, Warning detected: [33;1m[WARNING]: Consider using MySQL instead. [0m
+[2025-07-14T22:23:27.718Z] [ERROR] Empire health check failed (3/3): Empire database connection failed
+[2025-07-14T22:23:27.718Z] [ERROR] Maximum consecutive failures reached, attempting recovery
+[2025-07-14T22:23:27.718Z] [INFO] Starting Empire recovery process
+[2025-07-14T22:23:27.718Z] [INFO] Performing complete container cleanup
+[2025-07-14T22:23:33.379Z] [INFO] Container cleanup completed
+[2025-07-14T22:23:33.390Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/data
+[2025-07-14T22:23:33.399Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/downloads
+[2025-07-14T22:23:33.400Z] [INFO] Starting new Empire container
+[2025-07-14T22:23:33.400Z] [INFO] Pulling Empire image...
+[2025-07-14T22:23:33.889Z] [INFO] Creating Empire data container...
+[2025-07-14T22:23:34.170Z] [INFO] Starting Empire main container...
+[2025-07-14T22:23:49.421Z] [INFO] Empire container is ready
+[2025-07-14T22:23:49.422Z] [INFO] Empire recovery completed successfully
+[2025-07-14T22:23:49.422Z] [WARN] Empire warnings: Starkiller UI may not be accessible, Warning detected: [33;1m[WARNING]: Using SQLite may result in performance issues and some functions may be disabled. [0m, Warning detected: [33;1m[WARNING]: Consider using MySQL instead. [0m
+[2025-07-14T22:23:57.760Z] [ERROR] Empire health check failed (1/3): Empire database connection failed
+[2025-07-14T22:23:57.761Z] [WARN] Empire warnings: Starkiller UI may not be accessible, Warning detected: [33;1m[WARNING]: Using SQLite may result in performance issues and some functions may be disabled. [0m, Warning detected: [33;1m[WARNING]: Consider using MySQL instead. [0m
+[2025-07-14T22:24:27.718Z] [ERROR] Empire health check failed (2/3): Empire database connection failed
+[2025-07-14T22:24:27.719Z] [WARN] Empire warnings: Starkiller UI may not be accessible, Warning detected: [33;1m[WARNING]: Using SQLite may result in performance issues and some functions may be disabled. [0m, Warning detected: [33;1m[WARNING]: Consider using MySQL instead. [0m
+[2025-07-14T22:24:57.733Z] [ERROR] Empire health check failed (3/3): Empire database connection failed
+[2025-07-14T22:24:57.733Z] [ERROR] Maximum consecutive failures reached, attempting recovery
+[2025-07-14T22:24:57.734Z] [INFO] Starting Empire recovery process
+[2025-07-14T22:24:57.734Z] [INFO] Performing complete container cleanup
+[2025-07-14T22:25:03.404Z] [INFO] Container cleanup completed
+[2025-07-14T22:25:03.414Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/data
+[2025-07-14T22:25:03.423Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/downloads
+[2025-07-14T22:25:03.423Z] [INFO] Starting new Empire container
+[2025-07-14T22:25:03.424Z] [INFO] Pulling Empire image...
+[2025-07-14T22:25:03.902Z] [INFO] Creating Empire data container...
+[2025-07-14T22:25:04.213Z] [INFO] Starting Empire main container...
+[2025-07-14T22:25:19.447Z] [INFO] Empire container is ready
+[2025-07-14T22:25:19.447Z] [INFO] Empire recovery completed successfully
+[2025-07-14T22:25:19.447Z] [WARN] Empire warnings: Starkiller UI may not be accessible, Warning detected: [33;1m[WARNING]: Using SQLite may result in performance issues and some functions may be disabled. [0m, Warning detected: [33;1m[WARNING]: Consider using MySQL instead. [0m
+[2025-07-14T22:25:27.774Z] [ERROR] Empire health check failed (1/3): Empire database connection failed
+[2025-07-14T22:25:27.774Z] [WARN] Empire warnings: Starkiller UI may not be accessible, Warning detected: [33;1m[WARNING]: Using SQLite may result in performance issues and some functions may be disabled. [0m, Warning detected: [33;1m[WARNING]: Consider using MySQL instead. [0m
+[2025-07-14T22:25:57.721Z] [ERROR] Empire health check failed (2/3): Empire database connection failed
+[2025-07-14T22:25:57.721Z] [WARN] Empire warnings: Starkiller UI may not be accessible, Warning detected: [33;1m[WARNING]: Using SQLite may result in performance issues and some functions may be disabled. [0m, Warning detected: [33;1m[WARNING]: Consider using MySQL instead. [0m
+[2025-07-14T22:26:27.763Z] [ERROR] Empire health check failed (3/3): Empire database connection failed
+[2025-07-14T22:26:27.764Z] [ERROR] Maximum consecutive failures reached, attempting recovery
+[2025-07-14T22:26:27.764Z] [INFO] Starting Empire recovery process
+[2025-07-14T22:26:27.764Z] [INFO] Performing complete container cleanup
+[2025-07-14T22:26:33.432Z] [INFO] Container cleanup completed
+[2025-07-14T22:26:33.443Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/data
+[2025-07-14T22:26:33.453Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/downloads
+[2025-07-14T22:26:33.453Z] [INFO] Starting new Empire container
+[2025-07-14T22:26:33.454Z] [INFO] Pulling Empire image...
+[2025-07-14T22:26:34.017Z] [INFO] Creating Empire data container...
+[2025-07-14T22:26:34.323Z] [INFO] Starting Empire main container...
+[2025-07-14T22:26:49.583Z] [INFO] Empire container is ready
+[2025-07-14T22:26:49.583Z] [INFO] Empire recovery completed successfully
+[2025-07-14T22:26:49.583Z] [WARN] Empire warnings: Starkiller UI may not be accessible, Warning detected: [33;1m[WARNING]: Using SQLite may result in performance issues and some functions may be disabled. [0m, Warning detected: [33;1m[WARNING]: Consider using MySQL instead. [0m
+[2025-07-14T22:26:57.787Z] [ERROR] Empire health check failed (1/3): Empire database connection failed
+[2025-07-14T22:26:57.787Z] [WARN] Empire warnings: Starkiller UI may not be accessible, Warning detected: [33;1m[WARNING]: Using SQLite may result in performance issues and some functions may be disabled. [0m, Warning detected: [33;1m[WARNING]: Consider using MySQL instead. [0m
+[2025-07-14T22:27:27.754Z] [ERROR] Empire health check failed (2/3): Empire database connection failed
+[2025-07-14T22:27:27.755Z] [WARN] Empire warnings: Starkiller UI may not be accessible, Warning detected: [33;1m[WARNING]: Using SQLite may result in performance issues and some functions may be disabled. [0m, Warning detected: [33;1m[WARNING]: Consider using MySQL instead. [0m
+[2025-07-14T22:27:57.748Z] [ERROR] Empire health check failed (3/3): Empire database connection failed
+[2025-07-14T22:27:57.748Z] [ERROR] Maximum consecutive failures reached, attempting recovery
+[2025-07-14T22:27:57.749Z] [INFO] Starting Empire recovery process
+[2025-07-14T22:27:57.749Z] [INFO] Performing complete container cleanup
+[2025-07-14T22:28:03.400Z] [INFO] Container cleanup completed
+[2025-07-14T22:28:03.410Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/data
+[2025-07-14T22:28:03.420Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/downloads
+[2025-07-14T22:28:03.420Z] [INFO] Starting new Empire container
+[2025-07-14T22:28:03.421Z] [INFO] Pulling Empire image...
+[2025-07-14T22:28:03.878Z] [INFO] Creating Empire data container...
+[2025-07-14T22:28:04.175Z] [INFO] Starting Empire main container...
+[2025-07-14T22:28:19.416Z] [INFO] Empire container is ready
+[2025-07-14T22:28:19.417Z] [INFO] Empire recovery completed successfully
+[2025-07-14T22:28:19.417Z] [WARN] Empire warnings: Starkiller UI may not be accessible, Warning detected: [33;1m[WARNING]: Using SQLite may result in performance issues and some functions may be disabled. [0m, Warning detected: [33;1m[WARNING]: Consider using MySQL instead. [0m
+[2025-07-14T22:28:27.780Z] [ERROR] Empire health check failed (1/3): Empire database connection failed
+[2025-07-14T22:28:27.780Z] [WARN] Empire warnings: Starkiller UI may not be accessible, Warning detected: [33;1m[WARNING]: Using SQLite may result in performance issues and some functions may be disabled. [0m, Warning detected: [33;1m[WARNING]: Consider using MySQL instead. [0m
+[2025-07-14T22:28:57.738Z] [ERROR] Empire health check failed (2/3): Empire database connection failed
+[2025-07-14T22:28:57.739Z] [WARN] Empire warnings: Starkiller UI may not be accessible, Warning detected: [33;1m[WARNING]: Using SQLite may result in performance issues and some functions may be disabled. [0m, Warning detected: [33;1m[WARNING]: Consider using MySQL instead. [0m
+[2025-07-14T22:29:27.753Z] [ERROR] Empire health check failed (3/3): Empire database connection failed
+[2025-07-14T22:29:27.753Z] [ERROR] Maximum consecutive failures reached, attempting recovery
+[2025-07-14T22:29:27.754Z] [INFO] Starting Empire recovery process
+[2025-07-14T22:29:27.754Z] [INFO] Performing complete container cleanup
+[2025-07-14T22:29:33.407Z] [INFO] Container cleanup completed
+[2025-07-14T22:29:33.416Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/data
+[2025-07-14T22:29:33.426Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/downloads
+[2025-07-14T22:29:33.427Z] [INFO] Starting new Empire container
+[2025-07-14T22:29:33.427Z] [INFO] Pulling Empire image...
+[2025-07-14T22:29:33.880Z] [INFO] Creating Empire data container...
+[2025-07-14T22:29:34.186Z] [INFO] Starting Empire main container...
+[2025-07-14T22:29:49.438Z] [INFO] Empire container is ready
+[2025-07-14T22:29:49.438Z] [INFO] Empire recovery completed successfully
+[2025-07-14T22:29:49.438Z] [WARN] Empire warnings: Starkiller UI may not be accessible, Warning detected: [33;1m[WARNING]: Using SQLite may result in performance issues and some functions may be disabled. [0m, Warning detected: [33;1m[WARNING]: Consider using MySQL instead. [0m
+[2025-07-14T22:29:57.770Z] [ERROR] Empire health check failed (1/3): Empire database connection failed
+[2025-07-14T22:29:57.771Z] [WARN] Empire warnings: Starkiller UI may not be accessible, Warning detected: [33;1m[WARNING]: Using SQLite may result in performance issues and some functions may be disabled. [0m, Warning detected: [33;1m[WARNING]: Consider using MySQL instead. [0m
+[2025-07-14T22:30:27.755Z] [ERROR] Empire health check failed (2/3): Empire database connection failed
+[2025-07-14T22:30:27.756Z] [WARN] Empire warnings: Starkiller UI may not be accessible, Warning detected: [33;1m[WARNING]: Using SQLite may result in performance issues and some functions may be disabled. [0m, Warning detected: [33;1m[WARNING]: Consider using MySQL instead. [0m
+[2025-07-14T22:30:57.765Z] [ERROR] Empire health check failed (3/3): Empire database connection failed
+[2025-07-14T22:30:57.765Z] [ERROR] Maximum consecutive failures reached, attempting recovery
+[2025-07-14T22:30:57.765Z] [INFO] Starting Empire recovery process
+[2025-07-14T22:30:57.766Z] [INFO] Performing complete container cleanup
+[2025-07-14T22:31:03.431Z] [INFO] Container cleanup completed
+[2025-07-14T22:31:03.440Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/data
+[2025-07-14T22:31:03.450Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/downloads
+[2025-07-14T22:31:03.451Z] [INFO] Starting new Empire container
+[2025-07-14T22:31:03.451Z] [INFO] Pulling Empire image...
+[2025-07-14T22:31:03.940Z] [INFO] Creating Empire data container...
+[2025-07-14T22:31:04.247Z] [INFO] Starting Empire main container...
+[2025-07-14T22:31:19.489Z] [INFO] Empire container is ready
+[2025-07-14T22:31:19.489Z] [INFO] Empire recovery completed successfully
+[2025-07-14T22:31:19.489Z] [WARN] Empire warnings: Starkiller UI may not be accessible, Warning detected: [33;1m[WARNING]: Using SQLite may result in performance issues and some functions may be disabled. [0m, Warning detected: [33;1m[WARNING]: Consider using MySQL instead. [0m
+[2025-07-14T22:31:27.787Z] [ERROR] Empire health check failed (1/3): Empire database connection failed
+[2025-07-14T22:31:27.788Z] [WARN] Empire warnings: Starkiller UI may not be accessible, Warning detected: [33;1m[WARNING]: Using SQLite may result in performance issues and some functions may be disabled. [0m, Warning detected: [33;1m[WARNING]: Consider using MySQL instead. [0m
+[2025-07-14T22:31:57.759Z] [ERROR] Empire health check failed (2/3): Empire database connection failed
+[2025-07-14T22:31:57.759Z] [WARN] Empire warnings: Starkiller UI may not be accessible, Warning detected: [33;1m[WARNING]: Using SQLite may result in performance issues and some functions may be disabled. [0m, Warning detected: [33;1m[WARNING]: Consider using MySQL instead. [0m
+[2025-07-14T22:32:27.760Z] [ERROR] Empire health check failed (3/3): Empire database connection failed
+[2025-07-14T22:32:27.760Z] [ERROR] Maximum consecutive failures reached, attempting recovery
+[2025-07-14T22:32:27.761Z] [INFO] Starting Empire recovery process
+[2025-07-14T22:32:27.761Z] [INFO] Performing complete container cleanup
+[2025-07-14T22:32:33.428Z] [INFO] Container cleanup completed
+[2025-07-14T22:32:33.438Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/data
+[2025-07-14T22:32:33.448Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/downloads
+[2025-07-14T22:32:33.448Z] [INFO] Starting new Empire container
+[2025-07-14T22:32:33.448Z] [INFO] Pulling Empire image...
+[2025-07-14T22:32:33.909Z] [INFO] Creating Empire data container...
+[2025-07-14T22:32:34.220Z] [INFO] Starting Empire main container...
+[2025-07-14T22:32:49.461Z] [INFO] Empire container is ready
+[2025-07-14T22:32:49.461Z] [INFO] Empire recovery completed successfully
+[2025-07-14T22:32:49.461Z] [WARN] Empire warnings: Starkiller UI may not be accessible, Warning detected: [33;1m[WARNING]: Using SQLite may result in performance issues and some functions may be disabled. [0m, Warning detected: [33;1m[WARNING]: Consider using MySQL instead. [0m
+[2025-07-14T22:32:57.818Z] [ERROR] Empire health check failed (1/3): Empire database connection failed
+[2025-07-14T22:32:57.819Z] [WARN] Empire warnings: Starkiller UI may not be accessible, Warning detected: [33;1m[WARNING]: Using SQLite may result in performance issues and some functions may be disabled. [0m, Warning detected: [33;1m[WARNING]: Consider using MySQL instead. [0m
+[2025-07-14T22:33:27.758Z] [ERROR] Empire health check failed (2/3): Empire database connection failed
+[2025-07-14T22:33:27.758Z] [WARN] Empire warnings: Starkiller UI may not be accessible, Warning detected: [33;1m[WARNING]: Using SQLite may result in performance issues and some functions may be disabled. [0m, Warning detected: [33;1m[WARNING]: Consider using MySQL instead. [0m
+[2025-07-14T22:33:57.786Z] [ERROR] Empire health check failed (3/3): Empire database connection failed
+[2025-07-14T22:33:57.786Z] [ERROR] Maximum consecutive failures reached, attempting recovery
+[2025-07-14T22:33:57.787Z] [INFO] Starting Empire recovery process
+[2025-07-14T22:33:57.787Z] [INFO] Performing complete container cleanup
+[2025-07-14T22:34:03.469Z] [INFO] Container cleanup completed
+[2025-07-14T22:34:03.479Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/data
+[2025-07-14T22:34:03.489Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/downloads
+[2025-07-14T22:34:03.490Z] [INFO] Starting new Empire container
+[2025-07-14T22:34:03.490Z] [INFO] Pulling Empire image...
+[2025-07-14T22:34:03.942Z] [INFO] Creating Empire data container...
+[2025-07-14T22:34:04.259Z] [INFO] Starting Empire main container...
+[2025-07-14T22:34:19.500Z] [INFO] Empire container is ready
+[2025-07-14T22:34:19.500Z] [INFO] Empire recovery completed successfully
+[2025-07-14T22:34:19.500Z] [WARN] Empire warnings: Starkiller UI may not be accessible, Warning detected: [33;1m[WARNING]: Using SQLite may result in performance issues and some functions may be disabled. [0m, Warning detected: [33;1m[WARNING]: Consider using MySQL instead. [0m
+[2025-07-14T22:34:27.817Z] [ERROR] Empire health check failed (1/3): Empire database connection failed
+[2025-07-14T22:34:27.817Z] [WARN] Empire warnings: Starkiller UI may not be accessible, Warning detected: [33;1m[WARNING]: Using SQLite may result in performance issues and some functions may be disabled. [0m, Warning detected: [33;1m[WARNING]: Consider using MySQL instead. [0m
+[2025-07-14T22:34:57.771Z] [ERROR] Empire health check failed (2/3): Empire database connection failed
+[2025-07-14T22:34:57.771Z] [WARN] Empire warnings: Starkiller UI may not be accessible, Warning detected: [33;1m[WARNING]: Using SQLite may result in performance issues and some functions may be disabled. [0m, Warning detected: [33;1m[WARNING]: Consider using MySQL instead. [0m
+[2025-07-14T22:35:27.780Z] [ERROR] Empire health check failed (3/3): Empire database connection failed
+[2025-07-14T22:35:27.781Z] [ERROR] Maximum consecutive failures reached, attempting recovery
+[2025-07-14T22:35:27.781Z] [INFO] Starting Empire recovery process
+[2025-07-14T22:35:27.781Z] [INFO] Performing complete container cleanup
+[2025-07-14T22:35:33.433Z] [INFO] Container cleanup completed
+[2025-07-14T22:35:33.443Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/data
+[2025-07-14T22:35:33.453Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/downloads
+[2025-07-14T22:35:33.454Z] [INFO] Starting new Empire container
+[2025-07-14T22:35:33.454Z] [INFO] Pulling Empire image...
+[2025-07-14T22:35:33.905Z] [INFO] Creating Empire data container...
+[2025-07-14T22:35:34.203Z] [INFO] Starting Empire main container...
+[2025-07-14T22:35:49.431Z] [INFO] Empire container is ready
+[2025-07-14T22:35:49.432Z] [INFO] Empire recovery completed successfully
+[2025-07-14T22:35:49.432Z] [WARN] Empire warnings: Starkiller UI may not be accessible, Warning detected: [33;1m[WARNING]: Using SQLite may result in performance issues and some functions may be disabled. [0m, Warning detected: [33;1m[WARNING]: Consider using MySQL instead. [0m
+[2025-07-14T22:35:57.816Z] [ERROR] Empire health check failed (1/3): Empire database connection failed
+[2025-07-14T22:35:57.816Z] [WARN] Empire warnings: Starkiller UI may not be accessible, Warning detected: [33;1m[WARNING]: Using SQLite may result in performance issues and some functions may be disabled. [0m, Warning detected: [33;1m[WARNING]: Consider using MySQL instead. [0m
+[2025-07-14T22:36:27.789Z] [ERROR] Empire health check failed (2/3): Empire database connection failed
+[2025-07-14T22:36:27.790Z] [WARN] Empire warnings: Starkiller UI may not be accessible, Warning detected: [33;1m[WARNING]: Using SQLite may result in performance issues and some functions may be disabled. [0m, Warning detected: [33;1m[WARNING]: Consider using MySQL instead. [0m
+[2025-07-14T22:36:57.796Z] [ERROR] Empire health check failed (3/3): Empire database connection failed
+[2025-07-14T22:36:57.796Z] [ERROR] Maximum consecutive failures reached, attempting recovery
+[2025-07-14T22:36:57.797Z] [INFO] Starting Empire recovery process
+[2025-07-14T22:36:57.797Z] [INFO] Performing complete container cleanup
+[2025-07-14T22:37:03.460Z] [INFO] Container cleanup completed
+[2025-07-14T22:37:03.470Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/data
+[2025-07-14T22:37:03.480Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/downloads
+[2025-07-14T22:37:03.480Z] [INFO] Starting new Empire container
+[2025-07-14T22:37:03.480Z] [INFO] Pulling Empire image...
+[2025-07-14T22:37:04.011Z] [INFO] Creating Empire data container...
+[2025-07-14T22:37:04.306Z] [INFO] Starting Empire main container...
+[2025-07-14T22:37:19.558Z] [INFO] Empire container is ready
+[2025-07-14T22:37:19.558Z] [INFO] Empire recovery completed successfully
+[2025-07-14T22:37:19.559Z] [WARN] Empire warnings: Starkiller UI may not be accessible, Warning detected: [33;1m[WARNING]: Using SQLite may result in performance issues and some functions may be disabled. [0m, Warning detected: [33;1m[WARNING]: Consider using MySQL instead. [0m
+[2025-07-14T22:37:27.820Z] [ERROR] Empire health check failed (1/3): Empire database connection failed
+[2025-07-14T22:37:27.820Z] [WARN] Empire warnings: Starkiller UI may not be accessible, Warning detected: [33;1m[WARNING]: Using SQLite may result in performance issues and some functions may be disabled. [0m, Warning detected: [33;1m[WARNING]: Consider using MySQL instead. [0m
+[2025-07-14T22:37:57.783Z] [ERROR] Empire health check failed (2/3): Empire database connection failed
+[2025-07-14T22:37:57.783Z] [WARN] Empire warnings: Starkiller UI may not be accessible, Warning detected: [33;1m[WARNING]: Using SQLite may result in performance issues and some functions may be disabled. [0m, Warning detected: [33;1m[WARNING]: Consider using MySQL instead. [0m
+[2025-07-14T22:38:27.772Z] [ERROR] Empire health check failed (3/3): Empire database connection failed
+[2025-07-14T22:38:27.773Z] [ERROR] Maximum consecutive failures reached, attempting recovery
+[2025-07-14T22:38:27.773Z] [INFO] Starting Empire recovery process
+[2025-07-14T22:38:27.773Z] [INFO] Performing complete container cleanup
+[2025-07-14T22:38:33.421Z] [INFO] Container cleanup completed
+[2025-07-14T22:38:33.431Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/data
+[2025-07-14T22:38:33.441Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/downloads
+[2025-07-14T22:38:33.441Z] [INFO] Starting new Empire container
+[2025-07-14T22:38:33.442Z] [INFO] Pulling Empire image...
+[2025-07-14T22:38:33.905Z] [INFO] Creating Empire data container...
+[2025-07-14T22:38:34.185Z] [INFO] Starting Empire main container...
+[2025-07-14T22:38:49.421Z] [INFO] Empire container is ready
+[2025-07-14T22:38:49.421Z] [INFO] Empire recovery completed successfully
+[2025-07-14T22:38:49.421Z] [WARN] Empire warnings: Starkiller UI may not be accessible, Warning detected: [33;1m[WARNING]: Using SQLite may result in performance issues and some functions may be disabled. [0m, Warning detected: [33;1m[WARNING]: Consider using MySQL instead. [0m
+[2025-07-14T22:38:57.841Z] [ERROR] Empire health check failed (1/3): Empire database connection failed
+[2025-07-14T22:38:57.841Z] [WARN] Empire warnings: Starkiller UI may not be accessible, Warning detected: [33;1m[WARNING]: Using SQLite may result in performance issues and some functions may be disabled. [0m, Warning detected: [33;1m[WARNING]: Consider using MySQL instead. [0m
+[2025-07-14T22:39:27.797Z] [ERROR] Empire health check failed (2/3): Empire database connection failed
+[2025-07-14T22:39:27.798Z] [WARN] Empire warnings: Starkiller UI may not be accessible, Warning detected: [33;1m[WARNING]: Using SQLite may result in performance issues and some functions may be disabled. [0m, Warning detected: [33;1m[WARNING]: Consider using MySQL instead. [0m
+[2025-07-14T22:39:57.805Z] [ERROR] Empire health check failed (3/3): Empire database connection failed
+[2025-07-14T22:39:57.805Z] [ERROR] Maximum consecutive failures reached, attempting recovery
+[2025-07-14T22:39:57.805Z] [INFO] Starting Empire recovery process
+[2025-07-14T22:39:57.806Z] [INFO] Performing complete container cleanup
+[2025-07-14T22:40:03.465Z] [INFO] Container cleanup completed
+[2025-07-14T22:40:03.475Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/data
+[2025-07-14T22:40:03.485Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/downloads
+[2025-07-14T22:40:03.485Z] [INFO] Starting new Empire container
+[2025-07-14T22:40:03.486Z] [INFO] Pulling Empire image...
+[2025-07-14T22:40:03.953Z] [INFO] Creating Empire data container...
+[2025-07-14T22:40:04.267Z] [INFO] Starting Empire main container...
+[2025-07-14T22:40:19.516Z] [INFO] Empire container is ready
+[2025-07-14T22:40:19.516Z] [INFO] Empire recovery completed successfully
+[2025-07-14T22:40:19.516Z] [WARN] Empire warnings: Starkiller UI may not be accessible, Warning detected: [33;1m[WARNING]: Using SQLite may result in performance issues and some functions may be disabled. [0m, Warning detected: [33;1m[WARNING]: Consider using MySQL instead. [0m
+[2025-07-14T22:40:27.828Z] [ERROR] Empire health check failed (1/3): Empire database connection failed
+[2025-07-14T22:40:27.828Z] [WARN] Empire warnings: Starkiller UI may not be accessible, Warning detected: [33;1m[WARNING]: Using SQLite may result in performance issues and some functions may be disabled. [0m, Warning detected: [33;1m[WARNING]: Consider using MySQL instead. [0m
+[2025-07-14T22:40:57.798Z] [ERROR] Empire health check failed (2/3): Empire database connection failed
+[2025-07-14T22:40:57.799Z] [WARN] Empire warnings: Starkiller UI may not be accessible, Warning detected: [33;1m[WARNING]: Using SQLite may result in performance issues and some functions may be disabled. [0m, Warning detected: [33;1m[WARNING]: Consider using MySQL instead. [0m
+[2025-07-14T22:41:27.804Z] [ERROR] Empire health check failed (3/3): Empire database connection failed
+[2025-07-14T22:41:27.805Z] [ERROR] Maximum consecutive failures reached, attempting recovery
+[2025-07-14T22:41:27.805Z] [INFO] Starting Empire recovery process
+[2025-07-14T22:41:27.805Z] [INFO] Performing complete container cleanup
+[2025-07-14T22:41:33.448Z] [INFO] Container cleanup completed
+[2025-07-14T22:41:33.458Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/data
+[2025-07-14T22:41:33.469Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/downloads
+[2025-07-14T22:41:33.470Z] [INFO] Starting new Empire container
+[2025-07-14T22:41:33.470Z] [INFO] Pulling Empire image...
+[2025-07-14T22:41:33.926Z] [INFO] Creating Empire data container...
+[2025-07-14T22:41:34.253Z] [INFO] Starting Empire main container...
+[2025-07-14T22:41:49.498Z] [INFO] Empire container is ready
+[2025-07-14T22:41:49.498Z] [INFO] Empire recovery completed successfully
+[2025-07-14T22:41:49.498Z] [WARN] Empire warnings: Starkiller UI may not be accessible, Warning detected: [33;1m[WARNING]: Using SQLite may result in performance issues and some functions may be disabled. [0m, Warning detected: [33;1m[WARNING]: Consider using MySQL instead. [0m
+[2025-07-14T22:41:57.865Z] [ERROR] Empire health check failed (1/3): Empire database connection failed
+[2025-07-14T22:41:57.866Z] [WARN] Empire warnings: Starkiller UI may not be accessible, Warning detected: [33;1m[WARNING]: Using SQLite may result in performance issues and some functions may be disabled. [0m, Warning detected: [33;1m[WARNING]: Consider using MySQL instead. [0m
+[2025-07-14T22:42:27.734Z] [ERROR] Empire health check failed (2/3): Empire database connection failed
+[2025-07-14T22:42:27.735Z] [WARN] Empire warnings: Starkiller UI may not be accessible, Warning detected: [33;1m[WARNING]: Using SQLite may result in performance issues and some functions may be disabled. [0m, Warning detected: [33;1m[WARNING]: Consider using MySQL instead. [0m
+[2025-07-14T22:42:57.798Z] [ERROR] Empire health check failed (3/3): Empire database connection failed
+[2025-07-14T22:42:57.799Z] [ERROR] Maximum consecutive failures reached, attempting recovery
+[2025-07-14T22:42:57.799Z] [INFO] Starting Empire recovery process
+[2025-07-14T22:42:57.799Z] [INFO] Performing complete container cleanup
+[2025-07-14T22:43:03.459Z] [INFO] Container cleanup completed
+[2025-07-14T22:43:03.469Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/data
+[2025-07-14T22:43:03.479Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/downloads
+[2025-07-14T22:43:03.479Z] [INFO] Starting new Empire container
+[2025-07-14T22:43:03.479Z] [INFO] Pulling Empire image...
+[2025-07-14T22:43:04.001Z] [INFO] Creating Empire data container...
+[2025-07-14T22:43:04.301Z] [INFO] Starting Empire main container...
+[2025-07-14T22:43:19.549Z] [INFO] Empire container is ready
+[2025-07-14T22:43:19.550Z] [INFO] Empire recovery completed successfully
+[2025-07-14T22:43:19.550Z] [WARN] Empire warnings: Starkiller UI may not be accessible, Warning detected: [33;1m[WARNING]: Using SQLite may result in performance issues and some functions may be disabled. [0m, Warning detected: [33;1m[WARNING]: Consider using MySQL instead. [0m
+[2025-07-14T22:43:27.840Z] [ERROR] Empire health check failed (1/3): Empire database connection failed
+[2025-07-14T22:43:27.840Z] [WARN] Empire warnings: Starkiller UI may not be accessible, Warning detected: [33;1m[WARNING]: Using SQLite may result in performance issues and some functions may be disabled. [0m, Warning detected: [33;1m[WARNING]: Consider using MySQL instead. [0m
+[2025-07-14T22:43:57.821Z] [ERROR] Empire health check failed (2/3): Empire database connection failed
+[2025-07-14T22:43:57.822Z] [WARN] Empire warnings: Starkiller UI may not be accessible, Warning detected: [33;1m[WARNING]: Using SQLite may result in performance issues and some functions may be disabled. [0m, Warning detected: [33;1m[WARNING]: Consider using MySQL instead. [0m
+[2025-07-14T22:44:27.807Z] [ERROR] Empire health check failed (3/3): Empire database connection failed
+[2025-07-14T22:44:27.807Z] [ERROR] Maximum consecutive failures reached, attempting recovery
+[2025-07-14T22:44:27.807Z] [INFO] Starting Empire recovery process
+[2025-07-14T22:44:27.807Z] [INFO] Performing complete container cleanup
+[2025-07-14T22:44:33.460Z] [INFO] Container cleanup completed
+[2025-07-14T22:44:33.470Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/data
+[2025-07-14T22:44:33.479Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/downloads
+[2025-07-14T22:44:33.480Z] [INFO] Starting new Empire container
+[2025-07-14T22:44:33.480Z] [INFO] Pulling Empire image...
+[2025-07-14T22:44:33.993Z] [INFO] Creating Empire data container...
+[2025-07-14T22:44:34.292Z] [INFO] Starting Empire main container...
+[2025-07-14T22:44:49.528Z] [INFO] Empire container is ready
+[2025-07-14T22:44:49.529Z] [INFO] Empire recovery completed successfully
+[2025-07-14T22:44:49.529Z] [WARN] Empire warnings: Starkiller UI may not be accessible, Warning detected: [33;1m[WARNING]: Using SQLite may result in performance issues and some functions may be disabled. [0m, Warning detected: [33;1m[WARNING]: Consider using MySQL instead. [0m
+[2025-07-14T22:44:57.851Z] [ERROR] Empire health check failed (1/3): Empire database connection failed
+[2025-07-14T22:44:57.852Z] [WARN] Empire warnings: Starkiller UI may not be accessible, Warning detected: [33;1m[WARNING]: Using SQLite may result in performance issues and some functions may be disabled. [0m, Warning detected: [33;1m[WARNING]: Consider using MySQL instead. [0m
+[2025-07-14T22:45:27.816Z] [ERROR] Empire health check failed (2/3): Empire database connection failed
+[2025-07-14T22:45:27.817Z] [WARN] Empire warnings: Starkiller UI may not be accessible, Warning detected: [33;1m[WARNING]: Using SQLite may result in performance issues and some functions may be disabled. [0m, Warning detected: [33;1m[WARNING]: Consider using MySQL instead. [0m
+[2025-07-14T22:45:57.808Z] [ERROR] Empire health check failed (3/3): Empire database connection failed
+[2025-07-14T22:45:57.809Z] [ERROR] Maximum consecutive failures reached, attempting recovery
+[2025-07-14T22:45:57.809Z] [INFO] Starting Empire recovery process
+[2025-07-14T22:45:57.809Z] [INFO] Performing complete container cleanup
+[2025-07-14T22:46:03.442Z] [INFO] Container cleanup completed
+[2025-07-14T22:46:03.450Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/data
+[2025-07-14T22:46:03.458Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/downloads
+[2025-07-14T22:46:03.459Z] [INFO] Starting new Empire container
+[2025-07-14T22:46:03.459Z] [INFO] Pulling Empire image...
+[2025-07-14T22:46:03.901Z] [INFO] Creating Empire data container...
+[2025-07-14T22:46:04.153Z] [INFO] Starting Empire main container...
+[2025-07-14T22:46:19.392Z] [INFO] Empire container is ready
+[2025-07-14T22:46:19.393Z] [INFO] Empire recovery completed successfully
+[2025-07-14T22:46:19.393Z] [WARN] Empire warnings: Starkiller UI may not be accessible, Warning detected: [33;1m[WARNING]: Using SQLite may result in performance issues and some functions may be disabled. [0m, Warning detected: [33;1m[WARNING]: Consider using MySQL instead. [0m
+[2025-07-14T22:46:27.855Z] [ERROR] Empire health check failed (1/3): Empire database connection failed
+[2025-07-14T22:46:27.856Z] [WARN] Empire warnings: Starkiller UI may not be accessible, Warning detected: [33;1m[WARNING]: Using SQLite may result in performance issues and some functions may be disabled. [0m, Warning detected: [33;1m[WARNING]: Consider using MySQL instead. [0m
+[2025-07-14T22:46:57.814Z] [ERROR] Empire health check failed (2/3): Empire database connection failed
+[2025-07-14T22:46:57.815Z] [WARN] Empire warnings: Starkiller UI may not be accessible, Warning detected: [33;1m[WARNING]: Using SQLite may result in performance issues and some functions may be disabled. [0m, Warning detected: [33;1m[WARNING]: Consider using MySQL instead. [0m
+[2025-07-14T22:47:27.821Z] [ERROR] Empire health check failed (3/3): Empire database connection failed
+[2025-07-14T22:47:27.822Z] [ERROR] Maximum consecutive failures reached, attempting recovery
+[2025-07-14T22:47:27.822Z] [INFO] Starting Empire recovery process
+[2025-07-14T22:47:27.822Z] [INFO] Performing complete container cleanup
+[2025-07-14T22:47:33.481Z] [INFO] Container cleanup completed
+[2025-07-14T22:47:33.491Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/data
+[2025-07-14T22:47:33.501Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/downloads
+[2025-07-14T22:47:33.502Z] [INFO] Starting new Empire container
+[2025-07-14T22:47:33.502Z] [INFO] Pulling Empire image...
+[2025-07-14T22:47:33.989Z] [INFO] Creating Empire data container...
+[2025-07-14T22:47:34.316Z] [INFO] Starting Empire main container...
+[2025-07-14T22:47:49.556Z] [INFO] Empire container is ready
+[2025-07-14T22:47:49.556Z] [INFO] Empire recovery completed successfully
+[2025-07-14T22:47:49.556Z] [WARN] Empire warnings: Starkiller UI may not be accessible, Warning detected: [33;1m[WARNING]: Using SQLite may result in performance issues and some functions may be disabled. [0m, Warning detected: [33;1m[WARNING]: Consider using MySQL instead. [0m
+[2025-07-14T22:47:57.868Z] [ERROR] Empire health check failed (1/3): Empire database connection failed
+[2025-07-14T22:47:57.868Z] [WARN] Empire warnings: Starkiller UI may not be accessible, Warning detected: [33;1m[WARNING]: Using SQLite may result in performance issues and some functions may be disabled. [0m, Warning detected: [33;1m[WARNING]: Consider using MySQL instead. [0m
+[2025-07-14T22:48:27.827Z] [ERROR] Empire health check failed (2/3): Empire database connection failed
+[2025-07-14T22:48:27.827Z] [WARN] Empire warnings: Starkiller UI may not be accessible, Warning detected: [33;1m[WARNING]: Using SQLite may result in performance issues and some functions may be disabled. [0m, Warning detected: [33;1m[WARNING]: Consider using MySQL instead. [0m
+[2025-07-14T22:48:57.826Z] [ERROR] Empire health check failed (3/3): Empire database connection failed
+[2025-07-14T22:48:57.827Z] [ERROR] Maximum consecutive failures reached, attempting recovery
+[2025-07-14T22:48:57.828Z] [INFO] Starting Empire recovery process
+[2025-07-14T22:48:57.828Z] [INFO] Performing complete container cleanup
+[2025-07-14T22:49:03.485Z] [INFO] Container cleanup completed
+[2025-07-14T22:49:03.496Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/data
+[2025-07-14T22:49:03.506Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/downloads
+[2025-07-14T22:49:03.506Z] [INFO] Starting new Empire container
+[2025-07-14T22:49:03.507Z] [INFO] Pulling Empire image...
+[2025-07-14T22:49:03.972Z] [INFO] Creating Empire data container...
+[2025-07-14T22:49:04.286Z] [INFO] Starting Empire main container...
+[2025-07-14T22:49:19.524Z] [INFO] Empire container is ready
+[2025-07-14T22:49:19.525Z] [INFO] Empire recovery completed successfully
+[2025-07-14T22:49:19.525Z] [WARN] Empire warnings: Starkiller UI may not be accessible, Warning detected: [33;1m[WARNING]: Using SQLite may result in performance issues and some functions may be disabled. [0m, Warning detected: [33;1m[WARNING]: Consider using MySQL instead. [0m
+[2025-07-14T22:49:27.851Z] [ERROR] Empire health check failed (1/3): Empire database connection failed
+[2025-07-14T22:49:27.851Z] [WARN] Empire warnings: Starkiller UI may not be accessible, Warning detected: [33;1m[WARNING]: Using SQLite may result in performance issues and some functions may be disabled. [0m, Warning detected: [33;1m[WARNING]: Consider using MySQL instead. [0m
+[2025-07-14T22:49:57.865Z] [ERROR] Empire health check failed (2/3): Empire database connection failed
+[2025-07-14T22:49:57.865Z] [WARN] Empire warnings: Starkiller UI may not be accessible, Warning detected: [33;1m[WARNING]: Using SQLite may result in performance issues and some functions may be disabled. [0m, Warning detected: [33;1m[WARNING]: Consider using MySQL instead. [0m
+[2025-07-14T22:50:27.841Z] [ERROR] Empire health check failed (3/3): Empire database connection failed
+[2025-07-14T22:50:27.842Z] [ERROR] Maximum consecutive failures reached, attempting recovery
+[2025-07-14T22:50:27.842Z] [INFO] Starting Empire recovery process
+[2025-07-14T22:50:27.842Z] [INFO] Performing complete container cleanup
+[2025-07-14T22:50:33.495Z] [INFO] Container cleanup completed
+[2025-07-14T22:50:33.505Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/data
+[2025-07-14T22:50:33.515Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/downloads
+[2025-07-14T22:50:33.515Z] [INFO] Starting new Empire container
+[2025-07-14T22:50:33.515Z] [INFO] Pulling Empire image...
+[2025-07-14T22:50:33.976Z] [INFO] Creating Empire data container...
+[2025-07-14T22:50:34.280Z] [INFO] Starting Empire main container...
+[2025-07-14T22:50:49.522Z] [INFO] Empire container is ready
+[2025-07-14T22:50:49.523Z] [INFO] Empire recovery completed successfully
+[2025-07-14T22:50:49.523Z] [WARN] Empire warnings: Starkiller UI may not be accessible, Warning detected: [33;1m[WARNING]: Using SQLite may result in performance issues and some functions may be disabled. [0m, Warning detected: [33;1m[WARNING]: Consider using MySQL instead. [0m
+[2025-07-14T22:50:57.878Z] [ERROR] Empire health check failed (1/3): Empire database connection failed
+[2025-07-14T22:50:57.879Z] [WARN] Empire warnings: Starkiller UI may not be accessible, Warning detected: [33;1m[WARNING]: Using SQLite may result in performance issues and some functions may be disabled. [0m, Warning detected: [33;1m[WARNING]: Consider using MySQL instead. [0m
+[2025-07-14T22:51:27.842Z] [ERROR] Empire health check failed (2/3): Empire database connection failed
+[2025-07-14T22:51:27.842Z] [WARN] Empire warnings: Starkiller UI may not be accessible, Warning detected: [33;1m[WARNING]: Using SQLite may result in performance issues and some functions may be disabled. [0m, Warning detected: [33;1m[WARNING]: Consider using MySQL instead. [0m
+[2025-07-14T22:51:57.829Z] [ERROR] Empire health check failed (3/3): Empire database connection failed
+[2025-07-14T22:51:57.829Z] [ERROR] Maximum consecutive failures reached, attempting recovery
+[2025-07-14T22:51:57.829Z] [INFO] Starting Empire recovery process
+[2025-07-14T22:51:57.829Z] [INFO] Performing complete container cleanup
+[2025-07-14T22:52:03.489Z] [INFO] Container cleanup completed
+[2025-07-14T22:52:03.499Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/data
+[2025-07-14T22:52:03.509Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/downloads
+[2025-07-14T22:52:03.509Z] [INFO] Starting new Empire container
+[2025-07-14T22:52:03.509Z] [INFO] Pulling Empire image...
+[2025-07-14T22:52:04.132Z] [INFO] Creating Empire data container...
+[2025-07-14T22:52:04.469Z] [INFO] Starting Empire main container...
+[2025-07-14T22:52:19.711Z] [INFO] Empire container is ready
+[2025-07-14T22:52:19.711Z] [INFO] Empire recovery completed successfully
+[2025-07-14T22:52:19.712Z] [WARN] Empire warnings: Starkiller UI may not be accessible, Warning detected: [33;1m[WARNING]: Using SQLite may result in performance issues and some functions may be disabled. [0m, Warning detected: [33;1m[WARNING]: Consider using MySQL instead. [0m
+[2025-07-14T22:52:27.871Z] [ERROR] Empire health check failed (1/3): Empire database connection failed
+[2025-07-14T22:52:27.872Z] [WARN] Empire warnings: Starkiller UI may not be accessible, Warning detected: [33;1m[WARNING]: Using SQLite may result in performance issues and some functions may be disabled. [0m, Warning detected: [33;1m[WARNING]: Consider using MySQL instead. [0m
+[2025-07-14T22:52:57.840Z] [ERROR] Empire health check failed (2/3): Empire database connection failed
+[2025-07-14T22:52:57.840Z] [WARN] Empire warnings: Starkiller UI may not be accessible, Warning detected: [33;1m[WARNING]: Using SQLite may result in performance issues and some functions may be disabled. [0m, Warning detected: [33;1m[WARNING]: Consider using MySQL instead. [0m
+[2025-07-14T22:53:27.861Z] [ERROR] Empire health check failed (3/3): Empire database connection failed
+[2025-07-14T22:53:27.862Z] [ERROR] Maximum consecutive failures reached, attempting recovery
+[2025-07-14T22:53:27.862Z] [INFO] Starting Empire recovery process
+[2025-07-14T22:53:27.862Z] [INFO] Performing complete container cleanup
+[2025-07-14T22:53:33.519Z] [INFO] Container cleanup completed
+[2025-07-14T22:53:33.529Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/data
+[2025-07-14T22:53:33.539Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/downloads
+[2025-07-14T22:53:33.539Z] [INFO] Starting new Empire container
+[2025-07-14T22:53:33.540Z] [INFO] Pulling Empire image...
+[2025-07-14T22:53:34.016Z] [INFO] Creating Empire data container...
+[2025-07-14T22:53:34.304Z] [INFO] Starting Empire main container...
+[2025-07-14T22:53:49.561Z] [INFO] Empire container is ready
+[2025-07-14T22:53:49.561Z] [INFO] Empire recovery completed successfully
+[2025-07-14T22:53:49.561Z] [WARN] Empire warnings: Starkiller UI may not be accessible, Warning detected: [33;1m[WARNING]: Using SQLite may result in performance issues and some functions may be disabled. [0m, Warning detected: [33;1m[WARNING]: Consider using MySQL instead. [0m
+[2025-07-14T22:53:57.881Z] [ERROR] Empire health check failed (1/3): Empire database connection failed
+[2025-07-14T22:53:57.881Z] [WARN] Empire warnings: Starkiller UI may not be accessible, Warning detected: [33;1m[WARNING]: Using SQLite may result in performance issues and some functions may be disabled. [0m, Warning detected: [33;1m[WARNING]: Consider using MySQL instead. [0m
+[2025-07-14T22:54:27.847Z] [ERROR] Empire health check failed (2/3): Empire database connection failed
+[2025-07-14T22:54:27.847Z] [WARN] Empire warnings: Starkiller UI may not be accessible, Warning detected: [33;1m[WARNING]: Using SQLite may result in performance issues and some functions may be disabled. [0m, Warning detected: [33;1m[WARNING]: Consider using MySQL instead. [0m
+[2025-07-14T22:54:57.851Z] [ERROR] Empire health check failed (3/3): Empire database connection failed
+[2025-07-14T22:54:57.852Z] [ERROR] Maximum consecutive failures reached, attempting recovery
+[2025-07-14T22:54:57.852Z] [INFO] Starting Empire recovery process
+[2025-07-14T22:54:57.852Z] [INFO] Performing complete container cleanup
+[2025-07-14T22:55:03.509Z] [INFO] Container cleanup completed
+[2025-07-14T22:55:03.520Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/data
+[2025-07-14T22:55:03.531Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/downloads
+[2025-07-14T22:55:03.531Z] [INFO] Starting new Empire container
+[2025-07-14T22:55:03.531Z] [INFO] Pulling Empire image...
+[2025-07-14T22:55:03.996Z] [INFO] Creating Empire data container...
+[2025-07-14T22:55:04.320Z] [INFO] Starting Empire main container...
+[2025-07-14T22:55:19.560Z] [INFO] Empire container is ready
+[2025-07-14T22:55:19.560Z] [INFO] Empire recovery completed successfully
+[2025-07-14T22:55:19.560Z] [WARN] Empire warnings: Starkiller UI may not be accessible, Warning detected: [33;1m[WARNING]: Using SQLite may result in performance issues and some functions may be disabled. [0m, Warning detected: [33;1m[WARNING]: Consider using MySQL instead. [0m
+[2025-07-14T22:55:27.888Z] [ERROR] Empire health check failed (1/3): Empire database connection failed
+[2025-07-14T22:55:27.889Z] [WARN] Empire warnings: Starkiller UI may not be accessible, Warning detected: [33;1m[WARNING]: Using SQLite may result in performance issues and some functions may be disabled. [0m, Warning detected: [33;1m[WARNING]: Consider using MySQL instead. [0m
+[2025-07-14T22:55:57.860Z] [ERROR] Empire health check failed (2/3): Empire database connection failed
+[2025-07-14T22:55:57.861Z] [WARN] Empire warnings: Starkiller UI may not be accessible, Warning detected: [33;1m[WARNING]: Using SQLite may result in performance issues and some functions may be disabled. [0m, Warning detected: [33;1m[WARNING]: Consider using MySQL instead. [0m
+[2025-07-14T22:56:27.850Z] [ERROR] Empire health check failed (3/3): Empire database connection failed
+[2025-07-14T22:56:27.850Z] [ERROR] Maximum consecutive failures reached, attempting recovery
+[2025-07-14T22:56:27.850Z] [INFO] Starting Empire recovery process
+[2025-07-14T22:56:27.851Z] [INFO] Performing complete container cleanup
+[2025-07-14T22:56:33.493Z] [INFO] Container cleanup completed
+[2025-07-14T22:56:33.503Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/data
+[2025-07-14T22:56:33.514Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/downloads
+[2025-07-14T22:56:33.514Z] [INFO] Starting new Empire container
+[2025-07-14T22:56:33.514Z] [INFO] Pulling Empire image...
+[2025-07-14T22:56:33.986Z] [INFO] Creating Empire data container...
+[2025-07-14T22:56:34.296Z] [INFO] Starting Empire main container...
+[2025-07-14T22:56:49.545Z] [INFO] Empire container is ready
+[2025-07-14T22:56:49.545Z] [INFO] Empire recovery completed successfully
+[2025-07-14T22:56:49.546Z] [WARN] Empire warnings: Starkiller UI may not be accessible, Warning detected: [33;1m[WARNING]: Using SQLite may result in performance issues and some functions may be disabled. [0m, Warning detected: [33;1m[WARNING]: Consider using MySQL instead. [0m
+[2025-07-14T22:56:57.933Z] [ERROR] Empire health check failed (1/3): Empire database connection failed
+[2025-07-14T22:56:57.933Z] [WARN] Empire warnings: Starkiller UI may not be accessible, Warning detected: [33;1m[WARNING]: Using SQLite may result in performance issues and some functions may be disabled. [0m, Warning detected: [33;1m[WARNING]: Consider using MySQL instead. [0m
+[2025-07-14T22:57:27.866Z] [ERROR] Empire health check failed (2/3): Empire database connection failed
+[2025-07-14T22:57:27.866Z] [WARN] Empire warnings: Starkiller UI may not be accessible, Warning detected: [33;1m[WARNING]: Using SQLite may result in performance issues and some functions may be disabled. [0m, Warning detected: [33;1m[WARNING]: Consider using MySQL instead. [0m
+[2025-07-14T22:57:57.861Z] [ERROR] Empire health check failed (3/3): Empire database connection failed
+[2025-07-14T22:57:57.861Z] [ERROR] Maximum consecutive failures reached, attempting recovery
+[2025-07-14T22:57:57.861Z] [INFO] Starting Empire recovery process
+[2025-07-14T22:57:57.861Z] [INFO] Performing complete container cleanup
+[2025-07-14T22:58:03.524Z] [INFO] Container cleanup completed
+[2025-07-14T22:58:03.534Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/data
+[2025-07-14T22:58:03.544Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/downloads
+[2025-07-14T22:58:03.544Z] [INFO] Starting new Empire container
+[2025-07-14T22:58:03.544Z] [INFO] Pulling Empire image...
+[2025-07-14T22:58:04.014Z] [INFO] Creating Empire data container...
+[2025-07-14T22:58:04.327Z] [INFO] Starting Empire main container...
+[2025-07-14T22:58:19.586Z] [INFO] Empire container is ready
+[2025-07-14T22:58:19.586Z] [INFO] Empire recovery completed successfully
+[2025-07-14T22:58:19.587Z] [WARN] Empire warnings: Starkiller UI may not be accessible, Warning detected: [33;1m[WARNING]: Using SQLite may result in performance issues and some functions may be disabled. [0m, Warning detected: [33;1m[WARNING]: Consider using MySQL instead. [0m
+[2025-07-14T22:58:27.930Z] [ERROR] Empire health check failed (1/3): Empire database connection failed
+[2025-07-14T22:58:27.931Z] [WARN] Empire warnings: Starkiller UI may not be accessible, Warning detected: [33;1m[WARNING]: Using SQLite may result in performance issues and some functions may be disabled. [0m, Warning detected: [33;1m[WARNING]: Consider using MySQL instead. [0m
+[2025-07-14T22:58:57.879Z] [ERROR] Empire health check failed (2/3): Empire database connection failed
+[2025-07-14T22:58:57.879Z] [WARN] Empire warnings: Starkiller UI may not be accessible, Warning detected: [33;1m[WARNING]: Using SQLite may result in performance issues and some functions may be disabled. [0m, Warning detected: [33;1m[WARNING]: Consider using MySQL instead. [0m
+[2025-07-14T22:59:27.875Z] [ERROR] Empire health check failed (3/3): Empire database connection failed
+[2025-07-14T22:59:27.876Z] [ERROR] Maximum consecutive failures reached, attempting recovery
+[2025-07-14T22:59:27.876Z] [INFO] Starting Empire recovery process
+[2025-07-14T22:59:27.876Z] [INFO] Performing complete container cleanup
+[2025-07-14T22:59:33.526Z] [INFO] Container cleanup completed
+[2025-07-14T22:59:33.536Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/data
+[2025-07-14T22:59:33.546Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/downloads
+[2025-07-14T22:59:33.546Z] [INFO] Starting new Empire container
+[2025-07-14T22:59:33.546Z] [INFO] Pulling Empire image...
+[2025-07-14T22:59:34.006Z] [INFO] Creating Empire data container...
+[2025-07-14T22:59:34.287Z] [INFO] Starting Empire main container...
+[2025-07-14T22:59:49.533Z] [INFO] Empire container is ready
+[2025-07-14T22:59:49.533Z] [INFO] Empire recovery completed successfully
+[2025-07-14T22:59:49.533Z] [WARN] Empire warnings: Starkiller UI may not be accessible, Warning detected: [33;1m[WARNING]: Using SQLite may result in performance issues and some functions may be disabled. [0m, Warning detected: [33;1m[WARNING]: Consider using MySQL instead. [0m
+[2025-07-14T22:59:57.925Z] [ERROR] Empire health check failed (1/3): Empire database connection failed
+[2025-07-14T22:59:57.926Z] [WARN] Empire warnings: Starkiller UI may not be accessible, Warning detected: [33;1m[WARNING]: Using SQLite may result in performance issues and some functions may be disabled. [0m, Warning detected: [33;1m[WARNING]: Consider using MySQL instead. [0m
+[2025-07-14T23:00:27.872Z] [ERROR] Empire health check failed (2/3): Empire database connection failed
+[2025-07-14T23:00:27.872Z] [WARN] Empire warnings: Starkiller UI may not be accessible, Warning detected: [33;1m[WARNING]: Using SQLite may result in performance issues and some functions may be disabled. [0m, Warning detected: [33;1m[WARNING]: Consider using MySQL instead. [0m
+[2025-07-14T23:00:57.875Z] [ERROR] Empire health check failed (3/3): Empire database connection failed
+[2025-07-14T23:00:57.876Z] [ERROR] Maximum consecutive failures reached, attempting recovery
+[2025-07-14T23:00:57.876Z] [INFO] Starting Empire recovery process
+[2025-07-14T23:00:57.876Z] [INFO] Performing complete container cleanup
+[2025-07-14T23:01:03.553Z] [INFO] Container cleanup completed
+[2025-07-14T23:01:03.563Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/data
+[2025-07-14T23:01:03.573Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/downloads
+[2025-07-14T23:01:03.573Z] [INFO] Starting new Empire container
+[2025-07-14T23:01:03.574Z] [INFO] Pulling Empire image...
+[2025-07-14T23:01:04.056Z] [INFO] Creating Empire data container...
+[2025-07-14T23:01:04.348Z] [INFO] Starting Empire main container...
+[2025-07-14T23:01:19.603Z] [INFO] Empire container is ready
+[2025-07-14T23:01:19.603Z] [INFO] Empire recovery completed successfully
+[2025-07-14T23:01:19.603Z] [WARN] Empire warnings: Starkiller UI may not be accessible, Warning detected: [33;1m[WARNING]: Using SQLite may result in performance issues and some functions may be disabled. [0m, Warning detected: [33;1m[WARNING]: Consider using MySQL instead. [0m
+[2025-07-14T23:01:27.900Z] [ERROR] Empire health check failed (1/3): Empire database connection failed
+[2025-07-14T23:01:27.900Z] [WARN] Empire warnings: Starkiller UI may not be accessible, Warning detected: [33;1m[WARNING]: Using SQLite may result in performance issues and some functions may be disabled. [0m, Warning detected: [33;1m[WARNING]: Consider using MySQL instead. [0m
+[2025-07-14T23:01:57.874Z] [ERROR] Empire health check failed (2/3): Empire database connection failed
+[2025-07-14T23:01:57.874Z] [WARN] Empire warnings: Starkiller UI may not be accessible, Warning detected: [33;1m[WARNING]: Using SQLite may result in performance issues and some functions may be disabled. [0m, Warning detected: [33;1m[WARNING]: Consider using MySQL instead. [0m
+[2025-07-14T23:02:27.883Z] [ERROR] Empire health check failed (3/3): Empire database connection failed
+[2025-07-14T23:02:27.884Z] [ERROR] Maximum consecutive failures reached, attempting recovery
+[2025-07-14T23:02:27.884Z] [INFO] Starting Empire recovery process
+[2025-07-14T23:02:27.884Z] [INFO] Performing complete container cleanup
+[2025-07-14T23:02:33.544Z] [INFO] Container cleanup completed
+[2025-07-14T23:02:33.554Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/data
+[2025-07-14T23:02:33.565Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/downloads
+[2025-07-14T23:02:33.565Z] [INFO] Starting new Empire container
+[2025-07-14T23:02:33.565Z] [INFO] Pulling Empire image...
+[2025-07-14T23:02:34.021Z] [INFO] Creating Empire data container...
+[2025-07-14T23:02:34.304Z] [INFO] Starting Empire main container...
+[2025-07-14T23:02:49.549Z] [INFO] Empire container is ready
+[2025-07-14T23:02:49.550Z] [INFO] Empire recovery completed successfully
+[2025-07-14T23:02:49.550Z] [WARN] Empire warnings: Starkiller UI may not be accessible, Warning detected: [33;1m[WARNING]: Using SQLite may result in performance issues and some functions may be disabled. [0m, Warning detected: [33;1m[WARNING]: Consider using MySQL instead. [0m
+[2025-07-14T23:02:57.939Z] [ERROR] Empire health check failed (1/3): Empire database connection failed
+[2025-07-14T23:02:57.939Z] [WARN] Empire warnings: Starkiller UI may not be accessible, Warning detected: [33;1m[WARNING]: Using SQLite may result in performance issues and some functions may be disabled. [0m, Warning detected: [33;1m[WARNING]: Consider using MySQL instead. [0m
+[2025-07-14T23:03:27.900Z] [ERROR] Empire health check failed (2/3): Empire database connection failed
+[2025-07-14T23:03:27.901Z] [WARN] Empire warnings: Starkiller UI may not be accessible, Warning detected: [33;1m[WARNING]: Using SQLite may result in performance issues and some functions may be disabled. [0m, Warning detected: [33;1m[WARNING]: Consider using MySQL instead. [0m
+[2025-07-14T23:03:57.887Z] [ERROR] Empire health check failed (3/3): Empire database connection failed
+[2025-07-14T23:03:57.888Z] [ERROR] Maximum consecutive failures reached, attempting recovery
+[2025-07-14T23:03:57.888Z] [INFO] Starting Empire recovery process
+[2025-07-14T23:03:57.888Z] [INFO] Performing complete container cleanup
+[2025-07-14T23:04:03.549Z] [INFO] Container cleanup completed
+[2025-07-14T23:04:03.559Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/data
+[2025-07-14T23:04:03.569Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/downloads
+[2025-07-14T23:04:03.569Z] [INFO] Starting new Empire container
+[2025-07-14T23:04:03.570Z] [INFO] Pulling Empire image...
+[2025-07-14T23:04:04.047Z] [INFO] Creating Empire data container...
+[2025-07-14T23:04:04.363Z] [INFO] Starting Empire main container...
+[2025-07-14T23:04:19.605Z] [INFO] Empire container is ready
+[2025-07-14T23:04:19.606Z] [INFO] Empire recovery completed successfully
+[2025-07-14T23:04:19.606Z] [WARN] Empire warnings: Starkiller UI may not be accessible, Warning detected: [33;1m[WARNING]: Using SQLite may result in performance issues and some functions may be disabled. [0m, Warning detected: [33;1m[WARNING]: Consider using MySQL instead. [0m
+[2025-07-14T23:04:27.928Z] [ERROR] Empire health check failed (1/3): Empire database connection failed
+[2025-07-14T23:04:27.928Z] [WARN] Empire warnings: Starkiller UI may not be accessible, Warning detected: [33;1m[WARNING]: Using SQLite may result in performance issues and some functions may be disabled. [0m, Warning detected: [33;1m[WARNING]: Consider using MySQL instead. [0m
+[2025-07-14T23:04:57.876Z] [ERROR] Empire health check failed (2/3): Empire database connection failed
+[2025-07-14T23:04:57.876Z] [WARN] Empire warnings: Starkiller UI may not be accessible, Warning detected: [33;1m[WARNING]: Using SQLite may result in performance issues and some functions may be disabled. [0m, Warning detected: [33;1m[WARNING]: Consider using MySQL instead. [0m
+[2025-07-14T23:05:27.876Z] [ERROR] Empire health check failed (3/3): Empire database connection failed
+[2025-07-14T23:05:27.877Z] [ERROR] Maximum consecutive failures reached, attempting recovery
+[2025-07-14T23:05:27.877Z] [INFO] Starting Empire recovery process
+[2025-07-14T23:05:27.877Z] [INFO] Performing complete container cleanup
+[2025-07-14T23:05:33.533Z] [INFO] Container cleanup completed
+[2025-07-14T23:05:33.543Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/data
+[2025-07-14T23:05:33.554Z] [INFO] Volume directory prepared: /home/cmndcntrl/code/attack-node/uploads/empire/downloads
+[2025-07-14T23:05:33.554Z] [INFO] Starting new Empire container
+[2025-07-14T23:05:33.554Z] [INFO] Pulling Empire image...
+[2025-07-14T23:05:34.120Z] [INFO] Creating Empire data container...
+[2025-07-14T23:05:34.422Z] [INFO] Starting Empire main container...
+[2025-07-14T23:05:49.669Z] [INFO] Empire container is ready
+[2025-07-14T23:05:49.669Z] [INFO] Empire recovery completed successfully
+[2025-07-14T23:05:49.669Z] [WARN] Empire warnings: Starkiller UI may not be accessible, Warning detected: [33;1m[WARNING]: Using SQLite may result in performance issues and some functions may be disabled. [0m, Warning detected: [33;1m[WARNING]: Consider using MySQL instead. [0m
+[2025-07-14T23:05:57.880Z] [ERROR] Empire health check failed (1/3): Empire database connection failed
+[2025-07-14T23:05:57.881Z] [WARN] Empire warnings: Starkiller UI may not be accessible, Warning detected: [33;1m[WARNING]: Using SQLite may result in performance issues and some functions may be disabled. [0m, Warning detected: [33;1m[WARNING]: Consider using MySQL instead. [0m
+[2025-07-14T23:06:27.804Z] [ERROR] Empire health check failed (2/3): Empire database connection failed
+[2025-07-14T23:06:27.804Z] [WARN] Empire warnings: Starkiller UI may not be accessible, Warning detected: [33;1m[WARNING]: Using SQLite may result in performance issues and some functions may be disabled. [0m, Warning detected: [33;1m[WARNING]: Consider using MySQL instead. [0m

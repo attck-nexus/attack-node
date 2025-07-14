@@ -304,47 +304,54 @@ export default function KaliEnvironment() {
           </Card>
         </div>
 
-        {/* Tools and Applications */}
+        {/* Container Management */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-          {/* Pre-installed Tools */}
+          {/* Container Integration */}
           <Card className="bg-surface border-gray-700">
             <CardHeader>
-              <CardTitle className="text-lg font-semibold text-gray-100">Pre-installed Tools</CardTitle>
+              <CardTitle className="text-lg font-semibold text-gray-100">Container Integration</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-2 gap-3">
-                <Button variant="outline" className="border-gray-600 text-gray-300 justify-start">
-                  <Terminal className="h-4 w-4 mr-2" />
-                  Terminal
-                </Button>
-                <Button variant="outline" className="border-gray-600 text-gray-300 justify-start">
-                  <Globe className="h-4 w-4 mr-2" />
-                  Firefox ESR
-                </Button>
-                <Button variant="outline" className="border-gray-600 text-gray-300 justify-start">
-                  <Shield className="h-4 w-4 mr-2" />
-                  Burp Suite
-                </Button>
-                <Button variant="outline" className="border-gray-600 text-gray-300 justify-start">
-                  <Monitor className="h-4 w-4 mr-2" />
-                  OWASP ZAP
-                </Button>
-                <Button variant="outline" className="border-gray-600 text-gray-300 justify-start">
-                  <Terminal className="h-4 w-4 mr-2" />
-                  Metasploit
-                </Button>
-                <Button variant="outline" className="border-gray-600 text-gray-300 justify-start">
-                  <Shield className="h-4 w-4 mr-2" />
-                  Nmap
-                </Button>
-                <Button variant="outline" className="border-gray-600 text-gray-300 justify-start">
-                  <Globe className="h-4 w-4 mr-2" />
-                  Wireshark
-                </Button>
-                <Button variant="outline" className="border-gray-600 text-gray-300 justify-start">
-                  <Terminal className="h-4 w-4 mr-2" />
-                  Nikto
-                </Button>
+              <div className="space-y-4">
+                <div className="bg-card rounded-lg p-4">
+                  <div className="flex items-center justify-between mb-3">
+                    <h4 className="font-medium text-gray-100">AI Agent Integration</h4>
+                    <Badge className="bg-primary/10 text-primary">MCP Ready</Badge>
+                  </div>
+                  <p className="text-sm text-gray-400 mb-3">
+                    AI agents can directly execute commands and tools within this Kali environment through the MCP (Model Context Protocol) integration.
+                  </p>
+                  <Button 
+                    variant="outline" 
+                    className="border-gray-600 text-gray-300 w-full"
+                    onClick={() => window.location.href = '/ai-agents'}
+                  >
+                    <Users className="h-4 w-4 mr-2" />
+                    Configure AI Agents
+                  </Button>
+                </div>
+
+                <div className="bg-card rounded-lg p-4">
+                  <h4 className="font-medium text-gray-100 mb-3">Available Tools</h4>
+                  <div className="grid grid-cols-2 gap-2 text-sm">
+                    <div className="flex items-center">
+                      <Terminal className="h-3 w-3 mr-2 text-primary" />
+                      <span className="text-gray-300">Terminal Access</span>
+                    </div>
+                    <div className="flex items-center">
+                      <Shield className="h-3 w-3 mr-2 text-primary" />
+                      <span className="text-gray-300">Security Tools</span>
+                    </div>
+                    <div className="flex items-center">
+                      <Globe className="h-3 w-3 mr-2 text-primary" />
+                      <span className="text-gray-300">Web Browser</span>
+                    </div>
+                    <div className="flex items-center">
+                      <Monitor className="h-3 w-3 mr-2 text-primary" />
+                      <span className="text-gray-300">Desktop GUI</span>
+                    </div>
+                  </div>
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -364,17 +371,30 @@ export default function KaliEnvironment() {
                       <p className="text-gray-400 text-sm">User directory</p>
                     </div>
                   </div>
-                  <Button size="sm" variant="outline" className="border-gray-600 text-gray-300">
+                  <Button 
+                    size="sm" 
+                    variant="outline" 
+                    className="border-gray-600 text-gray-300"
+                    onClick={() => window.location.href = '/file-manager'}
+                  >
                     <ExternalLink className="h-3 w-3" />
                   </Button>
                 </div>
                 
                 <div className="grid grid-cols-2 gap-3">
-                  <Button variant="outline" className="border-gray-600 text-gray-300">
+                  <Button 
+                    variant="outline" 
+                    className="border-gray-600 text-gray-300"
+                    onClick={() => window.location.href = '/file-manager'}
+                  >
                     <Upload className="h-4 w-4 mr-2" />
                     Upload Files
                   </Button>
-                  <Button variant="outline" className="border-gray-600 text-gray-300">
+                  <Button 
+                    variant="outline" 
+                    className="border-gray-600 text-gray-300"
+                    onClick={() => window.location.href = '/file-manager'}
+                  >
                     <Download className="h-4 w-4 mr-2" />
                     Download
                   </Button>
@@ -384,6 +404,17 @@ export default function KaliEnvironment() {
                   <p className="text-gray-400 text-sm mb-2">Persistent Volume</p>
                   <p className="text-gray-100">All files are automatically saved</p>
                   <p className="text-gray-400 text-xs">Located at: /persistent-data</p>
+                </div>
+
+                <div className="pt-3 border-t border-gray-700">
+                  <Button 
+                    variant="outline" 
+                    className="w-full border-gray-600 text-gray-300"
+                    onClick={() => window.location.href = '/containers'}
+                  >
+                    <Monitor className="h-4 w-4 mr-2" />
+                    Manage All Containers
+                  </Button>
                 </div>
               </div>
             </CardContent>

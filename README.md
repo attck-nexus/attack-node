@@ -49,9 +49,20 @@ A comprehensive red team operations management platform with AI integration, Doc
 
 ### Installation
 
+#### Option 1: Quick Setup (Ubuntu 22.04)
+```bash
+git clone https://github.com/attck-nexus/attack-node.git
+cd attack-node
+chmod +x setup.sh
+./setup.sh
+npm run dev
+```
+
+#### Option 2: Manual Setup
+
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/yourusername/attack-node.git
+   git clone https://github.com/attck-nexus/attack-node.git
    cd attack-node
    ```
 
@@ -66,21 +77,22 @@ A comprehensive red team operations management platform with AI integration, Doc
    # Edit .env with your configuration
    ```
 
-4. **Configure database**
+4. **Start services (Docker)**
    ```bash
-   # Create PostgreSQL database
-   createdb attacknode
-   
-   # Push database schema
+   npm run docker:dev
+   ```
+
+5. **Configure database**
+   ```bash
    npm run db:push
    ```
 
-5. **Start the application**
+6. **Start the application**
    ```bash
    npm run dev
    ```
 
-6. **Access the application**
+7. **Access the application**
    - Open your browser to `http://localhost:5000`
    - Default development user is automatically created
 

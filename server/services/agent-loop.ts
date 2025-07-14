@@ -120,7 +120,7 @@ class AgentLoopService {
           iteration: loop.currentIteration + 1,
           agentId: currentAgentId,
           input: currentInput,
-          output: `Error: ${error.message}`,
+          output: `Error: ${error instanceof Error ? error.message : String(error)}`,
           success: false,
           exitConditionMet: false,
           timestamp: new Date(),
@@ -146,14 +146,14 @@ class AgentLoopService {
     }
 
     const prompt = agent.modelPrompt 
-      ? `${agent.modelPrompt}\n\nPrevious iteration output: ${input}\n\nBeacon: ${beacon.protocol} on ${beacon.hostname}:${beacon.port}`
-      : `Previous iteration output: ${input}\n\nBeacon: ${beacon.protocol} on ${beacon.hostname}:${beacon.port}`;
+      ? `${agent.modelPrompt}\n\nPrevious iteration output: ${input}\n\nBeacon: ${beacon.hostname || 'Unknown'}`
+      : `Previous iteration output: ${input}\n\nBeacon: ${beacon.hostname || 'Unknown'}`;
 
     switch (agent.type) {
       case 'openai':
-        return await openaiGenerate(beacon as any, prompt);
+        return await openaiGenerate("Agent Loop Analysis", "medium", prompt);
       case 'anthropic':
-        return await anthropicGenerate(beacon as any, prompt);
+        return await anthropicGenerate("Agent Loop Analysis", prompt, "medium", beacon.hostname || 'Unknown');
       case 'local':
         // For local agents, return enhanced input (placeholder)
         return `[Local Agent Processing]\nInput: ${input}\nEnhanced analysis: Vulnerability pattern analysis complete.\nRecommendation: Continue iteration for POC development.`;

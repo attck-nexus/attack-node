@@ -2,6 +2,10 @@ import { spawn, exec } from 'child_process';
 import { promisify } from 'util';
 import fs from 'fs/promises';
 import path from 'path';
+import { dockerErrorMonitor } from './docker-error-monitor';
+import { dockerRecoveryEngine } from './docker-recovery-engine';
+import { volumePermissionManager } from './volume-permission-manager';
+import { redisHealthMonitor } from './redis-health-monitor';
 
 const execAsync = promisify(exec);
 
@@ -13,16 +17,160 @@ export interface DockerContainer {
   status: 'running' | 'stopped' | 'installing' | 'error';
   created: Date;
   fileUploads?: string[];
+  category?: 'security' | 'development' | 'analysis' | 'infrastructure';
+  description?: string;
+  icon?: string;
+  additionalPorts?: number[];
+  dependencies?: string[];
+  healthCheck?: string;
+  environment?: Record<string, string>;
+  volumes?: string[];
+  capabilities?: string[];
+  privileged?: boolean;
+}
+
+export interface ContainerConfig {
+  name: string;
+  image: string;
+  port: number;
+  category: 'security' | 'development' | 'analysis' | 'infrastructure';
+  description: string;
+  icon: string;
+  additionalPorts?: number[];
+  dependencies?: string[];
+  healthCheck?: string;
+  environment?: Record<string, string>;
+  volumes?: string[];
+  capabilities?: string[];
+  privileged?: boolean;
+  customStartCommand?: string[];
+  dataContainer?: string; // Name of data container for persistent storage
+  interactive?: boolean; // Use -it flag for interactive mode
 }
 
 export class DockerService {
   private containers = new Map<string, DockerContainer>();
   private uploadDir = path.join(process.cwd(), 'uploads', 'docker');
   private dockerAvailable: boolean | null = null;
+  private containerConfigs: Map<string, ContainerConfig> = new Map();
 
   constructor() {
     this.ensureUploadDir();
     this.checkDockerAvailability();
+    this.initializeContainerConfigs();
+  }
+
+  private initializeContainerConfigs(): void {
+    // Security Tools
+    this.containerConfigs.set('kali', {
+      name: 'kali',
+      image: 'kasmweb/kali-rolling-desktop:develop',
+      port: 6902,
+      category: 'security',
+      description: 'Kali Linux penetration testing environment',
+      icon: 'Shield',
+      privileged: true,
+      environment: { VNC_PW: 'password', KASM_USER: 'root' },
+      volumes: ['uploads/kasm_profiles/kali-root:/home/kasm-user:rw'],
+      capabilities: ['SYS_ADMIN']
+    });
+
+    this.containerConfigs.set('vscode', {
+      name: 'vscode',
+      image: 'kasmweb/vs-code:1.17.0',
+      port: 6903,
+      category: 'development',
+      description: 'Visual Studio Code web-based IDE',
+      icon: 'Code',
+      environment: { VNC_PW: 'password' },
+      volumes: ['uploads/docker:/home/kasm-user/shared:rw']
+    });
+
+    this.containerConfigs.set('empire', {
+      name: 'empire',
+      image: 'bcsecurity/empire:latest',
+      port: 1337,
+      category: 'security',
+      description: 'PowerShell Empire C2 framework',
+      icon: 'Crown',
+      additionalPorts: [5000], // Direct port mapping 5000:5000
+      environment: {}, // Use Empire defaults
+      volumes: [], // Using data container pattern instead
+      dataContainer: 'empire-data', // Flag for data container deployment
+      interactive: true // Use -it flag for interactive mode
+    });
+
+    this.containerConfigs.set('bbot', {
+      name: 'bbot',
+      image: 'blacklanternsecurity/bbot:latest',
+      port: 8080,
+      category: 'security',
+      description: 'OSINT and attack surface mapping tool',
+      icon: 'Search',
+      volumes: ['uploads/bbot:/root/.bbot:rw']
+    });
+
+    this.containerConfigs.set('maltego', {
+      name: 'maltego',
+      image: 'kasmweb/maltego:1.17.0-rolling-daily',
+      port: 6904,
+      category: 'analysis',
+      description: 'Link analysis and data mining platform',
+      icon: 'Network',
+      environment: { VNC_PW: 'password' }
+    });
+
+    // Sysreptor Stack
+    this.containerConfigs.set('postgres', {
+      name: 'postgres',
+      image: 'postgres:14',
+      port: 5433, // Changed from 5432 to avoid conflict with system PostgreSQL
+      category: 'infrastructure',
+      description: 'PostgreSQL database for Sysreptor',
+      icon: 'Database',
+      environment: {
+        POSTGRES_DB: 'sysreptor',
+        POSTGRES_USER: 'sysreptor',
+        POSTGRES_PASSWORD: 'sysreptor123'
+      },
+      volumes: ['postgres-data:/var/lib/postgresql/data']
+    });
+
+    this.containerConfigs.set('redis', {
+      name: 'redis',
+      image: 'bitnami/redis:7.2',
+      port: 6380, // Changed from 6379 to avoid potential conflicts
+      category: 'infrastructure',
+      description: 'Redis cache for Sysreptor',
+      icon: 'Database',
+      environment: {
+        REDIS_PASSWORD: 'redis123'
+      },
+      volumes: ['redis-data:/bitnami/redis/data']
+    });
+
+    this.containerConfigs.set('sysreptor', {
+      name: 'sysreptor',
+      image: 'syslifters/sysreptor:2025.37',
+      port: 9000,
+      category: 'security',
+      description: 'Pentest reporting and documentation platform',
+      icon: 'FileText',
+      dependencies: ['postgres', 'redis'],
+      // Environment variables now loaded from app.env file
+      environment: {}
+    });
+
+    this.containerConfigs.set('caddy', {
+      name: 'caddy',
+      image: 'caddy:latest',
+      port: 80,
+      category: 'infrastructure',
+      description: 'Reverse proxy and web server',
+      icon: 'Server',
+      additionalPorts: [443],
+      dependencies: ['sysreptor']
+    });
   }
 
   private async checkDockerAvailability(): Promise<boolean> {
@@ -324,14 +472,25 @@ export class DockerService {
 
   async stopContainer(nameOrId: string): Promise<boolean> {
     try {
-      // Try to stop the container
-      await execAsync(`docker stop ${nameOrId}`).catch(async () => {
-        return await execAsync(`sudo docker stop ${nameOrId}`);
-      });
-      // Remove the container
-      await execAsync(`docker rm ${nameOrId}`).catch(async () => {
-        return await execAsync(`sudo docker rm ${nameOrId}`);
-      });
+      // Force stop and remove with timeout
+      try {
+        await execAsync(`docker stop ${nameOrId} -t 5`).catch(async () => {
+          return await execAsync(`sudo docker stop ${nameOrId} -t 5`);
+        });
+      } catch (error: any) {
+        // Container might not exist or already stopped, continue to removal
+        console.log(`Container ${nameOrId} not running or doesn't exist:`, error.message);
+      }
+      
+      // Force remove the container
+      try {
+        await execAsync(`docker rm -f ${nameOrId}`).catch(async () => {
+          return await execAsync(`sudo docker rm -f ${nameOrId}`);
+        });
+      } catch (error: any) {
+        // Container might not exist, that's ok
+        console.log(`Container ${nameOrId} already removed or doesn't exist:`, error.message);
+      }
       
       // Update our local state
       const entries = Array.from(this.containers.entries());
@@ -350,12 +509,94 @@ export class DockerService {
     }
   }
 
+  async cleanupConflictingContainer(containerName: string): Promise<void> {
+    const fullName = `attacknode-${containerName}`;
+    
+    try {
+      console.log(`[DockerService] Checking for conflicting containers: ${fullName}`);
+      
+      // Check if a container with this name exists
+      const { stdout } = await execAsync(`docker ps -aq -f name="^${fullName}$"`).catch(async () => {
+        return await execAsync(`sudo docker ps -aq -f name="^${fullName}$"`);
+      });
+      
+      const existingContainers = stdout.trim().split('\n').filter(id => id.trim());
+      
+      if (existingContainers.length === 0) {
+        console.log(`[DockerService] No conflicting containers found for: ${fullName}`);
+        return;
+      }
+      
+      console.log(`[DockerService] Found ${existingContainers.length} conflicting containers for ${fullName}`);
+      
+      // Stop and remove each conflicting container
+      for (const containerId of existingContainers) {
+        try {
+          console.log(`[DockerService] Stopping conflicting container: ${containerId}`);
+          await execAsync(`docker stop ${containerId} --time 10`).catch(async () => {
+            return await execAsync(`sudo docker stop ${containerId} --time 10`);
+          });
+          
+          console.log(`[DockerService] Removing conflicting container: ${containerId}`);
+          await execAsync(`docker rm ${containerId}`).catch(async () => {
+            return await execAsync(`sudo docker rm ${containerId}`);
+          });
+          
+          console.log(`[DockerService] Successfully removed conflicting container: ${containerId}`);
+        } catch (error: any) {
+          console.log(`[DockerService] Failed to remove container ${containerId}:`, error.message);
+          // Try force removal as fallback
+          try {
+            await execAsync(`docker rm -f ${containerId}`).catch(async () => {
+              return await execAsync(`sudo docker rm -f ${containerId}`);
+            });
+            console.log(`[DockerService] Force removed container: ${containerId}`);
+          } catch (forceError: any) {
+            console.error(`[DockerService] Failed to force remove container ${containerId}:`, forceError.message);
+          }
+        }
+      }
+      
+      // Brief wait for Docker daemon to process changes
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+    } catch (error: any) {
+      console.error(`[DockerService] Error during conflict cleanup of ${containerName}:`, error.message);
+      // Don't throw error - continue with container start attempt
+    }
+  }
+
   async getContainerStatus(nameOrId: string): Promise<'running' | 'stopped' | 'error'> {
     try {
-      const { stdout } = await execAsync(`docker ps -q -f name=${nameOrId}`).catch(async () => {
-        return await execAsync(`sudo docker ps -q -f name=${nameOrId}`);
+      // First check if container exists at all
+      const { stdout: allContainers } = await execAsync(`docker ps -aq --format "{{.Names}}\t{{.Status}}" --filter name="^${nameOrId}$"`).catch(async () => {
+        return await execAsync(`sudo docker ps -aq --format "{{.Names}}\t{{.Status}}" --filter name="^${nameOrId}$"`);
       });
-      return stdout.trim() ? 'running' : 'stopped';
+      
+      if (!allContainers.trim()) {
+        return 'stopped'; // Container doesn't exist
+      }
+
+      // Check if container is running
+      const { stdout: runningContainers } = await execAsync(`docker ps -q --filter name="^${nameOrId}$" --filter status=running`).catch(async () => {
+        return await execAsync(`sudo docker ps -q --filter name="^${nameOrId}$" --filter status=running`);
+      });
+      
+      if (runningContainers.trim()) {
+        return 'running';
+      }
+
+      // Check if container is in an error state
+      const { stdout: containerInfo } = await execAsync(`docker ps -a --format "{{.Status}}" --filter name="^${nameOrId}$"`).catch(async () => {
+        return await execAsync(`sudo docker ps -a --format "{{.Status}}" --filter name="^${nameOrId}$"`);
+      });
+      
+      const status = containerInfo.trim().toLowerCase();
+      if (status.includes('exited') && (status.includes('(1)') || status.includes('(125)') || status.includes('(126)') || status.includes('(127)'))) {
+        return 'error';
+      }
+      
+      return 'stopped';
     } catch (error) {
       console.error('Failed to get container status:', error);
       return 'error';
@@ -509,6 +750,455 @@ WORKDIR /home/kasm-user
       console.error('Failed to stop all containers:', error);
       return false;
     }
+  }
+
+  // Setup data container for persistent storage (Empire pattern)
+  private async setupDataContainer(config: ContainerConfig): Promise<void> {
+    if (!config.dataContainer) {
+      return;
+    }
+
+    const dataContainerName = config.dataContainer;
+    
+    try {
+      // Check if data container already exists
+      const { stdout } = await execAsync(`docker ps -aq --filter name="^${dataContainerName}$"`).catch(async () => {
+        return await execAsync(`sudo docker ps -aq --filter name="^${dataContainerName}$"`);
+      });
+      
+      if (stdout.trim()) {
+        console.log(`[DockerService] Data container ${dataContainerName} already exists`);
+        return;
+      }
+
+      // Create data container with volume
+      console.log(`[DockerService] Creating data container: ${dataContainerName}`);
+      const createCmd = `docker create -v /empire --name ${dataContainerName} ${config.image}`;
+      
+      await execAsync(createCmd).catch(async () => {
+        return await execAsync(`sudo ${createCmd}`);
+      });
+      
+      console.log(`[DockerService] Data container ${dataContainerName} created successfully`);
+      
+    } catch (error) {
+      console.error(`[DockerService] Failed to setup data container ${dataContainerName}:`, error);
+      throw error;
+    }
+  }
+
+  // New comprehensive container management methods
+  async startContainer(containerName: string): Promise<DockerContainer> {
+    const config = this.containerConfigs.get(containerName);
+    if (!config) {
+      throw new Error(`Container configuration not found for: ${containerName}`);
+    }
+
+    const dockerAvailable = await this.checkDockerAvailability();
+    if (!dockerAvailable) {
+      throw new Error('Docker is not available in this environment');
+    }
+
+    try {
+      // Preflight checks - validate volume permissions
+      console.log(`[DockerService] Running preflight checks for ${containerName}...`);
+      const preflightResult = await volumePermissionManager.preflightCheck(containerName);
+      
+      if (!preflightResult.passed) {
+        console.log(`[DockerService] Preflight checks failed for ${containerName}:`, preflightResult.issues);
+        
+        // Attempt to repair permissions
+        console.log(`[DockerService] Attempting to repair permissions for ${containerName}...`);
+        const repairSuccess = await volumePermissionManager.repairVolumePermissions(containerName);
+        
+        if (!repairSuccess) {
+          console.warn(`[DockerService] Permission repair failed for ${containerName}, proceeding with caution`);
+        }
+      }
+
+      // Start dependencies first
+      if (config.dependencies) {
+        for (const dep of config.dependencies) {
+          await this.startContainer(dep);
+          // Wait for dependency to be ready
+          await this.waitForContainer(dep);
+        }
+      }
+
+      // Clean up any conflicting containers with this name
+      await this.cleanupConflictingContainer(containerName);
+
+      // Pull the image
+      await this.pullImage(config.image);
+
+      // Build Docker command
+      const dockerCmd = await this.buildDockerCommand(config);
+
+      console.log(`Starting ${containerName} with command: ${dockerCmd.join(' ')}`);
+      
+      const { stdout } = await this.executeDockerCommandWithMonitoring(dockerCmd.join(' '), {
+        containerName: `attacknode-${containerName}`,
+        operation: 'start_container',
+        command: dockerCmd.join(' ')
+      });
+      
+      const containerId = stdout.trim();
+
+      const container: DockerContainer = {
+        id: containerId,
+        name: `attacknode-${containerName}`,
+        image: config.image,
+        port: config.port,
+        status: 'running',
+        created: new Date(),
+        category: config.category,
+        description: config.description,
+        icon: config.icon,
+        additionalPorts: config.additionalPorts,
+        dependencies: config.dependencies,
+        environment: config.environment,
+        volumes: config.volumes,
+        capabilities: config.capabilities,
+        privileged: config.privileged
+      };
+
+      this.containers.set(`attacknode-${containerName}`, container);
+      console.log(`Successfully started container: ${containerId}`);
+      return container;
+    } catch (error: any) {
+      console.error(`Failed to start ${containerName} container:`, error);
+      throw new Error(`Failed to start ${containerName} container: ${error.message}`);
+    }
+  }
+
+  private async buildDockerCommand(config: ContainerConfig): Promise<string[]> {
+    const containerName = `attacknode-${config.name}`;
+    
+    // Handle data container pattern for Empire
+    if (config.dataContainer) {
+      await this.setupDataContainer(config);
+    }
+    
+    const dockerCmd = ['docker', 'run', '-d', '--name', containerName, '--restart', 'unless-stopped'];
+    
+    // Add interactive mode flag if specified
+    if (config.interactive) {
+      dockerCmd.push('-it');
+    }
+
+    // Add host binding to 0.0.0.0 for reverse proxy compatibility
+    // Special handling for PostgreSQL and Redis port mapping
+    if (config.name === 'postgres') {
+      // PostgreSQL: External port 5433 -> Internal port 5432
+      dockerCmd.push('-p', `0.0.0.0:${config.port}:5432`);
+      console.log(`PostgreSQL port mapping: ${config.port}:5432 (external:internal)`);
+    } else if (config.name === 'redis') {
+      // Redis: External port 6380 -> Internal port 6379  
+      dockerCmd.push('-p', `0.0.0.0:${config.port}:6379`);
+      console.log(`Redis port mapping: ${config.port}:6379 (external:internal)`);
+    } else {
+      dockerCmd.push('-p', `0.0.0.0:${config.port}:${this.getContainerPort(config)}`);
+    }
+
+    // Add additional ports - special handling for Empire
+    if (config.additionalPorts) {
+      for (const port of config.additionalPorts) {
+        if (config.name === 'empire') {
+          // For Empire, direct port mapping 5000:5000
+          dockerCmd.push('-p', `0.0.0.0:${port}:5000`);
+        } else {
+          dockerCmd.push('-p', `0.0.0.0:${port}:${port}`);
+        }
+      }
+    }
+
+    // Add volumes-from for data container pattern
+    if (config.dataContainer) {
+      dockerCmd.push('--volumes-from', config.dataContainer);
+    }
+
+    // Add environment variables or env file
+    if (config.name === 'sysreptor') {
+      // Use app.env file for sysreptor
+      const envFilePath = path.join(process.cwd(), 'server/configs/sysreptor/app.env');
+      dockerCmd.push('--env-file', envFilePath);
+      console.log(`Using environment file for sysreptor: ${envFilePath}`);
+    } else if (config.environment) {
+      // Use individual environment variables for other containers
+      for (const [key, value] of Object.entries(config.environment)) {
+        dockerCmd.push('-e', `${key}=${value}`);
+      }
+    }
+
+    // Add volumes
+    if (config.volumes) {
+      for (const volume of config.volumes) {
+        // Handle relative paths and ensure directories exist
+        let volumePath = volume;
+        if (!volume.startsWith('/')) {
+          const localPath = volume.split(':')[0];
+          const fullLocalPath = path.join(process.cwd(), localPath);
+          // Create directory if it doesn't exist
+          try {
+            await fs.mkdir(fullLocalPath, { recursive: true });
+          } catch (error) {
+            console.warn(`Failed to create volume directory ${fullLocalPath}:`, error);
+          }
+          volumePath = volume.replace(localPath, fullLocalPath);
+        }
+        dockerCmd.push('-v', volumePath);
+      }
+    }
+
+    // Add capabilities
+    if (config.capabilities) {
+      for (const cap of config.capabilities) {
+        dockerCmd.push('--cap-add', cap);
+      }
+    }
+
+    // Add privileged mode
+    if (config.privileged) {
+      dockerCmd.push('--privileged');
+    }
+
+    // Add special configurations
+    if (config.image.includes('kasm')) {
+      dockerCmd.push('--shm-size=512m');
+    }
+
+    // Add custom start command or image
+    if (config.customStartCommand) {
+      dockerCmd.push(config.image, ...config.customStartCommand);
+    } else {
+      dockerCmd.push(config.image);
+    }
+
+    return dockerCmd;
+  }
+
+  private getContainerPort(config: ContainerConfig): string {
+    // Return the internal container port based on the image type
+    if (config.image.includes('kasm')) {
+      return '6901';
+    }
+    if (config.image.includes('postgres')) {
+      return '5432';
+    }
+    if (config.image.includes('redis')) {
+      return '6379';
+    }
+    if (config.image.includes('empire')) {
+      return '1337';
+    }
+    if (config.image.includes('sysreptor')) {
+      return '8000';
+    }
+    if (config.image.includes('caddy')) {
+      return '80';
+    }
+    if (config.image.includes('bbot')) {
+      return '8000';
+    }
+    
+    // Default to the configured port
+    return config.port.toString();
+  }
+
+  private async executeDockerCommandWithMonitoring(command: string, context: any = {}): Promise<{ stdout: string; stderr?: string }> {
+    try {
+      // First try the regular docker command
+      const result = await execAsync(command);
+      return result;
+    } catch (error: any) {
+      // Analyze the error with our monitoring system
+      const dockerError = dockerErrorMonitor.analyzeError(error.message || error.stderr || 'Unknown Docker error', {
+        ...context,
+        command
+      });
+
+      // If the error is auto-recoverable, the recovery engine will handle it
+      if (dockerError && dockerError.autoRecoverable) {
+        console.log(`[DockerService] Auto-recoverable error detected, recovery engine will attempt to fix it`);
+        // Wait a moment for recovery to potentially complete
+        await new Promise(resolve => setTimeout(resolve, 3000));
+      }
+
+      // Try with sudo as fallback
+      console.log(`Regular docker command failed, trying with sudo: ${error.message}`);
+      try {
+        const sudoResult = await execAsync('sudo ' + command);
+        return sudoResult;
+      } catch (sudoError: any) {
+        // Analyze the sudo error as well
+        dockerErrorMonitor.analyzeError(sudoError.message || sudoError.stderr || 'Unknown Docker error with sudo', {
+          ...context,
+          command: 'sudo ' + command,
+          originalError: error.message
+        });
+        
+        throw sudoError;
+      }
+    }
+  }
+
+  private async waitForContainer(containerName: string, maxWait: number = 60000): Promise<void> {
+    const startTime = Date.now();
+    const fullName = `attacknode-${containerName}`;
+    
+    console.log(`[DockerService] Waiting for container ${fullName} to be ready (max ${maxWait}ms)`);
+    
+    while (Date.now() - startTime < maxWait) {
+      const status = await this.getContainerStatus(fullName);
+      console.log(`[DockerService] Container ${fullName} status: ${status} (${Date.now() - startTime}ms elapsed)`);
+      
+      if (status === 'running') {
+        // Additional wait for service to be ready based on container type
+        const config = this.containerConfigs.get(containerName);
+        let serviceWait = 2000; // Default 2 seconds
+        
+        if (config?.name === 'postgres') {
+          serviceWait = 5000; // PostgreSQL needs more time
+        } else if (config?.name === 'redis') {
+          serviceWait = 3000; // Redis needs some time
+        } else if (config?.name === 'empire') {
+          serviceWait = 10000; // Empire needs longer to initialize
+        } else if (config?.name === 'sysreptor') {
+          serviceWait = 8000; // Sysreptor needs time to connect to DB
+        }
+        
+        console.log(`[DockerService] Container ${fullName} is running, waiting ${serviceWait}ms for service readiness`);
+        await new Promise(resolve => setTimeout(resolve, serviceWait));
+        
+        // Final status check to ensure container is still running
+        const finalStatus = await this.getContainerStatus(fullName);
+        if (finalStatus === 'running') {
+          console.log(`[DockerService] Container ${fullName} is ready`);
+          return;
+        } else {
+          console.log(`[DockerService] Container ${fullName} stopped during readiness check, status: ${finalStatus}`);
+        }
+      } else if (status === 'error') {
+        // Get container logs to help diagnose the issue
+        const logs = await this.getContainerLogs(containerName);
+        console.error(`[DockerService] Container ${fullName} failed to start. Logs:\n${logs}`);
+        throw new Error(`Container ${containerName} failed to start (error state). Check logs for details.`);
+      }
+      
+      await new Promise(resolve => setTimeout(resolve, 2000)); // Check every 2 seconds
+    }
+    
+    // Timeout reached - get final status and logs
+    const finalStatus = await this.getContainerStatus(fullName);
+    const logs = await this.getContainerLogs(containerName);
+    
+    console.error(`[DockerService] Container ${fullName} did not start within ${maxWait}ms. Final status: ${finalStatus}`);
+    console.error(`[DockerService] Container ${fullName} logs:\n${logs}`);
+    
+    throw new Error(`Container ${containerName} did not start within ${maxWait}ms. Final status: ${finalStatus}`);
+  }
+
+  async getAllContainerConfigs(): Promise<ContainerConfig[]> {
+    return Array.from(this.containerConfigs.values());
+  }
+
+  async getContainerConfig(name: string): Promise<ContainerConfig | undefined> {
+    return this.containerConfigs.get(name);
+  }
+
+  async getContainerLogs(containerName: string): Promise<string> {
+    try {
+      const { stdout } = await execAsync(`docker logs attacknode-${containerName} --tail 100`).catch(async () => {
+        return await execAsync(`sudo docker logs attacknode-${containerName} --tail 100`);
+      });
+      return stdout;
+    } catch (error) {
+      console.error('Failed to get container logs:', error);
+      return `Error retrieving logs: ${error instanceof Error ? error.message : 'Unknown error'}`;
+    }
+  }
+
+  async inspectContainer(containerName: string): Promise<any> {
+    try {
+      const { stdout } = await execAsync(`docker inspect attacknode-${containerName}`).catch(async () => {
+        return await execAsync(`sudo docker inspect attacknode-${containerName}`);
+      });
+      return JSON.parse(stdout)[0];
+    } catch (error) {
+      console.error('Failed to inspect container:', error);
+      return { error: `Failed to inspect container: ${error instanceof Error ? error.message : 'Unknown error'}` };
+    }
+  }
+
+  async execInContainer(containerName: string, command: string): Promise<string> {
+    try {
+      const { stdout } = await execAsync(`docker exec attacknode-${containerName} ${command}`).catch(async () => {
+        return await execAsync(`sudo docker exec attacknode-${containerName} ${command}`);
+      });
+      return stdout;
+    } catch (error) {
+      console.error('Failed to execute command in container:', error);
+      return `Error executing command: ${error instanceof Error ? error.message : 'Unknown error'}`;
+    }
+  }
+
+  async restartContainer(containerName: string): Promise<boolean> {
+    try {
+      await execAsync(`docker restart attacknode-${containerName}`).catch(async () => {
+        return await execAsync(`sudo docker restart attacknode-${containerName}`);
+      });
+      return true;
+    } catch (error) {
+      console.error('Failed to restart container:', error);
+      return false;
+    }
+  }
+
+  // Initialize essential containers on startup
+  async initializeEssentialContainers(): Promise<void> {
+    const essentialContainers = ['kali', 'vscode', 'empire', 'maltego'];
+    
+    for (const containerName of essentialContainers) {
+      try {
+        console.log(`Initializing essential container: ${containerName}`);
+        const status = await this.getContainerStatus(`attacknode-${containerName}`);
+        if (status === 'stopped') {
+          await this.startContainer(containerName);
+        }
+      } catch (error) {
+        console.error(`Failed to initialize ${containerName}:`, error);
+      }
+    }
+  }
+
+  // Graceful shutdown of all containers
+  async gracefulShutdown(): Promise<void> {
+    console.log('Shutting down all containers gracefully...');
+    
+    // Stop containers in reverse dependency order
+    const configs = Array.from(this.containerConfigs.values());
+    const dependents = configs.filter(c => c.dependencies && c.dependencies.length > 0);
+    const independents = configs.filter(c => !c.dependencies || c.dependencies.length === 0);
+    
+    // Stop dependent containers first
+    for (const config of dependents) {
+      try {
+        await this.stopContainer(`attacknode-${config.name}`);
+      } catch (error) {
+        console.error(`Failed to stop ${config.name}:`, error);
+      }
+    }
+    
+    // Then stop independent containers
+    for (const config of independents) {
+      try {
+        await this.stopContainer(`attacknode-${config.name}`);
+      } catch (error) {
+        console.error(`Failed to stop ${config.name}:`, error);
+      }
+    }
+    
+    console.log('Container shutdown complete');
   }
 }
 

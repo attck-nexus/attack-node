@@ -13,7 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { insertOperationSchema, type Operation } from "@shared/schema";
+import { insertProgramSchema, type Operation, type Program } from "@shared/schema";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -22,17 +22,13 @@ import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 
 // Enhanced form schema with all new fields
-const formSchema = insertOperationSchema.extend({
-  priority: z.string().optional(),
-  tags: z.array(z.string()).optional(),
+const formSchema = insertProgramSchema.extend({
+  platform: z.string().optional(),
+  url: z.string().optional(),
   rules: z.string().optional(),
   outOfScope: z.array(z.string()).optional(),
-  vulnerabilityTypes: z.array(z.string()).optional(),
-  contactEmail: z.string().email().optional().or(z.literal("")),
-  contactName: z.string().optional(),
-  startDate: z.date().optional(),
-  endDate: z.date().optional(),
-  notes: z.string().optional(),
+  minReward: z.string().optional(),
+  maxReward: z.string().optional(),
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -727,7 +723,7 @@ export default function ProgramFormEnhanced({ program, onSuccess, onCancel }: Pr
                     </div>
                     <div>
                       <p className="text-sm text-gray-400">Status</p>
-                      <Badge variant={form.watch("status") === "active" ? "success" : "secondary"}>
+                      <Badge variant={form.watch("status") === "active" ? "default" : "secondary"}>
                         {form.watch("status")}
                       </Badge>
                     </div>

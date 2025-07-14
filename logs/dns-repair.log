@@ -1,0 +1,38 @@
+[2025-07-14 16:38:50] [REPAIR] Starting automatic DNS repair...
+[2025-07-14 16:38:50] [DNS] Testing DNS resolution...
+[2025-07-14 16:38:50] [DNS] Testing DNS server: 8.8.8.8
+[2025-07-14 16:38:50] [ERROR] DNS server 8.8.8.8 failed
+[2025-07-14 16:38:50] [DNS] Testing DNS server: 8.8.4.4
+[2025-07-14 16:38:50] [ERROR] DNS server 8.8.4.4 failed
+[2025-07-14 16:38:50] [DNS] Testing DNS server: 1.1.1.1
+[2025-07-14 16:38:50] [ERROR] DNS server 1.1.1.1 failed
+[2025-07-14 16:38:50] [DNS] Testing DNS server: 1.0.0.1
+[2025-07-14 16:38:50] [ERROR] DNS server 1.0.0.1 failed
+[2025-07-14 16:38:50] [DNS] Testing DNS server: 9.9.9.9
+[2025-07-14 16:38:50] [ERROR] DNS server 9.9.9.9 failed
+[2025-07-14 16:38:50] [DNS] Testing DNS server: 149.112.112.112
+[2025-07-14 16:38:50] [ERROR] DNS server 149.112.112.112 failed
+[2025-07-14 16:38:50] [DNS] Testing DNS server: 208.67.222.222
+[2025-07-14 16:38:50] [ERROR] DNS server 208.67.222.222 failed
+[2025-07-14 16:38:50] [DNS] Testing DNS server: 208.67.220.220
+[2025-07-14 16:38:50] [ERROR] DNS server 208.67.220.220 failed
+[2025-07-14 16:38:50] [ERROR] No working DNS servers found
+[2025-07-14 16:38:50] [REPAIR] Starting progressive DNS repair...
+[2025-07-14 16:38:50] [REPAIR] Attempting repair_dns_level1...
+[2025-07-14 16:38:50] [REPAIR] Starting Level 1 DNS repair...
+[2025-07-14 16:38:50] [REPAIR] Backing up resolv.conf to /etc/resolv.conf.backup.1752529130
+[2025-07-14 16:38:56] [REPAIR] Detected systemd-resolved, attempting specific repair...
+[2025-07-14 16:38:56] [REPAIR] Starting systemd-resolved specific repair...
+[2025-07-14 16:38:56] [REPAIR] Configuring systemd-resolved with upstream DNS servers...
+[2025-07-14 16:38:56] [REPAIR] Restarting systemd-resolved service...
+[2025-07-14 16:39:01] [SUCCESS] systemd-resolved service is active
+[2025-07-14 16:39:01] [SUCCESS] systemd-resolved DNS resolution working
+[2025-07-14 16:39:01] [SUCCESS] DNS repair successful with repair_dns_level1
+[2025-07-14 16:39:01] [DNS] Verifying DNS functionality...
+[2025-07-14 16:39:01] [ERROR] DNS resolution failed for google.com
+[2025-07-14 16:39:01] [ERROR] DNS resolution failed for cloudflare.com
+[2025-07-14 16:39:01] [ERROR] DNS resolution failed for github.com
+[2025-07-14 16:39:01] [ERROR] DNS resolution failed for docker.io
+[2025-07-14 16:39:01] [ERROR] DNS resolution failed for registry-1.docker.io
+[2025-07-14 16:39:01] [DNS] DNS success rate: 0% (0/5)
+[2025-07-14 16:39:01] [ERROR] DNS functionality verification failed

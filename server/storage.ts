@@ -437,7 +437,7 @@ export class DatabaseStorage implements IStorage {
         count: count(),
       })
       .from(systems)
-      .where(systems.accessLevel !== null)
+      .where(eq(systems.accessLevel, systems.accessLevel))
       .groupBy(systems.accessLevel);
 
     return {

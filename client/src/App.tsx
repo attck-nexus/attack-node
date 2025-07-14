@@ -13,6 +13,7 @@ import AiAgents from "@/pages/ai-agents";
 import KaliEnvironment from "@/pages/kali-environment";
 import BurpSuite from "@/pages/burp-suite";
 import Integrations from "@/pages/integrations";
+import ContainerManagement from "@/pages/container-management";
 import FileManager from "@/pages/file-manager";
 import Certificates from "@/pages/certificates";
 import Settings from "@/pages/settings";
@@ -44,9 +45,10 @@ function Router() {
           <Route path="/vulnerabilities" component={Vulnerabilities} />
           <Route path="/analytics" component={Analytics} />
           <Route path="/ai-agents" component={AiAgents} />
-          <Route path="/kali" component={KaliEnvironment} />
+          <Route path="/kali-environment" component={KaliEnvironment} />
           <Route path="/burp" component={BurpSuite} />
           <Route path="/integrations" component={Integrations} />
+          <Route path="/containers" component={ContainerManagement} />
           <Route path="/file-manager" component={FileManager} />
           <Route path="/certificates" component={Certificates} />
           <Route path="/settings" component={Settings} />

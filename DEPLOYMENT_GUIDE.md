@@ -212,14 +212,14 @@ sudo usermod -aG docker $USER
 ### 2. Install Docker Compose
 
 ```bash
-sudo apt install -y docker-compose
+sudo apt install -y docker-compose-plugin
 ```
 
 ### 3. Verify Docker Installation
 
 ```bash
 docker --version
-docker-compose --version
+docker compose version
 ```
 
 ### 4. Docker Integration Features

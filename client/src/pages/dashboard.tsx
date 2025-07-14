@@ -29,9 +29,21 @@ export default function Dashboard() {
     queryKey: ["/api/ai-agents"],
   });
 
+  // Add container queries
+  const { data: containers = [], isLoading: containersLoading } = useQuery({
+    queryKey: ["/api/docker/containers"],
+    refetchInterval: 5000 // Refresh every 5 seconds
+  });
+
+  const { data: containerConfigs = [], isLoading: configsLoading } = useQuery({
+    queryKey: ["/api/docker/configs"],
+  });
+
   const recentBeacons = Array.isArray(beacons) ? beacons.slice(0, 3) : [];
   const activeOperations = Array.isArray(operations) ? operations.filter((p: any) => p.status === 'active').slice(0, 3) : [];
   const agentsList = Array.isArray(aiAgents) ? aiAgents.slice(0, 3) : [];
+  const containersList = Array.isArray(containers) ? containers : [];
+  const configsList = Array.isArray(containerConfigs) ? containerConfigs : [];
 
   // Load notifications from API
   const { data: notifications = [] } = useQuery({
@@ -324,45 +336,120 @@ export default function Dashboard() {
             <CardHeader>
               <div className="flex items-center justify-between">
                 <CardTitle className="text-lg font-semibold text-gray-100">
-                  Docker Environment
+                  Container Environment
                 </CardTitle>
                 <Button variant="link" className="text-primary hover:text-primary/80 p-0">
-                  Manage
+                  Manage All
                 </Button>
               </div>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
+                {/* Running Containers Summary */}
                 <div className="bg-card rounded-lg p-4">
-                  <div className="text-center py-8 text-gray-400">
-                    No containers running. Start a Docker environment to see status here.
+                  <div className="flex items-center justify-between mb-3">
+                    <h4 className="font-medium text-gray-100">Status Overview</h4>
+                    <Badge className={containersList.filter((c: any) => c.status === 'running').length > 0 ? "bg-success/10 text-success" : "bg-gray-500/10 text-gray-500"}>
+                      {containersList.filter((c: any) => c.status === 'running').length} Running
+                    </Badge>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div>
+                      <span className="text-gray-400">Total Containers:</span>
+                      <span className="text-gray-100 ml-2">{configsList.length}</span>
+                    </div>
+                    <div>
+                      <span className="text-gray-400">Stopped:</span>
+                      <span className="text-gray-100 ml-2">{containersList.filter((c: any) => c.status === 'stopped').length}</span>
+                    </div>
                   </div>
                 </div>
 
-                <div className="bg-card rounded-lg p-4">
-                  <h4 className="font-medium text-gray-100 mb-2">Available Environments</h4>
+                {/* Container Categories */}
+                <div className="space-y-3">
+                  <h4 className="font-medium text-gray-100">Security Tools</h4>
                   <div className="space-y-2">
-                    <button 
-                      className="w-full text-left text-sm text-gray-300 hover:text-gray-100 py-1"
+                    {configsList.filter((config: any) => config.category === 'security').map((config: any) => {
+                      const container = containersList.find((c: any) => c.name === `attacknode-${config.name}`);
+                      const isRunning = container?.status === 'running';
+                      
+                      return (
+                        <div key={config.name} className="flex items-center justify-between p-2 bg-card rounded">
+                          <div className="flex items-center">
+                            <div className={`w-2 h-2 rounded-full mr-3 ${
+                              isRunning ? 'bg-success' : 'bg-gray-500'
+                            }`} />
+                            <span className="text-sm text-gray-300">{config.description}</span>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <Badge variant="outline" className="text-xs">
+                              :{config.port}
+                            </Badge>
+                            {isRunning && (
+                              <Button
+                                size="sm"
+                                className="h-6 text-xs bg-primary hover:bg-primary/90"
+                                onClick={() => {
+                                  if (config.name === 'kali') {
+                                    window.location.href = '/kali-environment';
+                                  } else if (config.name === 'vscode') {
+                                    window.open(`http://localhost:${config.port}`, '_blank');
+                                  } else {
+                                    window.open(`http://localhost:${config.port}`, '_blank');
+                                  }
+                                }}
+                              >
+                                <ExternalLink className="h-3 w-3" />
+                              </Button>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                  
+                  <h4 className="font-medium text-gray-100 mt-4">Infrastructure</h4>
+                  <div className="space-y-2">
+                    {configsList.filter((config: any) => config.category === 'infrastructure').map((config: any) => {
+                      const container = containersList.find((c: any) => c.name === `attacknode-${config.name}`);
+                      const isRunning = container?.status === 'running';
+                      
+                      return (
+                        <div key={config.name} className="flex items-center justify-between p-2 bg-card rounded">
+                          <div className="flex items-center">
+                            <div className={`w-2 h-2 rounded-full mr-3 ${
+                              isRunning ? 'bg-success' : 'bg-gray-500'
+                            }`} />
+                            <span className="text-sm text-gray-300">{config.description}</span>
+                          </div>
+                          <Badge variant="outline" className="text-xs">
+                            :{config.port}
+                          </Badge>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Quick Actions */}
+                <div className="pt-3 border-t border-gray-700">
+                  <div className="grid grid-cols-2 gap-2">
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="border-gray-600 text-gray-300"
                       onClick={() => window.location.href = '/kali-environment'}
                     >
-                      <span className="mr-2">🐉</span>
-                      Kali Linux Desktop
-                    </button>
-                    <button 
-                      className="w-full text-left text-sm text-gray-300 hover:text-gray-100 py-1"
-                      onClick={() => window.location.href = '/burp-suite'}
+                      Kali Desktop
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="border-gray-600 text-gray-300"
+                      onClick={() => window.location.href = '/containers'}
                     >
-                      <span className="mr-2">🛡️</span>
-                      Burp Suite Professional
-                    </button>
-                    <button 
-                      className="w-full text-left text-sm text-gray-300 hover:text-gray-100 py-1"
-                      onClick={() => window.location.href = '/integrations'}
-                    >
-                      <span className="mr-2">🔧</span>
-                      Manage Integrations
-                    </button>
+                      Manage All
+                    </Button>
                   </div>
                 </div>
               </div>

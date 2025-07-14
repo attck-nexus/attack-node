@@ -178,6 +178,65 @@ export const globalConfig = pgTable("global_config", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
+// Programs table (for Bug Bounty programs)
+export const programs = pgTable("programs", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  type: text("type").notNull(), // bug-bounty, private, internal
+  platform: text("platform"), // hackerone, bugcrowd, synack, etc.
+  url: text("url"),
+  description: text("description"),
+  status: text("status").notNull().default("active"), // active, inactive, paused
+  codename: text("codename"),
+  priority: text("priority").default("medium"), // low, medium, high, critical
+  tags: json("tags").$type<string[]>().default([]),
+  scope: json("scope").$type<string[]>().default([]),
+  objectives: json("objectives").$type<string[]>().default([]),
+  rulesOfEngagement: text("rules_of_engagement"),
+  clientContact: text("client_contact"),
+  teamLead: text("team_lead"),
+  startDate: timestamp("start_date"),
+  endDate: timestamp("end_date"),
+  minReward: integer("min_reward"),
+  maxReward: integer("max_reward"),
+  vulnerabilityTypes: json("vulnerability_types").$type<string[]>().default([]),
+  notes: text("notes"),
+  contactEmail: text("contact_email"),
+  contactName: text("contact_name"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+// Vulnerabilities table
+export const vulnerabilities = pgTable("vulnerabilities", {
+  id: serial("id").primaryKey(),
+  programId: integer("program_id").references(() => programs.id),
+  operationId: integer("operation_id").references(() => operations.id).notNull(),
+  beaconId: text("beacon_id").notNull(),
+  type: text("type").notNull(), // xss, sqli, rce, etc.
+  title: text("title").notNull(),
+  description: text("description"),
+  severity: text("severity").notNull(), // P1, P2, P3, P4
+  status: text("status").notNull().default("new"), // new, triaged, resolved
+  proofOfConcept: text("proof_of_concept"),
+  recommendations: text("recommendations"),
+  cvssScore: decimal("cvss_score"),
+  reward: integer("reward"),
+  metadata: json("metadata").$type<Record<string, any>>().default({}),
+  integrity: text("integrity"),
+  username: text("username"),
+  hostname: text("hostname"),
+  systemId: integer("system_id").references(() => systems.id),
+  pid: integer("pid"),
+  architecture: text("architecture"),
+  lastCheckin: timestamp("last_checkin"),
+  sleepTime: integer("sleep_time"),
+  jitter: integer("jitter"),
+  attachments: json("attachments").$type<File[]>().default([]),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
 // Relations
 // Relations for Red Team entities
 export const operationsRelations = relations(operations, ({ many }) => ({
@@ -245,6 +304,25 @@ export const aiAgentsRelations = relations(aiAgents, ({ one }) => ({
   }),
 }));
 
+export const programsRelations = relations(programs, ({ many }) => ({
+  vulnerabilities: many(vulnerabilities),
+}));
+
+export const vulnerabilitiesRelations = relations(vulnerabilities, ({ one }) => ({
+  program: one(programs, {
+    fields: [vulnerabilities.programId],
+    references: [programs.id],
+  }),
+  operation: one(operations, {
+    fields: [vulnerabilities.operationId],
+    references: [operations.id],
+  }),
+  system: one(systems, {
+    fields: [vulnerabilities.systemId],
+    references: [systems.id],
+  }),
+}));
+
 // Insert schemas
 // Insert schemas
 export const insertUserSchema = createInsertSchema(users).omit({ createdAt: true, updatedAt: true });
@@ -258,6 +336,8 @@ export const insertAiAgentSchema = createInsertSchema(aiAgents).omit({ id: true,
 export const insertReportSchema = createInsertSchema(reports).omit({ id: true, createdAt: true });
 export const insertClientCertificateSchema = createInsertSchema(clientCertificates).omit({ id: true, createdAt: true, updatedAt: true });
 export const insertGlobalConfigSchema = createInsertSchema(globalConfig).omit({ id: true, createdAt: true, updatedAt: true });
+export const insertProgramSchema = createInsertSchema(programs).omit({ id: true, createdAt: true, updatedAt: true });
+export const insertVulnerabilitySchema = createInsertSchema(vulnerabilities).omit({ id: true, createdAt: true, updatedAt: true });
 
 // Types
 export type InsertUser = z.infer<typeof insertUserSchema>;
@@ -281,3 +361,7 @@ export type InsertClientCertificate = z.infer<typeof insertClientCertificateSche
 export type ClientCertificate = typeof clientCertificates.$inferSelect;
 export type InsertGlobalConfig = z.infer<typeof insertGlobalConfigSchema>;
 export type GlobalConfig = typeof globalConfig.$inferSelect;
+export type InsertProgram = z.infer<typeof insertProgramSchema>;
+export type Program = typeof programs.$inferSelect;
+export type InsertVulnerability = z.infer<typeof insertVulnerabilitySchema>;
+export type Vulnerability = typeof vulnerabilities.$inferSelect;

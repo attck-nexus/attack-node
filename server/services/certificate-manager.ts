@@ -83,7 +83,7 @@ export class CertificateManagerService {
         fingerprint: crypto.createHash('sha256').update(certificateBuffer).digest('hex'),
       };
     } catch (error) {
-      throw new Error('Failed to parse certificate: ' + error.message);
+      throw new Error('Failed to parse certificate: ' + (error instanceof Error ? error.message : String(error)));
     }
   }
 
@@ -144,7 +144,7 @@ export class CertificateManagerService {
       const content = await fs.readFile(filePath, 'utf-8');
       return content;
     } catch (error) {
-      throw new Error(`Failed to read certificate file: ${error.message}`);
+      throw new Error(`Failed to read certificate file: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
 
